@@ -7,5 +7,6 @@ const SOURCES = {
     hilsenrath: {reference: "Tables of Thermal Properties of Gases, U.S. Department of Commerce, 1955", url: "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular564.pdf"},
     copper: {reference: "Copper Tube Handbook, Copper Development Association Inc., ", url: "https://www.copper.org/publications/pub_list/pdf/copper_tube_handbook.pdf"},
     pipingHandbook: {reference: 'Nayyar, Mohinder L. (2000). "A1". In Nayyar, Mohinder L. (ed.). Piping Handbook (7th ed.). New York: McGraw-Hill. ISBN 0-07-047106-1.', url: "https://engineeringdocu.files.wordpress.com/2011/12/piping-handbook.pdf"},
+    nist: {reference: "National Institute of Standards and Technology - U.S. Department of Commerce", url: "https://webbook.nist.gov/chemistry/"},
   };
   
