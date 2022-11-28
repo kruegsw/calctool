@@ -1,0 +1,11 @@
+const SOURCES = {
+    crane: {reference: "Flow of Fluids, Technical Paper No. 410 (Crane Co., 1988)"},
+    crc: {reference: "CRC Handbook of Chemistry and Physics, 95th Edition", url: "https://edisciplinas.usp.br/pluginfile.php/4557662/mod_resource/content/1/CRC%20Handbook%20of%20Chemistry%20and%20Physics%2095th%20Edition.pdf"},
+    fmwhite: {reference: "F.M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, 2006.", url: "http://paginapessoal.utfpr.edu.br/fandrade/teaching/files/Viscous_Fluid_Flow_3rd_White.pdf"},
+    moody: {reference: "Friction Factors for Pipe Flow (L. F. Moody, 1944)", url: "http://www.ipt.ntnu.no/~asheim/TPG4135/Moody.pdf \"Friction Factors for Pipe Flow (L. F. Moody, 1944)\""},
+    poling: {reference: "The Properties of Gases and Liquids, 5th ed. McGraw-Hill, 2001", url: "https://www.eng.uc.edu/~beaucag/Classes/ChEThermoBeaucage/Books/Bruce%20E.%20Poling,%20John%20M.%20Prausnitz,%20John%20P.%20O'Connell%20-%20The%20properties%20of%20gases%20and%20liquids-McGraw-Hill%20Professional%20(2000).pdf"},
+    hilsenrath: {reference: "Tables of Thermal Properties of Gases, U.S. Department of Commerce, 1955", url: "https://nvlpubs.nist.gov/nistpubs/Legacy/circ/nbscircular564.pdf"},
+    copper: {reference: "Copper Tube Handbook, Copper Development Association Inc., ", url: "https://www.copper.org/publications/pub_list/pdf/copper_tube_handbook.pdf"},
+    pipingHandbook: {reference: 'Nayyar, Mohinder L. (2000). "A1". In Nayyar, Mohinder L. (ed.). Piping Handbook (7th ed.). New York: McGraw-Hill. ISBN 0-07-047106-1.', url: "https://engineeringdocu.files.wordpress.com/2011/12/piping-handbook.pdf"},
+  };
+  

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>-->
+
+    <script src="./scripts/classCalc.js"></script>
+    <script src="./scripts/buildHTML.js"></script>
+    <script src="./scripts/chemicals.js"></script>
+    <script src="./scripts/data.js"></script>
+    <script src="./scripts/units.js"></script>
+    <script src="./scripts/sources.js"></script>
+    <script src="./scripts/pipe.js"></script>
+
+    <script src="./scripts/flow-model-template.js"></script>
+    <script src="./scripts/chemical-property-name.js"></script>
+    <script src="./scripts/chemical-property-cas.js"></script>
+    <script src="./scripts/chemical-property-molecular-weight.js"></script>
+    <script src="./scripts/chemical-property-critical-pressure.js"></script>
+    <script src="./scripts/chemical-property-critical-temperature.js"></script>
+    <script src="./scripts/chemical-property-normal-boiling-temperature.js"></script>
+    <script src="./scripts/chemical-condition-temperature.js"></script>
+    <script src="./scripts/chemical-condition-pressure.js"></script>
+    <script src="./scripts/chemical-condition-phase.js"></script>
+    <script src="./scripts/chemical-condition-vapor-pressure.js"></script>
+    <script src="./scripts/chemical-condition-saturation-pressure.js"></script>
+    <script src="./scripts/chemical-condition-density.js"></script>
+    <script src="./scripts/chemical-condition-viscosity.js"></script>
+    <script src="./scripts/chemical-condition-cp.js"></script>
+    <script src="./scripts/chemical-condition-cv.js"></script>
+    <script src="./scripts/chemical-condition-cp-cv-ratio.js"></script>
+    <script src="./scripts/chemical-condition-sonic-velocity.js"></script>
+    <script src="./scripts/chemical-condition-static-pressure-out-in-ratio-for-sonic-velocity.js"></script>
+    <script src="./scripts/system-property-pipe-material.js"></script>
+    <script src="./scripts/system-property-pipe-standard.js"></script>
+    <script src="./scripts/system-property-pipe-nominal-diameter.js"></script>
+    <script src="./scripts/system-property-pipe-schedule.js"></script>
+    <script src="./scripts/system-property-pipe-absolute-roughness.js"></script>
+    <script src="./scripts/system-property-pipe-modulus-elasticity.js"></script>
+    <script src="./scripts/system-property-pipe-inner-diameter.js"></script>
+    <script src="./scripts/system-property-pipe-hydraulic-radius.js"></script>
+    <script src="./scripts/system-property-pipe-cross-sectional-area.js"></script>
+    <script src="./scripts/system-property-pipe-length.js"></script>
+    <script src="./scripts/system-condition-flow-mass-rate.js"></script>
+    <script src="./scripts/system-condition-flow-volume-rate.js"></script>
+    <script src="./scripts/system-condition-reynolds.js"></script>
+    <script src="./scripts/system-condition-friction-factor.js"></script>
+    <script src="./scripts/system-condition-velocity.js"></script>
+    <script src="./scripts/system-condition-pressure-drop-pipe.js"></script>
+    <script>
+        //let tableArray = ["systemConditionFlowMassRate", "systemPropertyPipeInnerDiameter", "chemicalConditionViscosity", "systemConditionReynolds"];
+        let flow1 = new Flow("flow1");
+    </script>
+    <link rel="stylesheet" href="./styles/basicTable.css">
+    <title>My test page</title>
+  </head>
+  <body onload="createAndInsertFlowTable(flow1, 'flowTable', ['label', 'user', 'units', 'method']), flow1.updateHTML(); flow1.eventHandler()"> <!-- insert empty input table after page load -->
+
+    <h1>Test Page</h1>
+    <span id="flowTable"></span> <!-- empty input table will be loaded here -->
+
+
+
+  </body>
+</html>
