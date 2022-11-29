@@ -11,9 +11,10 @@ class Flow {
         this.chemicalPropertyName = new ChemicalPropertyName (this, "Chemical", "air", "", "");
         this.chemicalPropertyCAS = new ChemicalPropertyCAS (this, "CAS Number", "", "", "lookup");
         this.chemicalPropertyMolecularWeight = new ChemicalPropertyMolecularWeight (this, "Molecular Weight", "", "", "lookup");
-        this.chemicalPropertyCriticalPressure = new ChemicalPropertyCriticalPressure (this, "Critical Pressure", "", "psig", "");
-        this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "celsius", "");
-        this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "celsius", "");
+        this.chemicalPropertyCriticalPressure = new ChemicalPropertyCriticalPressure (this, "Critical Pressure", "", "psia", "lookup");
+        this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "kelvin", "lookup");
+        this.chemicalPropertyCriticalMolarVolume = new ChemicalPropertyCriticalMolarVolume (this, "Critical Molar Volume", "", "cm3/mol", "lookup");
+        this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "celsius", "lookup");
         this.chemicalConditionTemperature = new ChemicalConditionTemperature (this, "Temperature", "", "celsius", "");
         this.chemicalConditionPressure = new ChemicalConditionPressure (this, "Pressure", "", "psig", "");
         this.chemicalConditionPhase = new ChemicalConditionPhase (this, "Phase", "", "", "");

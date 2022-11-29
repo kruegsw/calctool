@@ -5,6 +5,16 @@ class ChemicalPropertyNormalBoilingTemperature extends FlowModelTemplate {
 
         this.units.quantity = "temperature";
 
-        this.methods = {};
+        this.methods = {
+            lookup: {
+                label: "",
+                input: ["chemicalPropertyName"],
+                source: "",
+                get calculation() {
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    return parent.convertToLocalUnits("chemicalPropertyNormalBoilingTemperature", chemicalDataObject.normalBoilingTemperature.value, "celsius");
+                },
+            }
+        };
     }
 }

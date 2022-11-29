@@ -90,8 +90,14 @@ const UNITS = {
         units0Half: {name: "unitsHalf", symbol: "", factor: 0.5},
     },
 
+    molarVolume: {
+        "m3/mol": {name: "cubic meters per mole", symbol: "m3/mol", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "cm3/mol": {name: "cubic centimeters per mole", symbol: "cm3/mol", convertToBaseUnits: (oldValue) => +oldValue / 1000000, convertFromBaseUnits: (baseValue) => +baseValue * 1000000},
+    },
+
     pressure: {
         "Pa absolute": {name: "pascal", symbol: "Pa", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "MPa absolute": {name: "megapascal", symbol: "MPa", convertToBaseUnits: (oldValue) => +oldValue * 1000000, convertFromBaseUnits: (baseValue) => +baseValue / 1000000},
         "psia": {name: "pounds per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293, convertFromBaseUnits: (baseValue) => +baseValue / 6894.757293},
         "psig": {name: "pounds per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => ( +oldValue * 6894.757293 ) + 101325, convertFromBaseUnits: (baseValue) => ( +baseValue / 6894.757293 ) - 101325},
         "bar absolute": {name: "bar", symbol: "bar", convertToBaseUnits: (oldValue) => +oldValue * 100000, convertFromBaseUnits: (baseValue) => +baseValue / 100000},

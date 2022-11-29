@@ -1,9 +1,9 @@
-class ChemicalPropertyCriticalTemperature extends FlowModelTemplate {
+class ChemicalPropertyCriticalMolarVolume extends FlowModelTemplate {
     constructor(parent, label, user, unitsValue, method,)
     {
-        super(parent, label, user, unitsValue, method, "chemicalPropertyCriticalTemperature");
+        super(parent, label, user, unitsValue, method, "chemicalPropertyCriticalMolarVolume");
 
-        this.units.quantity = "temperature";
+        this.units.quantity = "molarVolume";
 
         this.methods = {
             lookup: {
@@ -12,7 +12,7 @@ class ChemicalPropertyCriticalTemperature extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    return parent.convertToLocalUnits("chemicalPropertyCriticalTemperature", chemicalDataObject.criticalTemperature.value, "kelvin");
+                    return parent.convertToLocalUnits("chemicalPropertyCriticalMolarVolume", chemicalDataObject.criticalMolarVolume.value, "cm3/mol");
                 },
             }
         };
