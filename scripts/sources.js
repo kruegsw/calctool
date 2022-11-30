@@ -8,5 +8,6 @@ const SOURCES = {
     copper: {reference: "Copper Tube Handbook, Copper Development Association Inc., ", url: "https://www.copper.org/publications/pub_list/pdf/copper_tube_handbook.pdf"},
     pipingHandbook: {reference: 'Nayyar, Mohinder L. (2000). "A1". In Nayyar, Mohinder L. (ed.). Piping Handbook (7th ed.). New York: McGraw-Hill. ISBN 0-07-047106-1.', url: "https://engineeringdocu.files.wordpress.com/2011/12/piping-handbook.pdf"},
     nist: {reference: "National Institute of Standards and Technology - U.S. Department of Commerce", url: "https://webbook.nist.gov/chemistry/"},
+    perry: {reference: "Perry, R.H., Green, D.W. and Southard, M.Z. (2018) Perry's Chemical Engineers' Handbook. 9th Edition, McGraw-Hill Education, New York, 2272.", url: ""},
   };
   

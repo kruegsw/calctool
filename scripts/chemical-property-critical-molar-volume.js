@@ -12,7 +12,7 @@ class ChemicalPropertyCriticalMolarVolume extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    return parent.convertToLocalUnits("chemicalPropertyCriticalMolarVolume", chemicalDataObject.criticalMolarVolume.value, "cm3/mol");
+                    return parent.convertToLocalUnits("chemicalPropertyCriticalMolarVolume", chemicalDataObject.criticalMolarVolume.value, "m3/kmol");
                 },
             }
         };

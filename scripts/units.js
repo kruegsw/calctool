@@ -92,7 +92,9 @@ const UNITS = {
 
     molarVolume: {
         "m3/mol": {name: "cubic meters per mole", symbol: "m3/mol", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "m3/kmol": {name: "cubic meters per kmole", symbol: "m3/kmol", convertToBaseUnits: (oldValue) => +oldValue / 1000, convertFromBaseUnits: (baseValue) => +baseValue * 1000},
         "cm3/mol": {name: "cubic centimeters per mole", symbol: "cm3/mol", convertToBaseUnits: (oldValue) => +oldValue / 1000000, convertFromBaseUnits: (baseValue) => +baseValue * 1000000},
+    
     },
 
     pressure: {

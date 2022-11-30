@@ -1,9 +1,9 @@
-class ChemicalPropertyNormalBoilingTemperature extends FlowModelTemplate {
+class ChemicalPropertyAcentricFactor extends FlowModelTemplate {
     constructor(parent, label, user, unitsValue, method,)
     {
-        super(parent, label, user, unitsValue, method, "chemicalPropertyNormalBoilingTemperature");
+        super(parent, label, user, unitsValue, method, "chemicalPropertyAcentricFactor");
 
-        this.units.quantity = "temperature";
+        this.units.quantity = "";
 
         this.methods = {
             lookup: {
@@ -12,7 +12,7 @@ class ChemicalPropertyNormalBoilingTemperature extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    return parent.convertToLocalUnits("chemicalPropertyNormalBoilingTemperature", chemicalDataObject.normalBoilingTemperature.value, "kelvin");
+                    return chemicalDataObject.acentricFactor.value;
                 },
             }
         };

@@ -14,6 +14,8 @@ class Flow {
         this.chemicalPropertyCriticalPressure = new ChemicalPropertyCriticalPressure (this, "Critical Pressure", "", "psia", "lookup");
         this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "kelvin", "lookup");
         this.chemicalPropertyCriticalMolarVolume = new ChemicalPropertyCriticalMolarVolume (this, "Critical Molar Volume", "", "cm3/mol", "lookup");
+        this.chemicalPropertyCriticalCompressibilityFactor = new ChemicalPropertyCriticalCompressibilityFactor (this, "Critical Compressibility Factor (Zc)", "", "", "lookup");
+        this.chemicalPropertyAcentricFactor = new ChemicalPropertyAcentricFactor (this, "Acentric Factor", "", "", "lookup");
         this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "celsius", "lookup");
         this.chemicalConditionTemperature = new ChemicalConditionTemperature (this, "Temperature", "", "celsius", "");
         this.chemicalConditionPressure = new ChemicalConditionPressure (this, "Pressure", "", "psig", "");
