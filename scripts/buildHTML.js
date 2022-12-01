@@ -1,4 +1,5 @@
-function convertArrayToOptionsHTML(dropDownArray, valueAttr) {
+function convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArray) {
+    let htmlTextArray = optionalHtmlTextArray ? optionalHtmlTextArray : [...dropDownArray];
     let dropDownListHTML = "";
     for (let i = 0; i < dropDownArray.length; i++) {
 
@@ -6,9 +7,10 @@ function convertArrayToOptionsHTML(dropDownArray, valueAttr) {
 
         let insertedSelectedIfSelected = dropDownArray[i] === valueAttr ? " selected" : ""; 
 
-        dropDownListHTML += "<option value=\"" + dropDownArray[i] + "\"" + insertedSelectedIfSelected + ">" + dropDownArray[i] + "</option>";
+        dropDownListHTML += "<option value=\"" + dropDownArray[i] + "\"" + insertedSelectedIfSelected + ">" + htmlTextArray[i] + "</option>";
 
     }
+    console.log(dropDownListHTML);
     return dropDownListHTML;
 }
 
@@ -162,7 +164,7 @@ function buildInputTextHTML(typeAttr, idAttr, nameAttr, valueAttr) {
     return htmlInputText;
 }
 
-function buildSelectHTML(idAttr, nameAttr, valueAttr, dropDownArray) {
+function buildSelectHTML(idAttr, nameAttr, valueAttr, dropDownArray, optionalHtmlTextArray) {
 
     /*
     console.log("typeAttr = ");
@@ -181,7 +183,7 @@ function buildSelectHTML(idAttr, nameAttr, valueAttr, dropDownArray) {
 
     //populateDropList(PROPERTIES.map((element, index, array) => {return element.searchTerm}), idAttr);
 
-    let dropDownListHTML = convertArrayToOptionsHTML(dropDownArray, valueAttr);
+    let dropDownListHTML = convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArray);
 
     let htmlSelectList = "<select"+
     " id=\"" + idAttr +
@@ -192,12 +194,12 @@ function buildSelectHTML(idAttr, nameAttr, valueAttr, dropDownArray) {
     return htmlSelectList;
 }
 
-function buildInputDataListHTML(typeAttr, dataListID, idAttr, nameAttr, valueAttr, dropDownArray) {
+function buildInputDataListHTML(typeAttr, dataListID, idAttr, nameAttr, valueAttr, dropDownArray, optionalHtmlTextArray) {
 
     //populateDropList(PROPERTIES.map((element, index, array) => {return element.searchTerm}), idAttr);
     //console.log(dropDownArray);
 
-    let dropDownListHTML = convertArrayToOptionsHTML(dropDownArray, valueAttr);
+    let dropDownListHTML = convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArray);
 
     let htmlInputText = "<input type=\"" + typeAttr +
         "\" list=\"" + dataListID +

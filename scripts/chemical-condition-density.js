@@ -12,7 +12,7 @@ class ChemicalConditionDensity extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    let temperature = parent.convertSpecifyUnits("chemicalConditionTemperature", "rankine");
+                    let temperature = parent.convertSpecifyUnits("chemicalConditionTemperature", "R");
                     let pressure = parent.convertSpecifyUnits("chemicalConditionPressure", "psia");
                     let gasConstant = 10.731; // ft3 * psia / lbmol / degR
                     let molecularWeight = chemicalDataObject.molecularWeight.value;

@@ -16,7 +16,7 @@ class ChemicalConditionSonicVelocity extends FlowModelTemplate {
                     let g = 32.2; // acceleration of gravity [ft/s^2]
                     let universalGasConstant = 1545;
                     let individualGasConstant = universalGasConstant / parent.chemicalPropertyMolecularWeight.value;
-                    let temperature = parent.convertSpecifyUnits("chemicalConditionTemperature", "rankine");
+                    let temperature = parent.convertSpecifyUnits("chemicalConditionTemperature", "R");
                     return parent.convertToLocalUnits("chemicalConditionSonicVelocity", Math.sqrt(k*g*individualGasConstant*temperature), "ft/s");
                 },
             }

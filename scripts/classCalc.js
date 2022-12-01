@@ -12,13 +12,13 @@ class Flow {
         this.chemicalPropertyCAS = new ChemicalPropertyCAS (this, "CAS Number", "", "", "lookup");
         this.chemicalPropertyMolecularWeight = new ChemicalPropertyMolecularWeight (this, "Molecular Weight", "", "", "lookup");
         this.chemicalPropertyCriticalPressure = new ChemicalPropertyCriticalPressure (this, "Critical Pressure", "", "psia", "lookup");
-        this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "kelvin", "lookup");
+        this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "K", "lookup");
         this.chemicalPropertyCriticalMolarVolume = new ChemicalPropertyCriticalMolarVolume (this, "Critical Molar Volume", "", "cm3/mol", "lookup");
         this.chemicalPropertyCriticalCompressibilityFactor = new ChemicalPropertyCriticalCompressibilityFactor (this, "Critical Compressibility Factor (Zc)", "", "", "lookup");
         this.chemicalPropertyAcentricFactor = new ChemicalPropertyAcentricFactor (this, "Acentric Factor", "", "", "lookup");
-        this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "celsius", "lookup");
-        this.chemicalConditionTemperature = new ChemicalConditionTemperature (this, "Temperature", "", "celsius", "");
-        this.chemicalConditionPressure = new ChemicalConditionPressure (this, "Pressure", "", "psig", "");
+        this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "C", "lookup");
+        this.chemicalConditionTemperature = new ChemicalConditionTemperature (this, "Temperature", "25", "C", "");
+        this.chemicalConditionPressure = new ChemicalConditionPressure (this, "Pressure", "0", "psig", "");
         this.chemicalConditionPhase = new ChemicalConditionPhase (this, "Phase", "", "", "");
         this.chemicalConditionVaporPressure = new ChemicalConditionVaporPressure (this, "Vapor Pressure", "", "psia", "");
         this.chemicalConditionSaturationPressure = new ChemicalConditionSaturationPressure (this, "Saturation Pressure", "", "psia", "");
@@ -63,18 +63,26 @@ class Flow {
 
     
     eventHandler() {
+
+        // If html element value is changed by the user
         document.addEventListener("change", (e) => {
             let htmlElementThis = document.getElementById(e.target.attributes.id.value);
 
-            //console.log(e);
-            //console.log(htmlElementThis);
+            // Prevent stack overflow (infinte calculation loop) if inputs / outputs referench other
             this.inputOutputConflict(htmlElementThis);
+
+            // Implemeent HTML changes (and opportunistic data values changes) which are necessary based on user selected value of html element.
             this.updatePreferences(htmlElementThis);
+
+            // Update the user determined properties within the data models
             this.updateInstance(htmlElementThis);
+
+            // Update html elements to match the calculated property values of the model
             this.updateHTML();
             console.log(this);
         })
 
+        // Format the current html element (and other elements)
         document.addEventListener("mouseover", (e) => {
             if (!e.target.attributes.id) {return}
             let htmlElementThis = document.getElementById(e.target.attributes.id.value);
@@ -84,6 +92,7 @@ class Flow {
 
         )
 
+        // Revert hover changes to current html element (and other elements)
         document.addEventListener("mouseout", (e) => {
             if (!e.target.attributes.id) {return}
             let htmlElementThis = document.getElementById(e.target.attributes.id.value);
@@ -95,6 +104,8 @@ class Flow {
     
     }
 
+
+    // Determine inputs and outputs for the hovered-over html element, add hover class when mouse is no longer hovering.
     mouseOver(htmlElementThis) {
         let [inputsOf, outputsOf] = this.determineDependencies();
         
@@ -117,7 +128,9 @@ class Flow {
         }
     }
 
-    mouseOut(htmlElementThis) { // this needs work, the mouseOut doesn't work if the input is changed while being mouseOver'd
+    // Determine inputs and outputs for the hovered-over html element, remove hover class when mouse is no longer hovering.
+    // needs work - mouseOut doesn't work if the input is changed while being mouseOver'd
+    mouseOut(htmlElementThis) {
         
         let [inputsOf, outputsOf] = this.determineDependencies();
         
@@ -139,7 +152,8 @@ class Flow {
         }
     }
 
-
+    // This is currently used to implement (a) DOM changes (e.g. change drop down) which are prompted by user changes and can't be solved with a
+    // getter within the data model, and to set the user.value of some html elements.
     updatePreferences(htmlElementThis) {
         switch (htmlElementThis.name) {
             case "systemPropertyPipeStandard":
@@ -151,7 +165,9 @@ class Flow {
         }
     }
 
-    updateInstance(htmlElementThis) {  // because the updateInstance() function is defined in buildHTML.js the text "this" to which 'htmlFormThis' points is the html element where it is called
+    // Update the data model (e.g. "ChemicalPropertyMolecularWeight") instance (e.g. "chemicalPropertyMolecularWeight") which is identified by
+    // the html element id.  The html id (e.g. chemicalPropertyMolecularWeight.user.value) describes the location of the property in the model.
+    updateInstance(htmlElementThis) {
     
         let arrayHtmlIdParced = htmlElementThis.id.split(".");
         
@@ -168,7 +184,9 @@ class Flow {
     // =========================  dependencies  ===================================
     // ============================================================================
 
-    determineDependencies() { // pairing inputs with the calculated, and the calculate with the inputs
+    // determine the interactions (inputs -> ouputs) between the data models, output these interactions in the form two arrays which show
+    //  the inputs for every outputs, and the outputs for every input.
+    determineDependencies() {
         
         let inputsOf = {}; // inputsOf[instanceProperty] === [... these are the inputs to this instanceProperty ...]
         let outputsOf = {}; // outputsOf[instanceProperty] === [... these are the outputs of this instanceProperty ...]
@@ -194,22 +212,25 @@ class Flow {
     }
 
     // ============================================================================
-    // ==========================  view hover  ====================================
-    // ============================================================================
-
-    // ============================================================================
     // ==========================  view table  ====================================
     // ============================================================================
 
+    // Create the array of html which will be used to create the table, with user determined 'columns' parameter where
+    // where columns = ["label", "user", "calculation", "value", "units", "method"];
     flowInstanceArrayForTable(columns) {
         let rows = Object.keys(this);
-        //let columns = ["label", "user", "calculation", "value", "units", "method"];
-        rows.shift(); // remove objectName off position [0]
+        rows.shift(); // remove objectName at position [0]
         let flowInstanceArray = rows.map((row, index, array) => {
             return (
                 columns.map((column, index, array) => {
+
+                    // if the data property has a 'html' sub property (e.g. chemicalPropertyName.user.html), then
                     return this[row][column].html ?
+
+                        // return getter .html.value which is set equal to the html override if it is present
                         this[row][column].html.value :
+
+                        // otherwise provide html for an output.
                         this.outputHTML(row + "." + column)})
             )
         });   
@@ -217,6 +238,8 @@ class Flow {
         return flowInstanceArray;
     }
 
+    // Update every html element value to match the data model with the path which matches the html element id.
+    // And update html to show which element are 'required' for other calculations (this could be moved elsewhere).
     updateHTML() {
         let [inputsOf, outputsOf] = this.determineDependencies();
         for (let instanceProperty of Object.keys(this).slice(1)) {
@@ -252,17 +275,19 @@ class Flow {
     // ============================================================================
 
     convertSpecifyUnits(property, newUnits) {
+        if (this[property].value == "") {return ""}
         return convertUnits(this[property].units.quantity, this[property].value, this[property].units.value, newUnits);
     }
 
     convertToLocalUnits(property, value, oldUnits) { // passing "this.property" from within the property (e.g. chemicalPropertyTemperature) will results in the property name e.g. "chemicalPropertyTemperature" 
+        if (value == "") {return ""}
         return convertUnits(this[property].units.quantity, value, oldUnits, this[property].units.value);
     }
     // ============================================================================
     // =========================  buildHTML.JS  ===================================
     // ============================================================================ 
 
-    dataListHTML(instancePropertyIdString, dropDownArray) {
+    dataListHTML(instancePropertyIdString, dropDownArray, optionalHtmlTextArray) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
         let instanceProperty = arrayHtmlIdParced[0];
@@ -280,10 +305,12 @@ class Flow {
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
-            dropDownArray); // dropDownArray
+            dropDownArray, // dropDownArray
+            optionalHtmlTextArray // optionalHtmlTextArray (if the html text for the option should be different than the value)
+        );
     }
 
-    selectHTML(instancePropertyIdString, dropDownArray) {
+    selectHTML(instancePropertyIdString, dropDownArray, optionalHtmlTextArray) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
         let instanceProperty = arrayHtmlIdParced[0];
@@ -299,7 +326,8 @@ class Flow {
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
-            dropDownArray // dropDownArray
+            dropDownArray, // dropDownArray
+            optionalHtmlTextArray // optionalHtmlTextArray (if the html text for the option should be different than the value)
         );
     }
 

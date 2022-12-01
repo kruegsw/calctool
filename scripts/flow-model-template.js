@@ -27,7 +27,7 @@ class FlowModelTemplate {
             quantity: "",                               // units.quantity is determined by child
             html: {
                 optionsArray: "",
-                get default() {return parent.selectHTML(instanceProperty + ".units.value", parent[instanceProperty].units.quantity ? Object.keys( UNITS[ parent[instanceProperty].units.quantity ] ) : "")},
+                get default() {return parent.selectHTML(instanceProperty + ".units.value", unitsArrayForTable(parent[instanceProperty].units.quantity)[0], unitsArrayForTable(parent[instanceProperty].units.quantity)[1])},
                 override: "",
                 get value() {return this.override ? this.override : this.default}
             },

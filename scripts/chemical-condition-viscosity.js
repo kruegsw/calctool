@@ -14,7 +14,7 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
                     // checkinputs() ...
                     // need to add logic to detect if inputs are not provided and make value = "" rather than throw error (?)
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "rankine");
+                    let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "R");
                     let mu_o = chemicalDataObject.sutherland.mu_o.value;
                     let T_o = chemicalDataObject.sutherland.T_o.value;
                     let S_mu = chemicalDataObject.sutherland.S_mu.value;

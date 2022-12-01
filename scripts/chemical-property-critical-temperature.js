@@ -12,7 +12,7 @@ class ChemicalPropertyCriticalTemperature extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    return parent.convertToLocalUnits("chemicalPropertyCriticalTemperature", chemicalDataObject.criticalTemperature.value, "kelvin");
+                    return parent.convertToLocalUnits("chemicalPropertyCriticalTemperature", chemicalDataObject.criticalTemperature.value, "K");
                 },
             }
         };
