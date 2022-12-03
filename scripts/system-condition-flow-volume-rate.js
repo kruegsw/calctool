@@ -13,7 +13,7 @@ class SystemConditionFlowVolumeRate extends FlowModelTemplate {
                 get calculation() {
                     let massFlow = parent.convertSpecifyUnits("systemConditionFlowMassRate", "kg/hr");
                     let density = parent.convertSpecifyUnits("chemicalConditionDensity", "kg/m3");
-                    return parent.convertToLocalUnits("systemConditionFlowVolumeRate", massFlow / density, "m^3/h");
+                    return parent.convertToLocalUnits("systemConditionFlowVolumeRate", massFlow / density, "m3/h");
                 },
             }
         };

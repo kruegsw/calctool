@@ -11,8 +11,8 @@ class SystemConditionVelocity extends FlowModelTemplate {
                 input: ["systemConditionFlowVolumeRate", "systemPropertyPipeCrossSectionalArea"],
                 source: "",
                 get calculation() {
-                    let area = parent.convertSpecifyUnits("systemPropertyPipeCrossSectionalArea", "m^2");
-                    let flowVolumeRate = parent.convertSpecifyUnits("systemConditionFlowVolumeRate", "m^3/s");
+                    let area = parent.convertSpecifyUnits("systemPropertyPipeCrossSectionalArea", "m2");
+                    let flowVolumeRate = parent.convertSpecifyUnits("systemConditionFlowVolumeRate", "m3/s");
                     return parent.convertToLocalUnits("systemConditionVelocity", flowVolumeRate / area, "m/s");
                 },
             }

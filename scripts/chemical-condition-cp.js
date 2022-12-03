@@ -3,7 +3,7 @@ class ChemicalConditionCp extends FlowModelTemplate {
     {
         super(parent, label, user, unitsValue, method, "chemicalConditionCp");
 
-        this.units.quantity = "heatCapacity";
+        this.units.quantity = "specificHeatCapacity";
 
         this.methods = {};
     }

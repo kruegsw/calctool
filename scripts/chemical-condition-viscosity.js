@@ -3,7 +3,7 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
     {
         super(parent, label, user, unitsValue, method, "chemicalConditionViscosity");
 
-        this.units.quantity = "viscosity";
+        this.units.quantity = "viscosityDynamic";
         
         this.methods = {
             sutherland: {

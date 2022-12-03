@@ -23,7 +23,7 @@ class Flow {
         this.chemicalConditionVaporPressure = new ChemicalConditionVaporPressure (this, "Vapor Pressure", "", "psia", "");
         this.chemicalConditionSaturationPressure = new ChemicalConditionSaturationPressure (this, "Saturation Pressure", "", "psia", "");
         this.chemicalConditionDensity = new ChemicalConditionDensity (this, "Density", "", "lb/ft3", "idealGas");
-        this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosity"), "sutherland");       
+        this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosityDynamic"), "sutherland");       
         this.chemicalConditionCp = new ChemicalConditionCp (this, "Heat Capacity at Constant Pressure (Cp)", "", "BTU/lb/F", "");
         this.chemicalConditionCv = new ChemicalConditionCv (this, "Heat Capacity at Constant Volume (Cv)", "", "BTU/lb/F", "");
         this.chemicalConditionCpCvRatio = new ChemicalConditionCpCvRatio (this, "Heat Capacity Ratio Cp/Cv", "", "", "heatCapacityRatio");
@@ -33,17 +33,17 @@ class Flow {
         this.systemPropertyPipeStandard = new SystemPropertyPipeStandard(this, "Pipe Standard", "NPS", "", "");
         
         this.systemPropertyPipeAbsoluteRoughness = new SystemPropertyPipeAbsoluteRoughness(this, "Absolute Roughness", "", "ft", "empirical");
-        this.systemPropertyPipeModulusElasticity = new SystemPropertyPipeModulusElasticity(this, "Modulus of Elasticity", "", "", "");
+        //this.systemPropertyPipeModulusElasticity = new SystemPropertyPipeModulusElasticity(this, "Modulus of Elasticity", "", "", "");
         this.systemPropertyPipeNominalDiameter = new SystemPropertyPipeNominalDiameter(this, "Nominal Diameter", "2", "in", "");
         this.systemPropertyPipeInnerDiameter = new SystemPropertyPipeInnerDiameter(this, "Inner Diameter", "", "in", "fromPipeInfo");
         this.systemPropertyPipeSchedule = new SystemPropertyPipeSchedule(this, "Pipe Schedule", "Sch. 40", "", "");
         this.systemPropertyPipeHydraulicRadius = new SystemPropertyPipeHydraulicRadius(this, "Hydraulic Radius", "", "in", "");
-        this.systemPropertyPipeCrossSectionalArea = new SystemPropertyPipeCrossSectionalArea(this, "Pipe Cross Section Area", "", "in^2", "calculatefromDiameter");
+        this.systemPropertyPipeCrossSectionalArea = new SystemPropertyPipeCrossSectionalArea(this, "Pipe Cross Section Area", "", "in2", "calculatefromDiameter");
         this.systemPropertyPipeLength = new SystemPropertyPipeLength(this, "Pipe Length", "100", "ft", "");
         //this.systemPropertyAdditionalK
         //this.systemPropertyAdditionalCv
         this.systemConditionFlowMassRate = new SystemConditionFlowMassRate(this, "Mass Flow Rate", "100", "lb/hr", "");
-        this.systemConditionFlowVolumeRate = new SystemConditionFlowVolumeRate(this, "Volume Flow Rate", "", "ft^3/h", "massRate/density");
+        this.systemConditionFlowVolumeRate = new SystemConditionFlowVolumeRate(this, "Volume Flow Rate", "", "ft3/h", "massRate/density");
         this.systemConditionReynolds = new SystemConditionReynolds(this, "Reynolds Number", "", "", "craneTPU410");
         this.systemConditionFrictionFactor = new SystemConditionFrictionFactor(this, "Friction Factor", "", "", "colebrooke");
         this.systemConditionVelocity = new SystemConditionVelocity(this, "Velocity", "", "m/s", "volumeRateOverArea");
@@ -80,6 +80,12 @@ class Flow {
             // Update html elements to match the calculated property values of the model
             this.updateHTML();
             console.log(this);
+
+            // =========== TEST CODE ==================
+            
+            // ========================================
+
+
         })
 
         // Format the current html element (and other elements)
@@ -177,7 +183,6 @@ class Flow {
             case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] = htmlElementThis.value;
             default: return console.log("updateInstance() did not update anything");
         }
-
     }
 
     // ============================================================================

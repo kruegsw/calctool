@@ -3,7 +3,7 @@ class ChemicalConditionDensity extends FlowModelTemplate {
     {
         super(parent, label, user, unitsValue, method, "chemicalConditionDensity");
 
-        this.units.quantity = "density";
+        this.units.quantity = "concentrationMass";
 
         this.methods = {
             idealGas: {

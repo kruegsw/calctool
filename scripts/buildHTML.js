@@ -10,7 +10,7 @@ function convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArr
         dropDownListHTML += "<option value=\"" + dropDownArray[i] + "\"" + insertedSelectedIfSelected + ">" + htmlTextArray[i] + "</option>";
 
     }
-    console.log(dropDownListHTML);
+    //console.log(dropDownListHTML);
     return dropDownListHTML;
 }
 
