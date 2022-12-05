@@ -16,7 +16,9 @@ function unitsArrayForTable(quantity) {
 function convertUnits(quantity, oldValue, oldUnits, newUnits) {
     let valueInBaseUnits = UNITS[quantity][oldUnits].convertToBaseUnits(oldValue); // This function doesn't seem to use the 'oldValue' parameter...
     let valueInNewUnits = UNITS[quantity][newUnits].convertFromBaseUnits(valueInBaseUnits);// This function doesn't seem to use the 'valueInBaseUnits' parameter...
+    //if(newUnits === "psig") {console.log(`Converted ${oldValue} ${oldUnits} to ${valueInNewUnits} ${newUnits}`)};
     return valueInNewUnits;
+
 };
 
 function determineFormula(numeratorArray, denominatorArray) {
@@ -211,13 +213,13 @@ const UNITS = {
 
     area: {
         "m2": {name: "square meters", symbol: "m"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "ft2": {name: "square feet", symbol: "ft"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235,2), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,2)},
-        "in2": {name: "square inches", symbol: "in"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235 * 12,2), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235 * 12,2)},
+        "ft2": {name: "square feet", symbol: "ft"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,2)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,2)},
+        "in2": {name: "square inches", symbol: "in"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235 * 12,2)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235 * 12,2)},
     },
 
     concentrationMass: {
         "kg/m3": {name: "kilogram per cubic meter", symbol: "kg/m"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "lb/ft3": {name: "pound per cubic foot", symbol: "lb/ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue / 2.2046226218487758 * Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758 / Math.pow(3.2808398950131235,3)},
+        "lb/ft3": {name: "pound per cubic foot", symbol: "lb/ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue * (1/2.2046226218487758) * Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758 / Math.pow(3.2808398950131235,3)},
     },
 
     concentrationMolar: {
@@ -281,9 +283,9 @@ const UNITS = {
 
     length: {
         "meter": {name: "meter", symbol: "m", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "mm": {name: "millimeter", symbol: "mm", convertToBaseUnits: (oldValue) => +oldValue / 1000, convertFromBaseUnits: (baseValue) => +baseValue * 1000},
-        "ft": {name: "foot", symbol: "ft", convertToBaseUnits: (oldValue) => +oldValue / 3.2808398950131235, convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235},
-        "in": {name: "inch", symbol: "in", convertToBaseUnits: (oldValue) => +oldValue / 3.2808398950131235 / 12, convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235 * 12},
+        "mm": {name: "millimeter", symbol: "mm", convertToBaseUnits: (oldValue) => +oldValue * (1/1000), convertFromBaseUnits: (baseValue) => +baseValue * 1000},
+        "ft": {name: "foot", symbol: "ft", convertToBaseUnits: (oldValue) => +oldValue * (1/3.2808398950131235), convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235},
+        "in": {name: "inch", symbol: "in", convertToBaseUnits: (oldValue) => +oldValue * (1/3.2808398950131235) * (1/12), convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235 * 12},
     },
 
     magneticFieldStrength: {
@@ -292,13 +294,13 @@ const UNITS = {
 
     mass: {
         kilogram: {name: "kilogram", symbol: "kg", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        pound: {name: "pound", symbol: "lb", convertToBaseUnits: (oldValue) => +oldValue / 2.2046226218487758, convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758},
+        pound: {name: "pound", symbol: "lb", convertToBaseUnits: (oldValue) => +oldValue * (1/2.2046226218487758), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758},
         "metric ton": {name: "metric ton", symbol: "MT", convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue / 1000},
     },
 
     massRate: {
         "kg/hr": {name: "kilogram per hour", symbol: "kg/hr", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "lb/hr": {name: "pound per hour", symbol: "lb/hr", convertToBaseUnits: (oldValue) => +oldValue / 2.2046226218487758, convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758},
+        "lb/hr": {name: "pound per hour", symbol: "lb/hr", convertToBaseUnits: (oldValue) => +oldValue * (1/2.2046226218487758), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758},
         //"SCFM": {name: "standard cubic foot per hour", symbol: "SCFM (air: 14.7 psia, 60 "+"&deg;"+"F)", convertToBaseUnits: (oldValue) => +oldValue / 2.2046226218487758 * 4.583, convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758 / 4.583},
     },
 
@@ -320,8 +322,8 @@ const UNITS = {
 
     molarVolume: {
         "m3/mol": {name: "cubic meter per mole", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/mol", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "m3/kmol": {name: "cubic meter per kmole", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/kmol", convertToBaseUnits: (oldValue) => +oldValue / 1000, convertFromBaseUnits: (baseValue) => +baseValue * 1000},
-        "cm3/mol": {name: "cubic centimeter per mole", symbol: "cm"+HTML_SYMBOL_CODES.supThree+"/mol", convertToBaseUnits: (oldValue) => +oldValue / 1000000, convertFromBaseUnits: (baseValue) => +baseValue * 1000000},   
+        "m3/kmol": {name: "cubic meter per kmole", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/kmol", convertToBaseUnits: (oldValue) => +oldValue * (1/1000), convertFromBaseUnits: (baseValue) => +baseValue * 1000},
+        "cm3/mol": {name: "cubic centimeter per mole", symbol: "cm"+HTML_SYMBOL_CODES.supThree+"/mol", convertToBaseUnits: (oldValue) => +oldValue * (1/1000000), convertFromBaseUnits: (baseValue) => +baseValue * 1000000},   
     },
 
     momentOfForce: {
@@ -330,22 +332,22 @@ const UNITS = {
 
     pressure: {
         "Pa absolute": {name: "pascal", symbol: "Pa", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "MPa absolute": {name: "megapascal", symbol: "MPa", convertToBaseUnits: (oldValue) => +oldValue * 1000000, convertFromBaseUnits: (baseValue) => +baseValue / 1000000},
-        "psia": {name: "pound per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293, convertFromBaseUnits: (baseValue) => +baseValue / 6894.757293},
-        "psig": {name: "pound per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => ( +oldValue * 6894.757293 ) + 101325, convertFromBaseUnits: (baseValue) => ( +baseValue / 6894.757293 ) - 101325},
-        "bar absolute": {name: "bar", symbol: "bar", convertToBaseUnits: (oldValue) => +oldValue * 100000, convertFromBaseUnits: (baseValue) => +baseValue / 100000},
-        "atm absolute": {name: "atmospheric pressure", symbol: "atm", convertToBaseUnits: (oldValue) => +oldValue * 101325, convertFromBaseUnits: (baseValue) => +baseValue / 101325},
-        "inH2O absolute": {name: "inches of water", symbol: "inH2O", convertToBaseUnits: (oldValue) => +oldValue * 248.84, convertFromBaseUnits: (baseValue) => +baseValue / 248.84},
-        "inHg absolute": {name: "inches of mercury", symbol: "inHg", convertToBaseUnits: (oldValue) => +oldValue * 3386.38866667, convertFromBaseUnits: (baseValue) => +baseValue / 3386.38866667},
+        "MPa absolute": {name: "megapascal", symbol: "MPa", convertToBaseUnits: (oldValue) => +oldValue * 1000000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000000)},
+        "psia": {name: "pound per square inch", symbol: "psia", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293, convertFromBaseUnits: (baseValue) => +baseValue * (1/6894.757293)},
+        "psig": {name: "pound per square inch", symbol: "psig", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293 + 101325, convertFromBaseUnits: (baseValue) => (+baseValue - 101325) * (1/6894.757293)},
+        "bar absolute": {name: "bar", symbol: "bar", convertToBaseUnits: (oldValue) => +oldValue * 100000, convertFromBaseUnits: (baseValue) => +baseValue * (1/100000)},
+        "atm absolute": {name: "atmospheric pressure", symbol: "atm", convertToBaseUnits: (oldValue) => +oldValue * 101325, convertFromBaseUnits: (baseValue) => +baseValue * (1/101325)},
+        "inH2O absolute": {name: "inches of water", symbol: "inH2O", convertToBaseUnits: (oldValue) => +oldValue * 248.84, convertFromBaseUnits: (baseValue) => +baseValue * (1/248.84)},
+        "inHg absolute": {name: "inches of mercury", symbol: "inHg", convertToBaseUnits: (oldValue) => +oldValue * 3386.38866667, convertFromBaseUnits: (baseValue) => +baseValue * (1/3386.38866667)},
     },
 
     pressureDifference: {
         "Pa": {name: "pascal", symbol: "Pa", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "psi": {name: "pounds per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293, convertFromBaseUnits: (baseValue) => +baseValue / 6894.757293},
-        "bar": {name: "bar", symbol: "bar", convertToBaseUnits: (oldValue) => +oldValue * 100000, convertFromBaseUnits: (baseValue) => +baseValue / 100000},
-        "atm": {name: "atmospheric pressure", symbol: "atm", convertToBaseUnits: (oldValue) => +oldValue * 101325, convertFromBaseUnits: (baseValue) => +baseValue / 101325},
-        "inH2O": {name: "inches of water", symbol: "inH2O", convertToBaseUnits: (oldValue) => +oldValue * 248.84, convertFromBaseUnits: (baseValue) => +baseValue / 248.84},
-        "inHg": {name: "inches of mercury", symbol: "inHg", convertToBaseUnits: (oldValue) => +oldValue * 3386.38866667, convertFromBaseUnits: (baseValue) => +baseValue / 3386.38866667},
+        "psi": {name: "pounds per square inch", symbol: "psi", convertToBaseUnits: (oldValue) => +oldValue * 6894.757293, convertFromBaseUnits: (baseValue) => +baseValue * (1/6894.757293)},
+        "bar": {name: "bar", symbol: "bar", convertToBaseUnits: (oldValue) => +oldValue * 100000, convertFromBaseUnits: (baseValue) => +baseValue * (1/100000)},
+        "atm": {name: "atmospheric pressure", symbol: "atm", convertToBaseUnits: (oldValue) => +oldValue * 101325, convertFromBaseUnits: (baseValue) => +baseValue * (1/101325)},
+        "inH2O": {name: "inches of water", symbol: "inH2O", convertToBaseUnits: (oldValue) => +oldValue * 248.84, convertFromBaseUnits: (baseValue) => +baseValue * (1/248.84)},
+        "inHg": {name: "inches of mercury", symbol: "inHg", convertToBaseUnits: (oldValue) => +oldValue * 3386.38866667, convertFromBaseUnits: (baseValue) => +baseValue * (1/3386.38866667)},
     },
 
     permeability: {
@@ -374,7 +376,7 @@ const UNITS = {
 
     specificHeatCapacity: {
         "J/kg/K": {name: "joule per kilogram-kelvin", symbol: "J/kg/K", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "BTU/lb/F": {name: "BTU per pound-fahrenheit", symbol: "BTU/lb/F", convertToBaseUnits: (oldValue) => +oldValue * 1.05505585262*1000 * 2.2046226218487758 * 9/5, convertFromBaseUnits: (baseValue) => +baseValue / 1.05505585262*1000 / 2.2046226218487758 / (9/5)},
+        "BTU/lb/F": {name: "BTU per pound-fahrenheit", symbol: "BTU/lb/F", convertToBaseUnits: (oldValue) => +oldValue * 1.05505585262 * 1000 * 2.2046226218487758 * 9/5, convertFromBaseUnits: (baseValue) => +baseValue * (1/1.05505585262) * (1/1000) * (1/2.2046226218487758) * 5/9},
     },
 
     specificVolume: {
@@ -392,21 +394,21 @@ const UNITS = {
     temperature: {
         "K": {name: "kelvin", symbol: "&deg;"+"K", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue}, //Base Units
         "C": {name: "celsius", symbol: "&deg;"+"C", convertToBaseUnits: (oldValue) => +oldValue + 273.15, convertFromBaseUnits: (baseValue) => +baseValue - 273.15},
-        "F": {name: "fahrenheit", symbol: "&deg;"+"F", convertToBaseUnits: (oldValue) => (+oldValue - 32) * (5/9) + 273.15, convertFromBaseUnits: (baseValue) => (+baseValue - 273.15) * 5/9 + 32},
-        "R": {name: "rankine", symbol: "&deg;"+"R", convertToBaseUnits: (oldValue) => +oldValue * (5/9), convertFromBaseUnits: (baseValue) => +baseValue / (5/9)},
+        "F": {name: "fahrenheit", symbol: "&deg;"+"F", convertToBaseUnits: (oldValue) => (+oldValue - 32) * (5/9) + 273.15, convertFromBaseUnits: (baseValue) => (+baseValue - 273.15) * (1/(5/9)) + 32 },
+        "R": {name: "rankine", symbol: "&deg;"+"R", convertToBaseUnits: (oldValue) => +oldValue * (5/9), convertFromBaseUnits: (baseValue) => +baseValue * (1/(5/9))},
     },
 
     velocity: {
         "m/s": {name: "meter per second", symbol: "m/s", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "ft/s": {name: "foot per second", symbol: "ft/s", convertToBaseUnits: (oldValue) => +oldValue / 3.2808398950131235, convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235},
-        "mph": {name: "mile per hour", symbol: "mph", convertToBaseUnits: (oldValue) => +oldValue / 3.2808398950131235 * 5280 / 60 / 60, convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235 / 5280 * 60 * 60},
+        "ft/s": {name: "foot per second", symbol: "ft/s", convertToBaseUnits: (oldValue) => +oldValue * (1/3.2808398950131235), convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235},
+        "mph": {name: "mile per hour", symbol: "mph", convertToBaseUnits: (oldValue) => +oldValue * (1/3.2808398950131235) * 5280 * (1/60) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * 3.2808398950131235 * (1/5280) * 60 * 60},
     },
 
     viscosityDynamic: { // or absolute viscosity
         "Pa*s": {name: "pascal-second", symbol: "Pa"+"&sdot;"+"s", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "poise": {name: "poise", symbol: "P", convertToBaseUnits: (oldValue) => +oldValue / 10, convertFromBaseUnits: (baseValue) => +baseValue * 10},
-        "centipoise": {name: "centipoise", symbol: "cP", convertToBaseUnits: (oldValue) => +oldValue / 100 / 10, convertFromBaseUnits: (baseValue) => +baseValue * 100 * 10},
-        "mPa-s": {name: "millipascal-second", symbol: "mPa"+"&sdot;"+"s", convertToBaseUnits: (oldValue) => +oldValue / 1000, convertFromBaseUnits: (baseValue) => +baseValue * 1000},
+        "poise": {name: "poise", symbol: "P", convertToBaseUnits: (oldValue) => +oldValue * (1/10), convertFromBaseUnits: (baseValue) => +baseValue * 10},
+        "centipoise": {name: "centipoise", symbol: "cP", convertToBaseUnits: (oldValue) => +oldValue * (1/100) * (1/10), convertFromBaseUnits: (baseValue) => +baseValue * 100 * 10},
+        "mPa-s": {name: "millipascal-second", symbol: "mPa"+"&sdot;"+"s", convertToBaseUnits: (oldValue) => +oldValue * (1/1000), convertFromBaseUnits: (baseValue) => +baseValue * 1000},
     },
 
     viscosityKinematic: {
@@ -415,16 +417,16 @@ const UNITS = {
 
     volume: {
         "m3": {name: "cubic meter", symbol: "m"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "ft3": {name: "cubic foot", symbol: "ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3)},
+        "ft3": {name: "cubic foot", symbol: "ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3)},
     },
     
     volumeRate: {
         "m3/s": {name: "cubic meter per second", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/s", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
-        "m3/m": {name: "cubic meter per minute", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/min", convertToBaseUnits: (oldValue) => +oldValue / 60, convertFromBaseUnits: (baseValue) => +baseValue * 60},
-        "m3/h": {name: "cubic meter per second", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/hr", convertToBaseUnits: (oldValue) => +oldValue / 60 / 60, convertFromBaseUnits: (baseValue) => +baseValue * 60 * 60},
-        "ft3/s": {name: "cubic foot per second", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/s", convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3)},
-        "ft3/m": {name: "cubic foot per minute", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/min", convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235,3) / 60, convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60},
-        "ft3/h": {name: "cubic foot per hour", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/hr", convertToBaseUnits: (oldValue) => +oldValue / Math.pow(3.2808398950131235,3) / 60 / 60, convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60 * 60},
+        "m3/m": {name: "cubic meter per minute", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/min", convertToBaseUnits: (oldValue) => +oldValue * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * 60},
+        "m3/h": {name: "cubic meter per second", symbol: "m"+HTML_SYMBOL_CODES.supThree+"/hr", convertToBaseUnits: (oldValue) => +oldValue * (1/60) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * 60 * 60},
+        "ft3/s": {name: "cubic foot per second", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/s", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3)},
+        "ft3/m": {name: "cubic foot per minute", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/min", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60},
+        "ft3/h": {name: "cubic foot per hour", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/hr", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)) * (1/60) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60 * 60},
     },
 
     waveNumber: {

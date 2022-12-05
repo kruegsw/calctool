@@ -11,7 +11,9 @@ class ChemicalConditionCpCvRatio extends FlowModelTemplate {
                 input: ["chemicalConditionCp", "chemicalConditionCv"],
                 source: "",
                 get calculation() {
-                    return parent.chemicalConditionCp.value / parent.chemicalConditionCv.value
+                    let cp = parent.convertSpecifyUnits("chemicalConditionCp", defaultUnits("specificHeatCapacity"));
+                    let cv = parent.convertSpecifyUnits("chemicalConditionCv", defaultUnits("specificHeatCapacity"));
+                    return cp / cv;
                 },
             }
         };

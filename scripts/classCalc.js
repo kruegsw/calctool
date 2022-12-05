@@ -71,6 +71,11 @@ class Flow {
             // Prevent stack overflow (infinte calculation loop) if inputs / outputs referench other
             this.inputOutputConflict(htmlElementThis);
 
+            // if units changed while user user.value is specified, then convert user.value to new units
+            // this could have been included in updateInstance() and/or updateHTML() but separated for now to try it out
+            this.updateUserValueUnits(htmlElementThis);
+            //not working
+
             // Implemeent HTML changes (and opportunistic data values changes) which are necessary based on user selected value of html element.
             this.updatePreferences(htmlElementThis);
 
@@ -170,6 +175,19 @@ class Flow {
                 console.log("default switch");
         }
     }
+
+    updateUserValueUnits(htmlElementThis) {
+        let arrayHtmlIdParced = htmlElementThis.id.split(".");
+        let instanceProperty = arrayHtmlIdParced[0];
+        let correspondingHtmlUserInput = document.getElementById(arrayHtmlIdParced[0]+".user.value");
+        if (arrayHtmlIdParced[1] + "." + arrayHtmlIdParced[2] === "units.value" && correspondingHtmlUserInput.value !== "") {
+            //this[instanceProperty].units.value = htmlElementThis.value; // note convertSpecifyUnits() looks at the instance not the html
+            //correspondingHtmlUserInput.value = this.convertSpecifyUnits(instanceProperty, htmlElementThis.value);
+            //ocument.getElementById(instanceProperty + ".units.value").value = this[instanceProperty].units.value;
+            this.implementPreference(instanceProperty, this.convertSpecifyUnits(instanceProperty, htmlElementThis.value), "", "", "");
+            //(instancePoperty, userValue, userDropDownArray, unitsValue, unitsDropDownArray, methodValue)
+        };
+    };
 
     // Update the data model (e.g. "ChemicalPropertyMolecularWeight") instance (e.g. "chemicalPropertyMolecularWeight") which is identified by
     // the html element id.  The html id (e.g. chemicalPropertyMolecularWeight.user.value) describes the location of the property in the model.
@@ -383,7 +401,9 @@ class Flow {
     
 
     implementPreference(instancePoperty, userValue, userDropDownArray, unitsValue, unitsDropDownArray, methodValue) {
-        if(userValue) {
+        console.log(userValue);
+        if(userValue !== undefined) {
+            //console.log(userValue); console.log(unitsValue);
             this[instancePoperty].user.value = userValue;
             document.getElementById(instancePoperty + ".user.value").value = userValue;
         };
