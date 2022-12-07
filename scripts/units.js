@@ -217,13 +217,29 @@ const UNITS = {
         "in2": {name: "square inches", symbol: "in"+HTML_SYMBOL_CODES.supTwo, convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235 * 12,2)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235 * 12,2)},
     },
 
-    concentrationMass: {
+    //needs work, probably a method defined above which uses molecular weight
+    concentrationMassMolarCombined: {
+
         "kg/m3": {name: "kilogram per cubic meter", symbol: "kg/m"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
         "lb/ft3": {name: "pound per cubic foot", symbol: "lb/ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue * (1/2.2046226218487758) * Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758 / Math.pow(3.2808398950131235,3)},
+    
+        "mol/m3": {name: "mole per cubic meter", symbol: "mol/m"+HTML_SYMBOL_CODES.supThree /* supserscript 3 */, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "mol/dm3": {name: "mole per cubic decimeter", symbol: "mol/dm"+HTML_SYMBOL_CODES.supThree /* supserscript 3 */, convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
+
+    },
+    // above needs work
+
+    concentrationMass: {
+        "kg/m3": {name: "kilogram per cubic meter", symbol: "kg/m"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "g/m3": {name: "gram per cubic meter", symbol: "g/m"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue * (1/1000), convertFromBaseUnits: (baseValue) => +baseValue * 1000},
+        "g/dm3": {name: "gram per cubic decimeter", symbol: "g/dm"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "lb/ft3": {name: "pound per cubic foot", symbol: "lb/ft"+HTML_SYMBOL_CODES.supThree, convertToBaseUnits: (oldValue) => +oldValue * (1/2.2046226218487758) * Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * 2.2046226218487758 / Math.pow(3.2808398950131235,3)},
+        "lb/gal": {name: "pound per US gallon", symbol: "lb/gal", convertToBaseUnits: (oldValue) => +oldValue * (1/0.133680556) * (1/2.2046226218487758) * Math.pow(3.2808398950131235,3), convertFromBaseUnits: (baseValue) => +baseValue * 0.133680556 * 2.2046226218487758 / Math.pow(3.2808398950131235,3)},
     },
 
     concentrationMolar: {
         "mol/m3": {name: "mole per cubic meter", symbol: "mol/m"+HTML_SYMBOL_CODES.supThree /* supserscript 3 */, convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "mol/dm3": {name: "mole per cubic decimeter", symbol: "mol/dm"+HTML_SYMBOL_CODES.supThree /* supserscript 3 */, convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
     },
 
     /*
@@ -310,14 +326,17 @@ const UNITS = {
 
     molarEnergy: {
         "J/mol": {name: "joule per mole", symbol: "J/mol", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "J/kmol": {name: "joule per kmole", symbol: "J/kmol", convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
     },
 
     molarEntropy: {
-        "J/mol/K": {name: "joule per mole-kelvin", symbol: "J/mol/k", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "J/mol/K": {name: "joule per mole-kelvin", symbol: "J/mol/K", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "J/kmol/K": {name: "joule per kmole-kelvin", symbol: "J/kmol/K", convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
     },
 
     molarHeatCapacity: {
-        "J/mol/K": {name: "joule per mole-kelvin", symbol: "J/mol/k", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "J/mol/K": {name: "joule per mole-kelvin", symbol: "J/mol/K", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "J/kmol/K": {name: "joule per kmole-kelvin", symbol: "J/kmol/K", convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
     },
 
     molarVolume: {
@@ -368,6 +387,9 @@ const UNITS = {
 
     specificEnergy: {
         "J/kg": {name: "joule per kilogram", symbol: "J/kg", convertToBaseUnits: (oldValue) => +oldValue, convertFromBaseUnits: (baseValue) => +baseValue},
+        "kJ/kg": {name: "kilojoule per kilogram", symbol: "kJ/kg", convertToBaseUnits: (oldValue) => +oldValue * 1000, convertFromBaseUnits: (baseValue) => +baseValue * (1/1000)},
+        "BTU/lb": {name: "BTU per pound", symbol: "BTU/lb", convertToBaseUnits: (oldValue) => +oldValue * 1.05505585262 * 1000 * 2.2046226218487758, convertFromBaseUnits: (baseValue) => +baseValue * (1/1.05505585262) * (1/1000) * (1/2.2046226218487758)},
+    
     },
 
     specificEntropy: {

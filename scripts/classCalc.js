@@ -24,11 +24,14 @@ class Flow {
         this.chemicalConditionSaturationPressure = new ChemicalConditionSaturationPressure (this, "Saturation Pressure", "", "psia", "");
         this.chemicalConditionDensity = new ChemicalConditionDensity (this, "Density", "", "lb/ft3", "idealGas");
         this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosityDynamic"), "sutherland");       
-        this.chemicalConditionCp = new ChemicalConditionCp (this, "Heat Capacity at Constant Pressure (Cp)", "", "BTU/lb/F", "");
+        this.chemicalConditionCp = new ChemicalConditionCp (this, "Heat Capacity at Constant Pressure (Cp)", "", "BTU/lb/F", "perryLiquidCorrelation");
         this.chemicalConditionCv = new ChemicalConditionCv (this, "Heat Capacity at Constant Volume (Cv)", "", "BTU/lb/F", "");
         this.chemicalConditionCpCvRatio = new ChemicalConditionCpCvRatio (this, "Heat Capacity Ratio Cp/Cv", "", "", "heatCapacityRatio");
         this.chemicalConditionSonicVelocity = new ChemicalConditionSonicVelocity (this, "Sonic Velocity", "", "m/s", "compressible gas");
         this.chemicalConditionStaticPressureOutInRatioForSonicVelocity = new ChemicalConditionStaticPressureOutInRatioForSonicVelocity (this, "Pressure Ratio for Sonic Velocity Po/Pi", "", "", "");
+        this.chemicalConditionHeatOfVaporization = new ChemicalConditionHeatOfVaporization (this, "Heat of Vaporization", "", "J/kg", "perryCorrelation");
+        this.chemicalConditionThermalConductivity = new ChemicalConditionThermalConductivity (this, "Thermal Conductivity", "", "W/m/K", "perryLiquidCorrelation");
+
         this.systemPropertyPipeMaterial = new SystemPropertyPipeMaterial(this, "Pipe Material", "Commercial Steel or Wrought Iron", "", "");
         this.systemPropertyPipeStandard = new SystemPropertyPipeStandard(this, "Pipe Standard", "NPS", "", "");
         
@@ -168,11 +171,9 @@ class Flow {
     updatePreferences(htmlElementThis) {
         switch (htmlElementThis.name) {
             case "systemPropertyPipeStandard":
-                console.log("inside case");
                 if (htmlElementThis.id === "systemPropertyPipeStandard.user.value" || "systemPropertyPipeNominalDiameter.user.value") {this.implementPipingStandardPreferences(htmlElementThis)};
                 break;
             default:
-                console.log("default switch");
         }
     }
 
@@ -280,7 +281,8 @@ class Flow {
                 this[instanceProperty].calculation ?
                     (+(this[instanceProperty].calculation) ? setNumberFormat(this[instanceProperty].calculation) : this[instanceProperty].calculation)
                     : "";
-                
+            
+            /*
             // Mark Fields as required or optional
             if (outputsOf[instanceProperty]) { // if property is used in another property's calculation then required, otherwise optional
                 document.getElementById(instanceProperty + ".user.value").required = true;
@@ -289,6 +291,7 @@ class Flow {
                 document.getElementById(instanceProperty + ".user.value").required = false;
                 document.getElementById(instanceProperty + ".user.value").optional = true;
             }
+            */
         }
 
     }
@@ -401,9 +404,7 @@ class Flow {
     
 
     implementPreference(instancePoperty, userValue, userDropDownArray, unitsValue, unitsDropDownArray, methodValue) {
-        console.log(userValue);
         if(userValue !== undefined) {
-            //console.log(userValue); console.log(unitsValue);
             this[instancePoperty].user.value = userValue;
             document.getElementById(instancePoperty + ".user.value").value = userValue;
         };

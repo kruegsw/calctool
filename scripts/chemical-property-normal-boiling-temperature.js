@@ -12,7 +12,7 @@ class ChemicalPropertyNormalBoilingTemperature extends FlowModelTemplate {
                 source: "",
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
-                    return parent.convertToLocalUnits("chemicalPropertyNormalBoilingTemperature", chemicalDataObject.normalBoilingTemperature.value, "kelvin");
+                    return parent.convertToLocalUnits("chemicalPropertyNormalBoilingTemperature", chemicalDataObject.normalBoilingTemperature.value, "K");
                 },
             }
         };
