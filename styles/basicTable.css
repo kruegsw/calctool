@@ -4,10 +4,22 @@
   box-sizing: border-box;
 }
 
+:root {
+  --input-hover-color: rgb(40, 133, 76, 0.25);
+  --target-hover-color: rgb(195, 226, 21, 0.25);
+  --output-hover-color: rgb(14, 133, 189, 0.25);
+  --test-id-variable: #chemicalConditionTemperature\.user\.value;
+}
+
 html {
 
 font-family: sans-serif;
 }
+
+/*
+var(--test-id-variable): {
+  background-color: #220ca0;
+}*/
 
 table {
 border-collapse: collapse;
@@ -57,22 +69,27 @@ border-color: #c00000;
 }
 
 .inputs-hover {
-  /*transition-delay: 250ms;
-  transition-duration: 1000ms;
-  transition-property: background-color;*/
-  background-color: rgb(40, 133, 76, 0.25);
+  transition-delay: 100ms;
+  transition-duration: 100ms;
+  transition-property: background-color;
+  
+  background-color: var(--input-hover-color);
 }
 
 .target-hover {
-  /*transition-delay: 500ms;
-  transition-duration: 1000ms;
-  transition-property: background-color;*/
-  background-color: rgb(195, 226, 21, 0.25);
+  transition-delay: 200ms;
+  transition-duration: 100ms;
+  transition-property: background-color;
+
+  background-color: var(--target-hover-color);
+  /*background-color: rgb(195, 226, 21, 0.25);*/
 }
 
 .outputs-hover {
-  /*transition-delay: 1000ms;
-  transition-duration: 1000ms;
-  transition-property: background-color;*/
-  background-color: rgb(14, 133, 189, 0.25);
+  transition-delay: 300ms;
+  transition-duration: 100ms;
+  transition-property: background-color;
+
+  background-color: var(--output-hover-color);
 }
+

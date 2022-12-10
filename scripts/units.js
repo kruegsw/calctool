@@ -449,6 +449,8 @@ const UNITS = {
         "ft3/s": {name: "cubic foot per second", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/s", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3)},
         "ft3/m": {name: "cubic foot per minute", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/min", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60},
         "ft3/h": {name: "cubic foot per hour", symbol: "ft"+HTML_SYMBOL_CODES.supThree+"/hr", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)) * (1/60) * (1/60), convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60 * 60},
+        "gpm": {name: "US gallon per minute", symbol: "gpm", convertToBaseUnits: (oldValue) => +oldValue * (1/Math.pow(3.2808398950131235,3)) * (1/60) * 0.133680556, convertFromBaseUnits: (baseValue) => +baseValue * Math.pow(3.2808398950131235,3) * 60 * (1/0.133680556)},
+    
     },
 
     waveNumber: {

@@ -23,7 +23,7 @@ class Flow {
         this.chemicalConditionVaporPressure = new ChemicalConditionVaporPressure (this, "Vapor Pressure", "", "psia", "");
         this.chemicalConditionSaturationPressure = new ChemicalConditionSaturationPressure (this, "Saturation Pressure", "", "psia", "");
         this.chemicalConditionDensity = new ChemicalConditionDensity (this, "Density", "", "lb/ft3", "idealGas");
-        this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosityDynamic"), "sutherland");       
+        this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosityDynamic"), "perryLiquidCorrelation");       
         this.chemicalConditionCp = new ChemicalConditionCp (this, "Heat Capacity at Constant Pressure (Cp)", "", "BTU/lb/F", "perryLiquidCorrelation");
         this.chemicalConditionCv = new ChemicalConditionCv (this, "Heat Capacity at Constant Volume (Cv)", "", "BTU/lb/F", "");
         this.chemicalConditionCpCvRatio = new ChemicalConditionCpCvRatio (this, "Heat Capacity Ratio Cp/Cv", "", "", "heatCapacityRatio");
@@ -92,8 +92,6 @@ class Flow {
             // =========== TEST CODE ==================
             
             // ========================================
-
-
         })
 
         // Format the current html element (and other elements)
@@ -164,6 +162,9 @@ class Flow {
                 document.getElementById(outputName+".user.value").classList.remove('outputs-hover');
             }
         }
+
+        //document.querySelectorAll('input*').classList.remove('outputs-hover');
+        //document.querySelectorAll('input*').classList.remove('inputs-hover');
     }
 
     // This is currently used to implement (a) DOM changes (e.g. change drop down) which are prompted by user changes and can't be solved with a
@@ -195,8 +196,8 @@ class Flow {
     updateInstance(htmlElementThis) {
     
         let arrayHtmlIdParced = htmlElementThis.id.split(".");
-        
-        switch(arrayHtmlIdParced.length) {
+        let len = arrayHtmlIdParced.length;
+        switch(len) {
             case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] = htmlElementThis.value;
             case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] = htmlElementThis.value;
             case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] = htmlElementThis.value;
@@ -265,7 +266,7 @@ class Flow {
     // Update every html element value to match the data model with the path which matches the html element id.
     // And update html to show which element are 'required' for other calculations (this could be moved elsewhere).
     updateHTML() {
-        let [inputsOf, outputsOf] = this.determineDependencies();
+        //let [inputsOf, outputsOf] = this.determineDependencies();
         for (let instanceProperty of Object.keys(this).slice(1)) {
             // temporary for troubleshooting only to populate the 'value' box
             
@@ -281,6 +282,9 @@ class Flow {
                 this[instanceProperty].calculation ?
                     (+(this[instanceProperty].calculation) ? setNumberFormat(this[instanceProperty].calculation) : this[instanceProperty].calculation)
                     : "";
+
+            document.getElementById(`${instanceProperty}.method.user`).placeholder = // the placeholder for the '.user' input will show calculated value if no user input
+                this[instanceProperty].method.value || "";
             
             /*
             // Mark Fields as required or optional

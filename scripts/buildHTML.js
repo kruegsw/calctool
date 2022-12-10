@@ -1,7 +1,8 @@
 function convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArray) {
     let htmlTextArray = optionalHtmlTextArray ? optionalHtmlTextArray : [...dropDownArray];
     let dropDownListHTML = "";
-    for (let i = 0; i < dropDownArray.length; i++) {
+    let len = dropDownArray.length;
+    for (let i = 0; i < len; i++) {
 
         if (dropDownArray[i] === "") {continue}; // remove empty strings ""
 

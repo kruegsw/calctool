@@ -10,7 +10,7 @@ class FlowModelTemplate {
             html: {
                 get default() {return `<label for='${instanceProperty}'>${parent[instanceProperty].label.value}</label>`},
                 override: "",
-                get value() {return this.override ? this.override : this.default},
+                get value() {return this.override || this.default},
             },
         };
         this.user = {
@@ -19,7 +19,7 @@ class FlowModelTemplate {
                 optionsArray: "",
                 get default() {return parent.inputHTML(instanceProperty + ".user.value")},
                 override: "",
-                get value() {return this.override ? this.override : this.default}
+                get value() {return this.override || this.default}
             },
         };
         this.units = {
@@ -29,19 +29,19 @@ class FlowModelTemplate {
                 optionsArray: "",
                 get default() {return parent.selectHTML(instanceProperty + ".units.value", unitsArrayForTable(parent[instanceProperty].units.quantity)[0], unitsArrayForTable(parent[instanceProperty].units.quantity)[1])},
                 override: "",
-                get value() {return this.override ? this.override : this.default}
+                get value() {return this.override || this.default}
             },
         };
         this.method = {
             user: methodValue,
             html: {
-                optionsArray: "",
+                get optionsArray() {return Object.keys(parent[instanceProperty].methods)},
                 get default() {return parent.selectHTML(instanceProperty + ".method.user", parent[instanceProperty].methods ? Object.keys(parent[instanceProperty].methods) : "" )},
                 override: "",
-                get value() {return this.override ? this.override : this.default}
+                get value() {return this.override || this.default}
             },
-            get calculation() {return ""},
-            get value() {return this.user ? this.user : this.calculation},
+            get calculation() {return ""},                    // method order preference is specified by the child
+            get value() {return this.user || this.calculation},  // equivalent to {return this.user ? this.user : this.calculation}
         };
 
 
@@ -51,7 +51,7 @@ class FlowModelTemplate {
     }
     get input() {return this.method.value && !this.user.value ? this.methods[this.method.value].input : ""}; // inputs for the current method selected
     get calculation() {return this.method.value ? this.methods[this.method.value].calculation : ""};
-    get value() {return this.user.value ? this.user.value : this.calculation};
+    get value() {return this.user.value || this.calculation};
 
 
     /*

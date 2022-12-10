@@ -8,24 +8,24 @@ class ChemicalConditionCp extends FlowModelTemplate {
         this.methods = {
             perryLiquidCorrelation: { // TABLE 2-72 Heat Capacities of Inorganic and Organic Liquids [J/(kmol∙K)]
                 label: "Emprical Correlation of Liquid Heat Capacity at Constant Pressure (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                        let equation = chemicalDataObject.empirical.liquid.cp.perryCorrelation.equation.value;
+                        console.log(equation);
+                        let C1 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C1.value;
+                        let C2 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C2.value;
+                        let C3 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C3.value;
+                        let C4 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C4.value;
+                        let C5 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C5.value;
+                        let Tmin = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.Tmin.value;
+                        let valueAtTmin = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.valueAtTmin.value;
+                        let Tmax = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.Tmax.value;
+                        let valueAtTmax = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.valueAtTmax.value;
+                    let molecularWeight = parent.chemicalPropertyMolecularWeight.value;
                     let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "K");
-                    let molecularWeight = +chemicalDataObject.molecularWeight.value;
-                    let equation = chemicalDataObject.empirical.liquid.cp.perryCorrelation.equation.value;
-                    console.log(equation);
-                    let C1 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C1.value;
-                    let C2 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C2.value;
-                    let C3 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C3.value;
-                    let C4 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C4.value;
-                    let C5 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C5.value;
-                    let Tmin = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.Tmin.value;
-                    let valueAtTmin = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.valueAtTmin.value;
-                    let Tmax = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.Tmax.value;
-                    let valueAtTmax = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.valueAtTmax.value;
-                    let Tcritical = +chemicalDataObject.criticalTemperature.value;
+                    let Tcritical = parent.chemicalPropertyCriticalTemperature.value;
                     let tau = 1 - ( T * (1/Tcritical) );
                     if (equation === "2-114") {
                         console.log(`equation used: ${equation}`);

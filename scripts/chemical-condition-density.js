@@ -8,40 +8,42 @@ class ChemicalConditionDensity extends FlowModelTemplate {
         this.methods = {
             idealGas: {
                 label: "Ideal Gas Law",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalConditionPressure"],
+                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalConditionPressure", "chemicalPropertyMolecularWeight"],
                 source: "",
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    //let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
                     let temperature = parent.convertSpecifyUnits("chemicalConditionTemperature", "R");
                     let pressure = parent.convertSpecifyUnits("chemicalConditionPressure", "psia");
                     let gasConstant = 10.731; // ft3 * psia / lbmol / degR
-                    let molecularWeight = chemicalDataObject.molecularWeight.value;
+                    let molecularWeight = parent.chemicalPropertyMolecularWeight.value;
                     return parent.convertToLocalUnits("chemicalConditionDensity", molecularWeight * pressure / gasConstant / temperature, "lb/ft3");
                 },
             },
 
             perryLiquidCorrelation: {
                 label: "Emprical Correlation of Liquid Density (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
+
                     let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                        let equation = chemicalDataObject.empirical.liquid.density.perryCorrelation.equation.value;
+                        let C1 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C1.value;
+                        let C2 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C2.value;
+                        let C3 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C3.value;
+                        let C4 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C4.value;
+                        let C5 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C5.value;
+                        let C6 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C6.value;
+                        let C7 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C7.value;
+                        let Tmin = +chemicalDataObject.empirical.liquid.density.perryCorrelation.Tmin.value;
+                        let valueAtTmin = +chemicalDataObject.empirical.liquid.density.perryCorrelation.valueAtTmin.value;
+                        let Tmax = +chemicalDataObject.empirical.liquid.density.perryCorrelation.Tmax.value;
+                        let valueAtTmax = +chemicalDataObject.empirical.liquid.density.perryCorrelation.valueAtTmax.value;
                     let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "K");
-                    let molecularWeight = +chemicalDataObject.molecularWeight.value;
-                    let equation = chemicalDataObject.empirical.liquid.density.perryCorrelation.equation.value;
-                    let C1 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C1.value;
-                    let C2 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C2.value;
-                    let C3 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C3.value;
-                    let C4 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C4.value;
-                    let C5 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C5.value;
-                    let C6 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C6.value;
-                    let C7 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C7.value;
-                    let Tmin = +chemicalDataObject.empirical.liquid.density.perryCorrelation.Tmin.value;
-                    let valueAtTmin = +chemicalDataObject.empirical.liquid.density.perryCorrelation.valueAtTmin.value;
-                    let Tmax = +chemicalDataObject.empirical.liquid.density.perryCorrelation.Tmax.value;
-                    let valueAtTmax = +chemicalDataObject.empirical.liquid.density.perryCorrelation.valueAtTmax.value;
-                    let Tcritical = +chemicalDataObject.criticalTemperature.value;
+                    let molecularWeight = parent.chemicalPropertyMolecularWeight.value;
+                    let Tcritical = parent.chemicalPropertyCriticalTemperature.value;
                     let tau = 1 - ( T * (1/Tcritical) );
+
                     if (equation === "105") {
                         console.log(`equation used: ${equation}`);
                         let density = C1 / (Math.pow(C2,(1+Math.pow(1-(T*(1/C3)),C4))));

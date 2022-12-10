@@ -1,4 +1,6 @@
 const SOURCES = {
+    churchill1973: {reference: "Churchill, Stuart W. “Empirical Expressions for the Shear Stress in Turbulent Flow in Commercial Pipe.” AIChE Journal 19, no. 2 (March 1, 1973): 375-76. doi:10.1002/aic.690190228.", url: ""},
+    churchill1977: {reference: "Churchill, S.W.: Friction factor equation spans all fluid flow regimes. Chem. Eng. J. 91, 91-92 (1977)", url: ""},
     crane: {reference: "Flow of Fluids, Technical Paper No. 410 (Crane Co., 1988)"},
     crc: {reference: "CRC Handbook of Chemistry and Physics, 95th Edition", url: "https://edisciplinas.usp.br/pluginfile.php/4557662/mod_resource/content/1/CRC%20Handbook%20of%20Chemistry%20and%20Physics%2095th%20Edition.pdf"},
     fmwhite: {reference: "F.M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, 2006.", url: "http://paginapessoal.utfpr.edu.br/fandrade/teaching/files/Viscous_Fluid_Flow_3rd_White.pdf"},
@@ -9,5 +11,6 @@ const SOURCES = {
     pipingHandbook: {reference: 'Nayyar, Mohinder L. (2000). "A1". In Nayyar, Mohinder L. (ed.). Piping Handbook (7th ed.). New York: McGraw-Hill. ISBN 0-07-047106-1.', url: "https://engineeringdocu.files.wordpress.com/2011/12/piping-handbook.pdf"},
     nist: {reference: "National Institute of Standards and Technology - U.S. Department of Commerce", url: "https://webbook.nist.gov/chemistry/"},
     perry: {reference: "Perry, R.H., Green, D.W. and Southard, M.Z. (2018) Perry's Chemical Engineers' Handbook. 9th Edition, McGraw-Hill Education, New York, 2272.", url: ""},
+    niazkar: {reference: "Majid, Niazkar (2019). \"Revisiting the Estimation of Colebrook Friction Factor: A Comparison between Artificial Intelligence Models and C-W based Explicit Equations\". KSCE Journal of Civil Engineering. 23 (10): 4311-4326.", url: "https://link.springer.com/article/10.1007/s12205-019-2217-1"},
+    cheng: {reference: "Cheng, Nian-Sheng (September 2008). \"Formulas for Friction Factor in Transitional Regimes\". Journal of Hydraulic Engineering. 134 (9): 1357-1362.", url: "https://doi.org/10.1061/(ASCE)0733-9429(2008)134:9(1357)"},
   };
-  
