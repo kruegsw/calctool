@@ -5,6 +5,18 @@ class ChemicalConditionPhase extends FlowModelTemplate {
 
         this.units.quantity = "";
 
-        this.methods = {};
+        this.methods = {
+            "basedOnVaporPressure": {
+                label: "",
+                input: ["chemicalConditionVaporPressure", "chemicalConditionPressure"],
+                source: "",
+                get calculation() {
+                    let pressure = parent.convertSpecifyUnits("chemicalConditionPressure", "Pa absolute");
+                    let vaporPressure = parent.convertSpecifyUnits("chemicalConditionVaporPressure", "Pa absolute");
+                    let phase = vaporPressure >= pressure ? "vapor" : "liquid"
+                    return phase;
+                },
+            }
+        };
     }
 }

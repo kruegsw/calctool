@@ -10,6 +10,7 @@ class Flow {
         //this.userMaxPressure
         this.chemicalPropertyName = new ChemicalPropertyName (this, "Chemical", "air", "", "");
         this.chemicalPropertyCAS = new ChemicalPropertyCAS (this, "CAS Number", "", "", "lookup");
+        this.chemicalPropertyFamily = new ChemicalPropertyFamily (this, "Family", "", "", "lookup");
         this.chemicalPropertyMolecularWeight = new ChemicalPropertyMolecularWeight (this, "Molecular Weight", "", "", "lookup");
         this.chemicalPropertyCriticalPressure = new ChemicalPropertyCriticalPressure (this, "Critical Pressure", "", "psia", "lookup");
         this.chemicalPropertyCriticalTemperature = new ChemicalPropertyCriticalTemperature (this, "Critical Temperature", "", "K", "lookup");
@@ -19,8 +20,8 @@ class Flow {
         this.chemicalPropertyNormalBoilingTemperature = new ChemicalPropertyNormalBoilingTemperature (this, "Normal Boiling Point", "", "C", "lookup");
         this.chemicalConditionTemperature = new ChemicalConditionTemperature (this, "Temperature", "25", "C", "");
         this.chemicalConditionPressure = new ChemicalConditionPressure (this, "Pressure", "0", "psig", "");
-        this.chemicalConditionPhase = new ChemicalConditionPhase (this, "Phase", "", "", "");
-        this.chemicalConditionVaporPressure = new ChemicalConditionVaporPressure (this, "Vapor Pressure", "", "psia", "");
+        this.chemicalConditionPhase = new ChemicalConditionPhase (this, "Phase", "", "", "basedOnVaporPressure");
+        this.chemicalConditionVaporPressure = new ChemicalConditionVaporPressure (this, "Vapor Pressure", "", "psia", "perryVaporPressureCorrelation");
         this.chemicalConditionSaturationPressure = new ChemicalConditionSaturationPressure (this, "Saturation Pressure", "", "psia", "");
         this.chemicalConditionDensity = new ChemicalConditionDensity (this, "Density", "", "lb/ft3", "idealGas");
         this.chemicalConditionViscosity = new ChemicalConditionViscosity(this, "Absolute (Dynamic) Viscosity", "", defaultUnits("viscosityDynamic"), "perryLiquidCorrelation");       
