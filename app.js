@@ -1,6 +1,6 @@
 function init() {
     
-    let flow1 = new Flow("flow1");
+    let flow1 = new PressureDropController("flow1");
 
     let span = document.createElement('span');
     let body = document.getElementsByTagName("body");
