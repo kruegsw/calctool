@@ -30,8 +30,10 @@ class ChemicalPropertyName extends FlowModelTemplate {
         this.methods = {};
 
         // VIEW
-        this.user.html.optionsArray = arrayOfChemicalSearchTerms();
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.dataListHTML("chemicalPropertyName.user.value", this.optionsArray) } } );
+        //[casArray, searchTermArray] = chemicalArrayForTable();
+        //this.user.html.optionsArray = casArray;
+        //let optionalHtmlTextArray = searchTermArray;
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.dataListHTML("chemicalPropertyName.user.value", chemicalArrayForTable()[0], chemicalArrayForTable()[1]) } } );
 
 
     }

@@ -8,10 +8,10 @@ class ChemicalPropertyCriticalPressure extends FlowModelTemplate {
         this.methods = {
             lookup: {
                 label: "",
-                input: ["chemicalPropertyName"],
+                input: ["chemicalPropertyCAS"],
                 source: "",
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                     return parent.convertToLocalUnits("chemicalPropertyCriticalPressure", chemicalDataObject.criticalPressure.value, "MPa absolute");
                 },
             }

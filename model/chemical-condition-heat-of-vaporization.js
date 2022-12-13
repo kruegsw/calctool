@@ -8,10 +8,10 @@ class ChemicalConditionHeatOfVaporization extends FlowModelTemplate {
         this.methods = {
             perryCorrelation: { // TABLE 2-69 Heats of Vaporization of Inorganic and Organic Liquids (J/kmol)
                 label: "Emprical Correlation of Heats of Vaporization (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let C1 = +chemicalDataObject.empirical.liquid.heatVaporization.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.liquid.heatVaporization.perryCorrelation.C2.value;
                         let C3 = +chemicalDataObject.empirical.liquid.heatVaporization.perryCorrelation.C3.value;

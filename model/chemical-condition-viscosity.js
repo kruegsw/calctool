@@ -22,12 +22,12 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
         this.methods = {
             sutherland: {
                 label: "Sutherland Method",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature"],
                 source: SOURCES.moody,
                 get calculation() {
                     // checkinputs() ...
                     // need to add logic to detect if inputs are not provided and make value = "" rather than throw error (?)
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let mu_o = chemicalDataObject.empirical.gaseous.viscosity.sutherland.mu_o.value;
                         let T_o = chemicalDataObject.empirical.gaseous.viscosity.sutherland.T_o.value;
                         let S_mu = chemicalDataObject.empirical.gaseous.viscosity.sutherland.S_mu.value;
@@ -37,10 +37,10 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
             },
             perryVaporCorrelation: { // TABLE 2-138 Vapor Viscosity of Inorganic and Organic Substances (Pa∙s)
                 label: "Emprical Correlation of Vapor Viscosity (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let C1 = +chemicalDataObject.empirical.gaseous.viscosity.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.gaseous.viscosity.perryCorrelation.C2.value;
                         let C3 = +chemicalDataObject.empirical.gaseous.viscosity.perryCorrelation.C3.value;
@@ -56,10 +56,10 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
             },
             perryLiquidCorrelation: { // TABLE 2-139 Viscosity of Inorganic and Organic Liquids (Pa∙s)
                 label: "Emprical Correlation of Liquid Viscosity (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let equation = chemicalDataObject.empirical.liquid.viscosity.perryCorrelation.equation.value;
                         let C1 = +chemicalDataObject.empirical.liquid.viscosity.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.liquid.viscosity.perryCorrelation.C2.value;

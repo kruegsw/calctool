@@ -22,9 +22,19 @@ function selectChemicalDataObject(chemicalIdentifier) { // select object from PR
     //return PROPERTIES.filter((element, index, array) => ( element.searchTerm === chemicalIdentifier || element.cas === chemicalIdentifier || element.name === chemicalIdentifier))[0]; // [0] to select object in array
 }
 
-function arrayOfChemicalSearchTerms() {
-    return Object.keys(PROPERTIES);
+function chemicalArrayForTable() {
+    //return Object.keys(PROPERTIES);
     //return PROPERTIES.map((chemical, index, array) => {return chemical.searchTerm})
+
+    let casArray =  Object.keys(PROPERTIES);
+    
+    let searchTermArray = [];
+    
+    for (let cas of casArray) {
+        searchTermArray.push(PROPERTIES[cas].name + "" + "[" + PROPERTIES[cas].cas + "]");
+    }
+    return [casArray, searchTermArray];
+
 };
 
 

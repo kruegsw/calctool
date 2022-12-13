@@ -8,10 +8,10 @@ class ChemicalConditionCp extends FlowModelTemplate {
         this.methods = {
             perryLiquidCorrelation: { // TABLE 2-72 Heat Capacities of Inorganic and Organic Liquids [J/(kmol∙K)]
                 label: "Emprical Correlation of Liquid Heat Capacity at Constant Pressure (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let equation = chemicalDataObject.empirical.liquid.cp.perryCorrelation.equation.value;
                         //console.log(equation);
                         let C1 = +chemicalDataObject.empirical.liquid.cp.perryCorrelation.C1.value;

@@ -8,10 +8,10 @@ class ChemicalConditionThermalConductivity extends FlowModelTemplate {
         this.methods = {
             perryVaporCorrelation: { // TABLE 2-145 Vapor Thermal Conductivity of Inorganic and Organic Substances [W/(m∙K)]
                 label: "Emprical Correlation of Vapor Thermal Conductivity (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyCriticalTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let equation = chemicalDataObject.empirical.gaseous.thermalConductivity.perryCorrelation.equation.value;
                         let C1 = +chemicalDataObject.empirical.gaseous.thermalConductivity.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.gaseous.thermalConductivity.perryCorrelation.C2.value;
@@ -37,10 +37,10 @@ class ChemicalConditionThermalConductivity extends FlowModelTemplate {
             },
             perryLiquidCorrelation: { // TABLE 2-147 Thermal Conductivity of Inorganic and Organic Liquids [W/(m∙K)]
                 label: "Emprical Correlation of Liquid Thermal Conductivity (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                     let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "K");
                         let C1 = +chemicalDataObject.empirical.liquid.thermalConductivity.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.liquid.thermalConductivity.perryCorrelation.C2.value;

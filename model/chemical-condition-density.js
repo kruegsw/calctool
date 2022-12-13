@@ -8,7 +8,7 @@ class ChemicalConditionDensity extends FlowModelTemplate {
         this.methods = {
             idealGas: {
                 label: "Ideal Gas Law",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalConditionPressure", "chemicalPropertyMolecularWeight"],
+                input: ["chemicalConditionTemperature", "chemicalConditionPressure", "chemicalPropertyMolecularWeight"],
                 source: "",
                 get calculation() {
                     //let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
@@ -22,11 +22,11 @@ class ChemicalConditionDensity extends FlowModelTemplate {
 
             perryLiquidCorrelation: {
                 label: "Emprical Correlation of Liquid Density (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature", "chemicalPropertyMolecularWeight", "chemicalPropertyCriticalTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
 
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let equation = chemicalDataObject.empirical.liquid.density.perryCorrelation.equation.value;
                         let C1 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.liquid.density.perryCorrelation.C2.value;
@@ -45,13 +45,13 @@ class ChemicalConditionDensity extends FlowModelTemplate {
                     let tau = 1 - ( T * (1/Tcritical) );
 
                     if (equation === "105") {
-                        console.log(`equation used: ${equation}`);
+                        //console.log(`equation used: ${equation}`);
                         let density = C1 / (Math.pow(C2,(1+Math.pow(1-(T*(1/C3)),C4))));
                         return parent.convertToLocalUnits("chemicalConditionDensity", density*molecularWeight, "g/dm3");
                     } else {
-                        console.log(`equation used: ${equation}`);
+                        //console.log(`equation used: ${equation}`);
                         let density = C1+C2*Math.pow(tau,1/3)+C3*Math.pow(tau,2/3)+C4*Math.pow(tau,5/3)+C5*Math.pow(tau,16/3)+C6*Math.pow(tau,46/3)+C7*Math.pow(tau,110/3);
-                        console.log(`density from equation ${equation} is ${density}.`);
+                        //console.log(`density from equation ${equation} is ${density}.`);
                         return parent.convertToLocalUnits("chemicalConditionDensity", density*molecularWeight, "g/dm3");
                     };
                 },

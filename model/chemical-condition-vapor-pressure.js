@@ -8,10 +8,10 @@ class ChemicalConditionVaporPressure extends FlowModelTemplate {
         this.methods = {
             perryVaporPressureCorrelation: { // TABLE 2-8 Vapor Pressure of Inorganic and Organic Liquids (P in Pa, T in K)
                 label: "Emprical Correlation of Vapor Pressure (Perry's)",
-                input: ["chemicalPropertyName", "chemicalConditionTemperature"],
+                input: ["chemicalPropertyCAS", "chemicalConditionTemperature"],
                 source: SOURCES.perry,
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
                         let C1 = +chemicalDataObject.empirical.gaseous.vaporPressure.perryCorrelation.C1.value;
                         let C2 = +chemicalDataObject.empirical.gaseous.vaporPressure.perryCorrelation.C2.value;
                         let C3 = +chemicalDataObject.empirical.gaseous.vaporPressure.perryCorrelation.C3.value;
