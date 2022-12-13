@@ -18,10 +18,14 @@
 // ==============================
 
 function selectChemicalDataObject(chemicalIdentifier) { // select object from PROPERTIES array based on properties: searchTerm, cas, or name
-	return PROPERTIES.filter((element, index, array) => ( element.searchTerm === chemicalIdentifier || element.cas === chemicalIdentifier || element.name === chemicalIdentifier))[0]; // [0] to select object in array
+    return PROPERTIES[chemicalIdentifier] || PROPERTIES[""];
+    //return PROPERTIES.filter((element, index, array) => ( element.searchTerm === chemicalIdentifier || element.cas === chemicalIdentifier || element.name === chemicalIdentifier))[0]; // [0] to select object in array
 }
 
-function arrayOfChemicalSearchTerms() {return PROPERTIES.map((chemical, index, array) => {return chemical.searchTerm})};
+function arrayOfChemicalSearchTerms() {
+    return Object.keys(PROPERTIES);
+    //return PROPERTIES.map((chemical, index, array) => {return chemical.searchTerm})
+};
 
 
 function determineViscositySutherland(chemicalIdentifier, temperature) {

@@ -72,11 +72,11 @@ class ChemicalConditionViscosity extends FlowModelTemplate {
                         let valueAtTmax = +chemicalDataObject.empirical.liquid.viscosity.perryCorrelation.valueAtTmax.value;
                     let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "K");
                     if (equation === "101") {
-                        console.log(`equation used: ${equation}`);
+                        //console.log(`equation used: ${equation}`);
                         let viscosity = Math.exp(C1+C2*(1/T)+C3*Math.log(T)+C4*Math.pow(T,C5));
                         return parent.convertToLocalUnits("chemicalConditionViscosity", viscosity, "Pa*s");
                     } else { // equation "100"
-                        console.log(`equation used: ${equation}`);
+                        //console.log(`equation used: ${equation}`);
                         let viscosity = C1+C2*T+C3*Math.pow(T,2)+C4*Math.pow(T,3)*C5*Math.pow(T,4);
                         return parent.convertToLocalUnits("chemicalConditionViscosity", viscosity, "Pa*s");
                     };

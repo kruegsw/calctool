@@ -23,7 +23,7 @@ class ChemicalConditionVaporPressure extends FlowModelTemplate {
                         let valueAtTmax = +chemicalDataObject.empirical.gaseous.vaporPressure.perryCorrelation.valueAtTmax.value;
                     let T = parent.convertSpecifyUnits("chemicalConditionTemperature", "K");
                     let vaporPressure = Math.exp(C1+C2*(1/T)+C3*Math.log(T)+C4*Math.pow(T,C5));
-                    console.log(vaporPressure);
+                    //console.log(vaporPressure);
                     return parent.convertToLocalUnits("chemicalConditionVaporPressure", vaporPressure, "Pa absolute");
                 },
             },

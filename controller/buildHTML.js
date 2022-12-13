@@ -1,4 +1,5 @@
 function convertArrayToOptionsHTML(dropDownArray, valueAttr, optionalHtmlTextArray) {
+    //console.log(dropDownArray);
     let htmlTextArray = optionalHtmlTextArray ? optionalHtmlTextArray : [...dropDownArray];
     let dropDownListHTML = "";
     let len = dropDownArray.length;
