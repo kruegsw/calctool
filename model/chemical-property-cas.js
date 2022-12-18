@@ -8,10 +8,10 @@ class ChemicalPropertyCAS extends FlowModelTemplate {
         this.methods = {
             lookup: {
                 label: "",
-                input: ["chemicalPropertyName"],
+                input: ["chemicalPropertySearch"],
                 source: "",
                 get calculation() {
-                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyName.value);
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertySearch.value);
                     return chemicalDataObject.cas;
                 },
             }

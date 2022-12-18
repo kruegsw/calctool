@@ -50,7 +50,9 @@ class FlowModelTemplate {
 
     }
     get input() {return this.method.value && !this.user.value ? this.methods[this.method.value].input : ""}; // inputs for the current method selected
-    get calculation() {return this.method.value ? this.methods[this.method.value].calculation : ""};
+    get calculation() {
+        //console.log(this.methods[this.method.value]);
+        return this.method.value ? this.methods[this.method.value].calculation : ""};
     get value() {return this.user.value || this.calculation};
 
 

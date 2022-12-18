@@ -8,7 +8,8 @@ class PressureDropController extends CalcControllerTemplate {
         //this.userMaxVelocity
         //this.userMinPressure
         //this.userMaxPressure
-        this.chemicalPropertyName = new ChemicalPropertyName (this, "Chemical", "", "", "");
+        this.chemicalPropertySearch = new ChemicalPropertySearch (this, "Chemical Search", "", "", "");
+        this.chemicalPropertyName = new ChemicalPropertyName (this, "Chemical", "", "", "lookup");
         this.chemicalPropertyCAS = new ChemicalPropertyCAS (this, "CAS Number", "", "", "lookup");
         this.chemicalPropertyFamily = new ChemicalPropertyFamily (this, "Family", "", "", "lookup");
         this.chemicalPropertyMolecularWeight = new ChemicalPropertyMolecularWeight (this, "Molecular Weight", "", "", "lookup");

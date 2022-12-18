@@ -1,40 +1,24 @@
 class ChemicalPropertyName extends FlowModelTemplate {
-    constructor(parent, labelValue, userValue, unitsValue, methodValue)
+    constructor(parent, label, user, unitsValue, method,)
     {
-        super(parent, labelValue, userValue, unitsValue, methodValue, "chemicalPropertyName");
-
-        /*
-        this.overrideUserHtml = {
-            user: {
-                get html() {return parent.dataListHTML("chemicalPropertyName.user.value", arrayOfChemicalSearchTerms())}
-            }
-        }
-        */
-
-        /*
-        this.user = {
-            value: userValue,
-            optionsArray: arrayOfChemicalSearchTerms(),
-            html: {
-                get default() {return parent.inputHTML(instanceProperty, "user", "value")},
-                get override() {return parent.dataListHTML("chemicalPropertyName.user.value", arrayOfChemicalSearchTerms())},
-                get value() {return this.override ? this.override : this.default}
-            },
-        };
-        */
-
-        // this.user.html.override = "";
+        super(parent, label, user, unitsValue, method, "chemicalPropertyName");
 
         this.units.quantity = "";
 
-        this.methods = {};
+        this.methods = {
+            lookup: {
+                label: "",
+                input: ["chemicalPropertyCAS"],
+                source: "",
+                get calculation() {
+                    let chemicalDataObject = selectChemicalDataObject(parent.chemicalPropertyCAS.value);
+                    return chemicalDataObject.name;
+                },
+            }
+        };
 
-        // VIEW
-        //[casArray, searchTermArray] = chemicalArrayForTable();
-        //this.user.html.optionsArray = casArray;
-        //let optionalHtmlTextArray = searchTermArray;
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.dataListHTML("chemicalPropertyName.user.value", chemicalArrayForTable()[0], chemicalArrayForTable()[1]) } } );
-
+        // use getter so the html override is reference later (when table is built) and not now (during object definition) otherwise errors
+        //Object.defineProperty( this.user.html, 'override', { get() { return parent.outputHTML("chemicalPropertyName.user.value") } } );
 
     }
 
