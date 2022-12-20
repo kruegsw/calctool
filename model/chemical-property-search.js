@@ -34,7 +34,7 @@ class ChemicalPropertySearch extends FlowModelTemplate {
         //this.user.html.optionsArray = casArray;
         //let optionalHtmlTextArray = searchTermArray;
         // use getter so the html override is reference later (when table is built) and not now (during object definition) otherwise errors
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.dataListHTML("chemicalPropertySearch.user.value", chemicalArrayForTable()[0], chemicalArrayForTable()[1]) } } );
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.dataListHTML(parent.objectName+".chemicalPropertySearch.user.value", chemicalArrayForTable()[0], chemicalArrayForTable()[1]) } } );
 
 
     }

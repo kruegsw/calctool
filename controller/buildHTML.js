@@ -85,7 +85,7 @@ function buildBasicTableHTML(dataArray, captionText) {
 
 }
 
-function createAndInsertFlowTable(dataObject, destinationID, columns, captionText = "", tableClass = "") {
+function createAndInsertFlowTable(dataObject, destinationID, columns, tableId, tableName, captionText = "", tableClass = "") {
 
     let dataArray = dataObject.flowInstanceArrayForTable(columns); // data for table comes from another JS file
 
@@ -112,6 +112,10 @@ function createAndInsertFlowTable(dataObject, destinationID, columns, captionTex
     let headerArray = dataArray.shift(); /* dataArray first element is removed and saved as variable headingArray */
    
     let newTable = document.createElement("table");
+
+        //newTable.id = tableId;
+
+        //newTable.name = tableName;
 
         let caption_1 = document.createElement("caption");
         caption_1.innerHTML = captionText;

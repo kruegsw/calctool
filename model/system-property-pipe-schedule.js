@@ -9,7 +9,7 @@ class SystemPropertyPipeSchedule extends FlowModelTemplate {
 
         // VIEW
         this.user.html.optionsArray = arrayOfPipeSchedule(parent.systemPropertyPipeStandard.value, parent.systemPropertyPipeNominalDiameter.value);
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML("systemPropertyPipeSchedule.user.value", this.optionsArray) } } );
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML(parent.objectName+".systemPropertyPipeSchedule.user.value", this.optionsArray) } } );
        
     }
 }

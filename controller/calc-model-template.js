@@ -11,7 +11,7 @@ class CalcControllerTemplate {
     eventHandler() {
 
         // If html element value is changed by the user
-        document.addEventListener("change", (e) => {
+        document.getElementById(this.objectName).addEventListener("change", (e) => {
 
             let htmlElementThis = document.getElementById(e.target.attributes.id.value);
 
@@ -64,14 +64,18 @@ class CalcControllerTemplate {
     // Determine inputs and outputs for the hovered-over html element, add hover class when mouse is no longer hovering.
     mouseOver(htmlElementThis) {
         let [inputsOf, outputsOf] = this.determineDependencies();
-        
+
         let inputNamesArray = inputsOf[htmlElementThis.name];
         let outputNamesArray = outputsOf[htmlElementThis.name];
 
+        let arrayHtmlIdParced = htmlElementThis.id.split(".");
+        let instance = arrayHtmlIdParced[0];
+        //let instanceProperty = arrayHtmlIdParced[1];
 
         if (inputNamesArray) {
             for (let inputName of inputNamesArray) {
-                document.getElementById(inputName+".user.value").classList.add('inputs-hover');
+                //console.log(this.objectName+"."+inputName+".user.value");
+                document.getElementById(instance+"."+inputName+".user.value").classList.add('inputs-hover');
             }
         }
 
@@ -79,7 +83,7 @@ class CalcControllerTemplate {
 
         if (outputNamesArray) {
             for (let outputName of outputNamesArray) {
-                document.getElementById(outputName+".user.value").classList.add('outputs-hover');
+                document.getElementById(instance+"."+outputName+".user.value").classList.add('outputs-hover');
             }
         }
     }
@@ -93,9 +97,13 @@ class CalcControllerTemplate {
         let inputNamesArray = inputsOf[htmlElementThis.name];
         let outputNamesArray = outputsOf[htmlElementThis.name];
 
+        let arrayHtmlIdParced = htmlElementThis.id.split(".");
+        let instance = arrayHtmlIdParced[0];
+        //let instanceProperty = arrayHtmlIdParced[1];
+
         if (inputNamesArray) {
             for (let inputName of inputNamesArray) {
-                document.getElementById(inputName+".user.value").classList.remove('inputs-hover');
+                document.getElementById(instance+"."+inputName+".user.value").classList.remove('inputs-hover');
             }
         }
 
@@ -103,7 +111,7 @@ class CalcControllerTemplate {
 
         if (outputNamesArray) {
             for (let outputName of outputNamesArray) {
-                document.getElementById(outputName+".user.value").classList.remove('outputs-hover');
+                document.getElementById(instance+"."+outputName+".user.value").classList.remove('outputs-hover');
             }
         }
 
@@ -124,9 +132,10 @@ class CalcControllerTemplate {
 
     updateUserValueUnits(htmlElementThis) {
         let arrayHtmlIdParced = htmlElementThis.id.split(".");
-        let instanceProperty = arrayHtmlIdParced[0];
-        let correspondingHtmlUserInput = document.getElementById(arrayHtmlIdParced[0]+".user.value");
-        if (arrayHtmlIdParced[1] + "." + arrayHtmlIdParced[2] === "units.value" && correspondingHtmlUserInput.value !== "") {
+        let instance = arrayHtmlIdParced[0];
+        let instanceProperty = arrayHtmlIdParced[1];
+        let correspondingHtmlUserInput = document.getElementById(instance+"."+instanceProperty+".user.value");
+        if (arrayHtmlIdParced[2] + "." + arrayHtmlIdParced[3] === "units.value" && correspondingHtmlUserInput.value !== "") {
             //this[instanceProperty].units.value = htmlElementThis.value; // note convertSpecifyUnits() looks at the instance not the html
             //correspondingHtmlUserInput.value = this.convertSpecifyUnits(instanceProperty, htmlElementThis.value);
             //ocument.getElementById(instanceProperty + ".units.value").value = this[instanceProperty].units.value;
@@ -138,13 +147,13 @@ class CalcControllerTemplate {
     // Update the data model (e.g. "ChemicalPropertyMolecularWeight") instance (e.g. "chemicalPropertyMolecularWeight") which is identified by
     // the html element id.  The html id (e.g. chemicalPropertyMolecularWeight.user.value) describes the location of the property in the model.
     updateInstance(htmlElementThis) {
-    
         let arrayHtmlIdParced = htmlElementThis.id.split(".");
         let len = arrayHtmlIdParced.length;
         switch(len) {
-            case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] = htmlElementThis.value;
-            case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] = htmlElementThis.value;
-            case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] = htmlElementThis.value;
+            case 3: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] = htmlElementThis.value;
+            case 4: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] = htmlElementThis.value;
+            case 5: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] = htmlElementThis.value;
+            case 6: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] = htmlElementThis.value;
             default: return console.log("updateInstance() did not update anything");
         }
     }
@@ -211,23 +220,26 @@ class CalcControllerTemplate {
     // And update html to show which element are 'required' for other calculations (this could be moved elsewhere).
     updateHTML() {
         //let [inputsOf, outputsOf] = this.determineDependencies();
+
+        let instance = this.objectName;
+
         for (let instanceProperty of Object.keys(this).slice(1)) {
             // temporary for troubleshooting only to populate the 'value' box
             
-            document.getElementById(instanceProperty + ".calculation") ? document.getElementById(instanceProperty + ".calculation").value = this[instanceProperty].calculation : ""; 
-            document.getElementById(instanceProperty + ".value") ? document.getElementById(instanceProperty + ".value").value = this[instanceProperty].value : "";
+            document.getElementById(instance + "." + instanceProperty + ".calculation") ? document.getElementById(instance + "." + instanceProperty + ".calculation").value = this[instanceProperty].calculation : ""; 
+            document.getElementById(instance + "." + instanceProperty + ".value") ? document.getElementById(instance + "." + instanceProperty + ".value").value = this[instanceProperty].value : "";
             
-            document.getElementById(instanceProperty + ".units.value").value = this[instanceProperty].units.value; // this only necessary for the getter systemPipeNominalDiameter
+            document.getElementById(instance + "." + instanceProperty + ".units.value").value = this[instanceProperty].units.value; // this only necessary for the getter systemPipeNominalDiameter
 
             // end temporary code
 
             //document.getElementsByName(`${element}.user`)[0].placeholder = this[element].calculation; // if empty, the 'user' text box shows the current 'value'
-            document.getElementById(`${instanceProperty}.user.value`).placeholder = // the placeholder for the '.user' input will show calculated value if no user input
+            document.getElementById(`${instance}.${instanceProperty}.user.value`).placeholder = // the placeholder for the '.user' input will show calculated value if no user input
                 this[instanceProperty].calculation ?
                     (+(this[instanceProperty].calculation) ? setNumberFormat(this[instanceProperty].calculation) : this[instanceProperty].calculation)
                     : "";
 
-            document.getElementById(`${instanceProperty}.method.user`).placeholder = // the placeholder for the '.user' input will show calculated value if no user input
+            document.getElementById(`${instance}.${instanceProperty}.method.user`).placeholder = // the placeholder for the '.user' input will show calculated value if no user input
                 this[instanceProperty].method.value || "";
             
             /*
@@ -264,7 +276,8 @@ class CalcControllerTemplate {
     dataListHTML(instancePropertyIdString, dropDownArray, optionalHtmlTextArray) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
-        let instanceProperty = arrayHtmlIdParced[0];
+        console.log(arrayHtmlIdParced);
+        let instanceProperty = arrayHtmlIdParced[1];
 
         return buildInputDataListHTML(
             "search", // type
@@ -273,9 +286,10 @@ class CalcControllerTemplate {
             instanceProperty, // name
             (() => {
                 switch(arrayHtmlIdParced.length) {
-                    case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] : "";
-                    case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
-                    case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 3: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
+                    case 4: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 5: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] : "";
+                    case 6: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] : "";
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
@@ -287,16 +301,17 @@ class CalcControllerTemplate {
     selectHTML(instancePropertyIdString, dropDownArray, optionalHtmlTextArray) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
-        let instanceProperty = arrayHtmlIdParced[0];
+        let instanceProperty = arrayHtmlIdParced[1];
 
         return buildSelectHTML(
             instancePropertyIdString, // id
             instanceProperty, // name
             (() => {
                 switch(arrayHtmlIdParced.length) {
-                    case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] : "";
-                    case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
-                    case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 3: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
+                    case 4: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 5: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] : "";
+                    case 6: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] : "";
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
@@ -308,7 +323,7 @@ class CalcControllerTemplate {
     inputHTML(instancePropertyIdString, dropDownArray) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
-        let instanceProperty = arrayHtmlIdParced[0];
+        let instanceProperty = arrayHtmlIdParced[1];
 
 
         return buildInputTextHTML(
@@ -317,9 +332,10 @@ class CalcControllerTemplate {
             instanceProperty, // name
             (() => {
                 switch(arrayHtmlIdParced.length) {
-                    case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] : "";
-                    case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
-                    case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 3: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
+                    case 4: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 5: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] : "";
+                    case 6: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] : "";
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
@@ -329,17 +345,23 @@ class CalcControllerTemplate {
     outputHTML(instancePropertyIdString) {
 
         let arrayHtmlIdParced = instancePropertyIdString.split(".");
-        let instanceProperty = arrayHtmlIdParced[0];
+        let instanceProperty = arrayHtmlIdParced[1];
+
+        console.log(this);
+        console.log(this[instanceProperty]);
+        console.log(this[instanceProperty].input);
 
         return buildOutputHTML(
+
             this[instanceProperty].input ? this[instanceProperty].input : [],  // for
             instancePropertyIdString, // id
             instanceProperty, // name
             (() => {
                 switch(arrayHtmlIdParced.length) {
-                    case 2: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]] : "";
-                    case 3: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
-                    case 4: return this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[0]][arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 3: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]] : "";
+                    case 4: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]] : "";
+                    case 5: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]] : "";
+                    case 6: return this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] ? this[arrayHtmlIdParced[1]][arrayHtmlIdParced[2]][arrayHtmlIdParced[3]][arrayHtmlIdParced[4]][arrayHtmlIdParced[5]] : "";
                     default: console.log("updateInstance() did not update anything");
                 }
             })(), // value
@@ -354,14 +376,14 @@ class CalcControllerTemplate {
     implementPreference(instancePoperty, userValue, userDropDownArray, unitsValue, unitsDropDownArray, methodValue) {
         if(userValue !== undefined) {
             this[instancePoperty].user.value = userValue;
-            document.getElementById(instancePoperty + ".user.value").value = userValue;
+            document.getElementById(this.objectName+"."+instancePoperty + ".user.value").value = userValue;
         };
-        if(userDropDownArray) {document.getElementById(instancePoperty + ".user.value").innerHTML = convertArrayToOptionsHTML(userDropDownArray, userValue)};
+        if(userDropDownArray) {document.getElementById(this.objectName+"."+instancePoperty + ".user.value").innerHTML = convertArrayToOptionsHTML(userDropDownArray, userValue)};
         if(unitsValue) {
             this[instancePoperty].units.value = unitsValue;
-            document.getElementById(instancePoperty + ".units.value").value = unitsValue;
+            document.getElementById(this.objectName+"."+instancePoperty + ".units.value").value = unitsValue;
         };
-        if(unitsDropDownArray) {document.getElementById(instancePoperty + ".units.value").innerHTML = convertArrayToOptionsHTML(unitsDropDownArray, unitsValue)};
+        if(unitsDropDownArray) {document.getElementById(this.objectName+"."+instancePoperty + ".units.value").innerHTML = convertArrayToOptionsHTML(unitsDropDownArray, unitsValue)};
         if(methodValue) {this[instancePoperty].method.value = methodValue};
     };
 

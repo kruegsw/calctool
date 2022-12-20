@@ -9,10 +9,10 @@ class SystemPropertyPipeNominalDiameter extends FlowModelTemplate {
 
         // VIEW
         this.user.html.optionsArray = arrayOfPipeNominalDiameter(parent.systemPropertyPipeStandard.value);
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML("systemPropertyPipeNominalDiameter.user.value", this.optionsArray) } } );
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML(parent.objectName+".systemPropertyPipeNominalDiameter.user.value", this.optionsArray) } } );
         
         this.units.html.optionsArray = arrayOfPipeNominalDiameter(parent.systemPropertyPipeStandard.value);
-        Object.defineProperty( this.units.html, 'override', { get() { return parent.outputHTML("systemPropertyPipeNominalDiameter.units.value") } } );
+        Object.defineProperty( this.units.html, 'override', { get() { return parent.outputHTML(parent.objectName+".systemPropertyPipeNominalDiameter.units.value") } } );
 
 
         /*

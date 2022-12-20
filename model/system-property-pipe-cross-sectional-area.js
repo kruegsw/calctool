@@ -11,7 +11,7 @@ class SystemPropertyPipeCrossSectionalArea extends FlowModelTemplate {
                 input: ["systemPropertyPipeInnerDiameter"],
                 source: "",
                 get calculation() {
-                    let diameter = parent.convertSpecifyUnits("systemPropertyPipeInnerDiameter", "meter");
+                    let diameter = parent.convertSpecifyUnits("systemPropertyPipeInnerDiameter", "m");
                     return parent.convertToLocalUnits("systemPropertyPipeCrossSectionalArea", Math.PI * Math.pow(diameter,2) / 4, "m2");
                 },
             }

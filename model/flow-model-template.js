@@ -17,7 +17,7 @@ class FlowModelTemplate {
             value: userValue,
             html: {
                 optionsArray: "",
-                get default() {return parent.inputHTML(instanceProperty + ".user.value")},
+                get default() {return parent.inputHTML(parent.objectName + "." + instanceProperty + ".user.value")},
                 override: "",
                 get value() {return this.override || this.default}
             },
@@ -27,7 +27,7 @@ class FlowModelTemplate {
             quantity: "",                               // units.quantity is determined by child
             html: {
                 optionsArray: "",
-                get default() {return parent.selectHTML(instanceProperty + ".units.value", unitsArrayForTable(parent[instanceProperty].units.quantity)[0], unitsArrayForTable(parent[instanceProperty].units.quantity)[1])},
+                get default() {return parent.selectHTML(parent.objectName + "." + instanceProperty + ".units.value", unitsArrayForTable(parent[instanceProperty].units.quantity)[0], unitsArrayForTable(parent[instanceProperty].units.quantity)[1])},
                 override: "",
                 get value() {return this.override || this.default}
             },
@@ -36,7 +36,7 @@ class FlowModelTemplate {
             user: methodValue,
             html: {
                 get optionsArray() {return Object.keys(parent[instanceProperty].methods)},
-                get default() {return parent.selectHTML(instanceProperty + ".method.user", parent[instanceProperty].methods ? Object.keys(parent[instanceProperty].methods) : "" )},
+                get default() {return parent.selectHTML(parent.objectName + "." + instanceProperty + ".method.user", parent[instanceProperty].methods ? Object.keys(parent[instanceProperty].methods) : "" )},
                 override: "",
                 get value() {return this.override || this.default}
             },

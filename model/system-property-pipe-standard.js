@@ -9,7 +9,7 @@ class SystemPropertyPipeStandard extends FlowModelTemplate {
 
         // VIEW
         this.user.html.optionsArray = arrayOfPipeStandards();
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML("systemPropertyPipeStandard.user.value", this.optionsArray) } } );
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML(parent.objectName+".systemPropertyPipeStandard.user.value", this.optionsArray) } } );
 
         /*this.events = {
             "NPS" : function() {

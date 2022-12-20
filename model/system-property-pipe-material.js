@@ -9,7 +9,7 @@ class SystemPropertyPipeMaterial extends FlowModelTemplate {
 
         // VIEW
         this.user.html.optionsArray = arrayOfPipeMaterialNames();
-        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML("systemPropertyPipeMaterial.user.value", this.optionsArray) } } );
+        Object.defineProperty( this.user.html, 'override', { get() { return parent.selectHTML(parent.objectName+".systemPropertyPipeMaterial.user.value", this.optionsArray) } } );
 
     }
 }
