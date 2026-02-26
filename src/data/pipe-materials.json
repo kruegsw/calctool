@@ -1,0 +1,14 @@
+[
+  { "name": "Commercial Steel or Wrought Iron", "roughness": 0.00015, "source": "moody" },
+  { "name": "Galvanized Iron", "roughness": 0.0005, "source": "moody" },
+  { "name": "Drawn Tubing", "roughness": 0.000005, "source": "moody" },
+  { "name": "Cast Iron", "roughness": 0.00085, "source": "moody" },
+  { "name": "Concrete - less rough", "roughness": 0.001, "source": "moody" },
+  { "name": "Concrete - more rough", "roughness": 0.01, "source": "moody" },
+  { "name": "Asphalted Cast Iron", "roughness": 0.0004, "source": "moody" },
+  { "name": "Riveted Steel - less rough", "roughness": 0.003, "source": "moody" },
+  { "name": "Riveted Steel - more rough", "roughness": 0.03, "source": "moody" },
+  { "name": "Wood Stave - less rough", "roughness": 0.0006, "source": "moody" },
+  { "name": "Wood Stave - more rough", "roughness": 0.003, "source": "moody" },
+  { "name": "Smoothest Possible Surface", "roughness": 0.000005, "source": "moody" }
+]

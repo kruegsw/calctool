@@ -1,0 +1,16 @@
+{
+  "name": "calctool",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Pressure drop calculator for engineers",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vitest": "^4.0.18"
+  }
+}
