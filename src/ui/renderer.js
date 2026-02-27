@@ -761,6 +761,9 @@ function buildMethodSelector(propId, state) {
  * Update all output displays with current results.
  */
 function updateAll(state) {
+  // Clean up previous error hint elements
+  for (const hint of document.querySelectorAll('.field-error-hint')) hint.remove();
+
   for (const [propId, result] of Object.entries(state.results)) {
     // Update standard output displays
     const outputEl = document.getElementById(`output-${propId}`);
@@ -772,11 +775,15 @@ function updateAll(state) {
         outputEl.classList.remove('error', 'empty');
         outputEl.title = '';
       } else if (result.error) {
-        // Dependency errors: show dash with tooltip
+        // Dependency errors: show dash with tooltip + visible hint
         outputEl.textContent = '\u2014';
         outputEl.classList.remove('error');
         outputEl.classList.add('empty');
         outputEl.title = result.error.message || '';
+        if (result.error.type === 'DEPENDENCY_ERROR' && result.error.message) {
+          const hint = el('div', { className: 'field-error-hint' }, result.error.message);
+          outputEl.parentNode.insertBefore(hint, outputEl.nextSibling);
+        }
       } else {
         outputEl.textContent = '\u2014';
         outputEl.classList.remove('error');
