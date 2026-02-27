@@ -205,7 +205,29 @@ function buildResultsHero(state) {
   const dpItem = el('div', { className: 'hero-item', dataset: { heroId: 'pressureDropTotal' } });
   dpItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop'));
   const dpValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropTotal' } }, '\u2014');
-  dpItem.appendChild(dpValue);
+  const dpCopyBtn = el('button', {
+    className: 'hero-copy-btn',
+    type: 'button',
+    title: 'Copy value',
+  }, 'copy');
+  dpCopyBtn.addEventListener('click', () => {
+    const valueEl = dpItem.querySelector('.hero-value');
+    const unitSelect = dpItem.querySelector('.hero-unit-select');
+    if (!valueEl || valueEl.classList.contains('empty')) return;
+    const text = valueEl.textContent + (unitSelect ? ' ' + unitSelect.options[unitSelect.selectedIndex].text : '');
+    navigator.clipboard.writeText(text).then(() => {
+      dpCopyBtn.textContent = 'copied!';
+      dpCopyBtn.classList.add('copied');
+      setTimeout(() => {
+        dpCopyBtn.textContent = 'copy';
+        dpCopyBtn.classList.remove('copied');
+      }, 1500);
+    });
+  });
+  const dpValueRow = el('div', { className: 'hero-value-row' });
+  dpValueRow.appendChild(dpValue);
+  dpValueRow.appendChild(dpCopyBtn);
+  dpItem.appendChild(dpValueRow);
   dpItem.appendChild(buildHeroUnitSelect('pressureDropTotal', state));
   hero.appendChild(dpItem);
 
