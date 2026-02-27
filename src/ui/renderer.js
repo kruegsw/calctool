@@ -486,6 +486,9 @@ function buildUnitSelector(propId, state) {
 
   select.addEventListener('change', () => {
     state.setUnit(propId, select.value);
+    // Sync hero unit select if one exists for this property
+    const heroSelect = document.querySelector(`[data-hero-unit="${propId}"]`);
+    if (heroSelect) heroSelect.value = select.value;
   });
 
   return select;
@@ -694,16 +697,15 @@ function updateInputValidation(state) {
     el.classList.remove('input-invalid');
   }
 
-  // Check user-input fields: mark as invalid if value is null/empty and a dependent has an error
+  // Check user-input fields: mark as invalid if value is null/empty and field has been touched
   for (const [propId, def] of Object.entries(REGISTRY)) {
     if (!def.isUserInput) continue;
+    if (!state.dirtyFields.has(propId)) continue;
     const val = state.userValues[propId]?.value;
     if (val != null && val !== '') continue;
 
-    // Check if any result depends on this and has an error
     const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
     if (row) {
-      // Only flag required inputs that haven't been filled
       row.classList.add('input-invalid');
     }
   }

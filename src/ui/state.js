@@ -13,6 +13,7 @@ export class AppState {
     this.results = {};
     this.listeners = [];
     this.expandedSections = new Set();
+    this.dirtyFields = new Set();
 
     // Set defaults from registry
     for (const [id, def] of Object.entries(REGISTRY)) {
@@ -47,6 +48,7 @@ export class AppState {
    * Set a user value and re-solve.
    */
   setValue(propertyId, value, unit) {
+    this.dirtyFields.add(propertyId);
     this.userValues[propertyId] = { value, unit: unit || this.userValues[propertyId]?.unit || null };
     this.recalculate();
   }
@@ -75,6 +77,7 @@ export class AppState {
    * Select a chemical by CAS number.
    */
   selectChemical(cas) {
+    this.dirtyFields.add('chemicalSearch');
     this.userValues.chemicalSearch = { value: cas };
     this.recalculate();
   }
