@@ -711,6 +711,8 @@ function buildMethodSelector(propId, state) {
   const keys = Object.keys(methods);
   if (keys.length <= 1) return el('span');
 
+  const wrapper = el('div', { className: 'method-selector-group', dataset: { methodGroup: propId } });
+
   const select = el('select', {
     className: 'method-selector',
     dataset: { propId },
@@ -729,7 +731,8 @@ function buildMethodSelector(propId, state) {
     autoSizeSelect(select);
   });
 
-  return select;
+  wrapper.appendChild(select);
+  return wrapper;
 }
 
 /**
@@ -811,8 +814,11 @@ function updateMethodSelectors(state) {
   const prevBadges = document.querySelectorAll('.method-status-badge');
   for (const b of prevBadges) b.remove();
 
-  const selectors = document.querySelectorAll('.method-selector');
-  for (const select of selectors) {
+  const groups = document.querySelectorAll('.method-selector-group');
+  for (const group of groups) {
+    const select = group.querySelector('.method-selector');
+    if (!select) continue;
+
     const propId = select.dataset.propId;
     const current = state.activeMethodMap[propId];
     if (current && select.value !== current) {
@@ -820,25 +826,18 @@ function updateMethodSelectors(state) {
       autoSizeSelect(select);
     }
 
-    const def = REGISTRY[propId];
-    const methodKeys = Object.keys(def?.methods || {});
-    if (methodKeys.length <= 1) continue;
-
-    const overridden = def.allowUserOverride && state.isOverridden(propId);
     const autoSelected = !state.userMethodOverrides.has(propId);
 
-    if (overridden) {
-      const badge = el('span', {
-        className: 'method-status-badge status-pinned',
-        title: 'Value pinned by user — calculation bypassed',
-      }, 'pinned');
-      select.parentNode.insertBefore(badge, select.nextSibling);
-    } else if (autoSelected) {
-      const badge = el('span', {
+    if (autoSelected) {
+      group.appendChild(el('span', {
         className: 'method-status-badge status-auto',
         title: 'Automatically selected based on phase',
-      }, 'auto');
-      select.parentNode.insertBefore(badge, select.nextSibling);
+      }, 'auto'));
+    } else {
+      group.appendChild(el('span', {
+        className: 'method-status-badge status-pinned',
+        title: 'Method selected by user',
+      }, 'pinned'));
     }
   }
 }
