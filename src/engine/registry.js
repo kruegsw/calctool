@@ -1086,6 +1086,38 @@ export const REGISTRY = {
           return 1 / Math.pow(A - (B-A)**2 / (C - 2*B + A), 2);
         },
       },
+      swameeJain: {
+        name: 'Swamee-Jain (1976)',
+        inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
+        source: 'swameeJain',
+        description: 'Explicit approximation to the Colebrook equation (~1% accuracy)',
+        assumption: 'Turbulent flow only; Re 5000–10⁸, ε/D 10⁻⁶–5×10⁻²',
+        calculate: (inputs) => {
+          const Re = inputs.reynoldsNumber;
+          const e = inputs.pipeAbsoluteRoughness;
+          const D = inputs.pipeInnerDiameter;
+          const eD = e / D;
+
+          const x = Math.log10(eD / 3.7 + 5.74 / Math.pow(Re, 0.9));
+          return 0.25 / (x * x);
+        },
+      },
+      haaland: {
+        name: 'Haaland (1983)',
+        inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
+        source: 'haaland',
+        description: 'Explicit approximation to the Colebrook equation (~1.5% accuracy)',
+        assumption: 'Turbulent flow only',
+        calculate: (inputs) => {
+          const Re = inputs.reynoldsNumber;
+          const e = inputs.pipeAbsoluteRoughness;
+          const D = inputs.pipeInnerDiameter;
+          const eD = e / D;
+
+          const x = -1.8 * Math.log10(Math.pow(eD / 3.7, 1.11) + 6.9 / Re);
+          return 1 / (x * x);
+        },
+      },
       cheng: {
         name: 'Cheng (all regimes)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],

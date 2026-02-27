@@ -40,5 +40,11 @@
   },
   "cheng": {
     "reference": "Cheng, Nian-Sheng (September 2008). \"Formulas for Friction Factor in Transitional Regimes\". Journal of Hydraulic Engineering. 134 (9): 1357-1362."
+  },
+  "swameeJain": {
+    "reference": "Swamee, P.K. and Jain, A.K. (1976). \"Explicit Equations for Pipe-Flow Problems\". Journal of the Hydraulics Division. 102 (5): 657-664."
+  },
+  "haaland": {
+    "reference": "Haaland, S.E. (1983). \"Simple and Explicit Formulas for the Friction Factor in Turbulent Pipe Flow\". Journal of Fluids Engineering. 105 (1): 89-90."
   }
 }
