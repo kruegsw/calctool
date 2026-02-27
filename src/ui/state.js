@@ -5,7 +5,7 @@ import { solve } from '../engine/solver.js';
 import { convertUnits, UNIT_PRESETS } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
-import { countSigFigs, roundToSigFigs } from './formatting.js';
+import { countSigFigs } from './formatting.js';
 
 export class AppState {
   constructor() {
@@ -79,11 +79,7 @@ export class AppState {
     if (entry) {
       // Convert value when we have a numeric value, a known old unit, and a quantity
       if (entry.value != null && oldUnit && oldUnit !== unit && quantity) {
-        let converted = convertUnits(quantity, entry.value, oldUnit, unit);
-        if (entry.sigFigs && isFinite(converted)) {
-          converted = roundToSigFigs(converted, entry.sigFigs);
-        }
-        entry.value = converted;
+        entry.value = convertUnits(quantity, entry.value, oldUnit, unit);
       }
       entry.unit = unit;
     } else {
@@ -115,11 +111,7 @@ export class AppState {
       }
 
       if (entry && entry.value != null) {
-        let converted = convertUnits(quantity, entry.value, oldUnit, targetUnit);
-        if (entry.sigFigs && isFinite(converted)) {
-          converted = roundToSigFigs(converted, entry.sigFigs);
-        }
-        entry.value = converted;
+        entry.value = convertUnits(quantity, entry.value, oldUnit, targetUnit);
         entry.unit = targetUnit;
       } else if (entry) {
         entry.unit = targetUnit;

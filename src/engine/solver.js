@@ -96,12 +96,13 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
         return createPropertyResult(id, null, null, def.defaultUnit, methodKey, []);
       }
       let displayValue;
+      const displayUnit = (userValues[id]?.unit) || def.defaultUnit;
       if (def.quantity) {
-        displayValue = fromSI(def.quantity, def.defaultUnit, value);
+        displayValue = fromSI(def.quantity, displayUnit, value);
       } else {
         displayValue = value;
       }
-      return createPropertyResult(id, value, displayValue, def.defaultUnit, methodKey, []);
+      return createPropertyResult(id, value, displayValue, displayUnit, methodKey, []);
     } catch (e) {
       return createErrorResult(id, new PropertyError(ErrorType.CALCULATION_ERROR, e.message, id));
     }

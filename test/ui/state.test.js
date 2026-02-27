@@ -71,12 +71,13 @@ describe('AppState sigFigs tracking', () => {
     expect(state.userValues.massFlowRate.sigFigs).toBe(3);
   });
 
-  it('setUnit rounds converted value when sigFigs is set', () => {
+  it('setUnit stores full precision (sig figs only affect display)', () => {
     const state = new AppState();
     state.userValues.massFlowRate = { value: 100, unit: 'lb/hr', sigFigs: 3 };
     state.setUnit('massFlowRate', 'kg/hr');
-    // 100 lb/hr = 45.359237... kg/hr → rounded to 3 sig figs = 45.4
-    expect(state.userValues.massFlowRate.value).toBeCloseTo(45.4, 5);
+    // 100 lb/hr = 45.359237... kg/hr — stored at full precision
+    expect(state.userValues.massFlowRate.value).toBeCloseTo(45.3592, 3);
+    expect(state.userValues.massFlowRate.sigFigs).toBe(3);
   });
 
   it('setUnit preserves full precision when no sigFigs', () => {
@@ -131,12 +132,12 @@ describe('AppState.setUnitSystem()', () => {
     }
   });
 
-  it('preserves sig figs during conversion', () => {
+  it('stores full precision during conversion (sig figs only affect display)', () => {
     const state = new AppState();
     state.userValues.massFlowRate = { value: 100, unit: 'lb/hr', sigFigs: 3 };
     state.setUnitSystem('SI');
-    // 100 lb/hr → 45.4 kg/hr (3 sig figs)
-    expect(state.userValues.massFlowRate.value).toBeCloseTo(45.4, 5);
+    // 100 lb/hr = 45.359237... kg/hr — stored at full precision
+    expect(state.userValues.massFlowRate.value).toBeCloseTo(45.3592, 3);
     expect(state.userValues.massFlowRate.unit).toBe('kg/hr');
     expect(state.userValues.massFlowRate.sigFigs).toBe(3);
   });

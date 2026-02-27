@@ -3,7 +3,7 @@
 import { REGISTRY } from '../engine/registry.js';
 import { UNITS, unitOptionsFor, filteredUnitOptionsFor, CONDITIONAL_UNITS, UNIT_PRESETS, fromSI, toSI } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
-import { formatNumber, flowRegimeLabel, countSigFigs } from './formatting.js';
+import { formatNumber, flowRegimeLabel, countSigFigs, roundToSigFigs } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
@@ -1166,7 +1166,11 @@ function updateInputValues(state) {
     if (!input || input.type !== 'number') continue;
     // Don't overwrite while the user is typing
     if (document.activeElement === input) continue;
-    const stateStr = String(entry.value);
+    // Display with user's sig figs (the stored value is unrounded)
+    const displayVal = entry.sigFigs && isFinite(entry.value)
+      ? roundToSigFigs(entry.value, entry.sigFigs)
+      : entry.value;
+    const stateStr = String(displayVal);
     if (input.value === stateStr) continue;
     input.value = stateStr;
   }
