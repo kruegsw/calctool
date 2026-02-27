@@ -76,6 +76,17 @@ export function getNominalDiameters(standard) {
 }
 
 /**
+ * Get the unit label for a given pipe standard.
+ * @param {string} standard
+ * @returns {string} e.g. "in" for NPS, "mm" for DN
+ */
+export function getPipeUnits(standard) {
+  if (!pipeDimensions) return '';
+  const entry = pipeDimensions.find(p => p.standard === standard);
+  return entry?.units || '';
+}
+
+/**
  * Get available schedules for a given standard + nominal diameter.
  * Returns only schedules that have wall thickness data.
  * @param {string} standard

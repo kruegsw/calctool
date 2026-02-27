@@ -5,8 +5,26 @@ import { UNITS, unitOptionsFor } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
-import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules } from '../data/pipe.js';
+import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
+
+/**
+ * Size a ghost select to fit its currently selected option text + caret padding.
+ * Uses a scratch canvas to measure text width.
+ */
+const _measureCtx = typeof document !== 'undefined'
+  ? document.createElement('canvas').getContext('2d')
+  : null;
+
+function autoSizeSelect(select) {
+  if (!_measureCtx) return;
+  const style = getComputedStyle(select);
+  _measureCtx.font = `${style.fontWeight || 'normal'} ${style.fontSize} ${style.fontFamily}`;
+  const text = select.options[select.selectedIndex]?.text || '';
+  const textWidth = _measureCtx.measureText(text).width;
+  // 14px right padding for caret + 4px left padding + 2px buffer
+  select.style.width = `${Math.ceil(textWidth) + 20}px`;
+}
 
 /** Create an element with attributes and children. */
 function el(tag, attrs = {}, ...children) {
@@ -218,11 +236,16 @@ function buildHeroUnitSelect(propId, state) {
   const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
   if (currentUnit) select.value = currentUnit;
 
+  requestAnimationFrame(() => autoSizeSelect(select));
   select.addEventListener('change', () => {
     state.setUnit(propId, select.value);
+    autoSizeSelect(select);
     // Sync the matching field-row unit selector if present
     const fieldSelect = document.querySelector(`.unit-selector[data-prop-id="${propId}"]`);
-    if (fieldSelect) fieldSelect.value = select.value;
+    if (fieldSelect) {
+      fieldSelect.value = select.value;
+      autoSizeSelect(fieldSelect);
+    }
   });
 
   wrapper.appendChild(select);
@@ -325,7 +348,7 @@ function buildPropertyField(propId, state) {
 }
 
 /**
- * Build chemical search input with datalist.
+ * Build chemical search input with custom autocomplete dropdown.
  */
 function buildChemicalSearch(state) {
   const wrapper = el('div', { className: 'chemical-search-wrapper' });
@@ -335,38 +358,103 @@ function buildChemicalSearch(state) {
     id: 'input-chemicalSearch',
     className: 'field-input-control chemical-search',
     placeholder: 'Search chemical name or CAS...',
-    list: 'chemical-list',
     autocomplete: 'off',
   });
 
-  const datalist = el('datalist', { id: 'chemical-list' });
-  const allChems = getAllChemicals();
-  for (const chem of allChems) {
-    datalist.appendChild(el('option', { value: chem.cas, label: chem.searchTerm }));
+  let dropdown = null;
+  let activeIndex = -1;
+
+  function clearDropdown() {
+    if (dropdown) {
+      dropdown.remove();
+      dropdown = null;
+    }
+    activeIndex = -1;
+  }
+
+  function selectItem(chem) {
+    input.value = chem.name;
+    state.selectChemical(chem.cas);
+    clearDropdown();
+  }
+
+  function setActive(index) {
+    if (!dropdown) return;
+    const items = dropdown.querySelectorAll('.chem-dropdown-item');
+    for (const item of items) item.classList.remove('active');
+    if (index >= 0 && index < items.length) {
+      activeIndex = index;
+      items[index].classList.add('active');
+      items[index].scrollIntoView({ block: 'nearest' });
+    } else {
+      activeIndex = -1;
+    }
+  }
+
+  function showResults(query) {
+    clearDropdown();
+    const q = query.trim();
+    if (!q) return;
+
+    const results = searchChemicals(q, 20);
+    dropdown = el('div', { className: 'chem-dropdown' });
+
+    if (results.length === 0) {
+      dropdown.appendChild(el('div', { className: 'chem-dropdown-empty' }, 'No results'));
+    } else {
+      for (const chem of results) {
+        const item = el('div', { className: 'chem-dropdown-item' },
+          el('span', { className: 'chem-name' }, chem.name),
+          el('span', { className: 'chem-cas' }, chem.cas),
+        );
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault(); // prevent blur before click registers
+          selectItem(chem);
+        });
+        dropdown.appendChild(item);
+      }
+    }
+
+    wrapper.appendChild(dropdown);
   }
 
   input.addEventListener('input', () => {
-    const val = input.value.trim();
-    const allChems = getAllChemicals();
-    const match = allChems.find(c => c.cas === val || c.searchTerm === val);
-    if (match) {
-      input.value = match.name;
-      state.selectChemical(match.cas);
+    showResults(input.value);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (!dropdown) return;
+    const items = dropdown.querySelectorAll('.chem-dropdown-item');
+    const count = items.length;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActive(activeIndex < count - 1 ? activeIndex + 1 : 0);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive(activeIndex > 0 ? activeIndex - 1 : count - 1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIndex >= 0 && activeIndex < count) {
+        const results = searchChemicals(input.value.trim(), 20);
+        if (results[activeIndex]) selectItem(results[activeIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      clearDropdown();
     }
   });
 
-  input.addEventListener('change', () => {
-    const val = input.value.trim();
-    const allChems = getAllChemicals();
-    const match = allChems.find(c => c.cas === val || c.searchTerm === val || c.name === val);
-    if (match) {
-      input.value = match.name;
-      state.selectChemical(match.cas);
-    }
+  input.addEventListener('blur', () => {
+    // Small delay so mousedown on item fires before removal
+    setTimeout(clearDropdown, 150);
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) clearDropdown();
   });
 
   wrapper.appendChild(input);
-  wrapper.appendChild(datalist);
   return wrapper;
 }
 
@@ -418,6 +506,11 @@ function populateDropdown(select, propId, state) {
   } else if (propId === 'pipeNominalDiameter') {
     const standard = state.userValues.pipeStandard?.value || 'NPS';
     options = getNominalDiameters(standard);
+    const units = getPipeUnits(standard);
+    for (const opt of options) {
+      if (opt) select.appendChild(el('option', { value: opt }, units ? `${opt} ${units}` : opt));
+    }
+    return;
   } else if (propId === 'pipeSchedule') {
     const standard = state.userValues.pipeStandard?.value || 'NPS';
     const nomDia = state.userValues.pipeNominalDiameter?.value || '2';
@@ -484,11 +577,17 @@ function buildUnitSelector(propId, state) {
   const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
   if (currentUnit) select.value = currentUnit;
 
+  // Auto-size after first paint and on change
+  requestAnimationFrame(() => autoSizeSelect(select));
   select.addEventListener('change', () => {
     state.setUnit(propId, select.value);
+    autoSizeSelect(select);
     // Sync hero unit select if one exists for this property
     const heroSelect = document.querySelector(`[data-hero-unit="${propId}"]`);
-    if (heroSelect) heroSelect.value = select.value;
+    if (heroSelect) {
+      heroSelect.value = select.value;
+      autoSizeSelect(heroSelect);
+    }
   });
 
   return select;
@@ -515,8 +614,10 @@ function buildMethodSelector(propId, state) {
   const current = state.activeMethodMap[propId];
   if (current) select.value = current;
 
+  requestAnimationFrame(() => autoSizeSelect(select));
   select.addEventListener('change', () => {
     state.setMethod(propId, select.value);
+    autoSizeSelect(select);
   });
 
   return select;
