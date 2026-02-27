@@ -202,6 +202,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => chemData?.family?.value || null,
       },
     },
