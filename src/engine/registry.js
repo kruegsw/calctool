@@ -1087,6 +1087,9 @@ export function getDefaultMethodMap(registry) {
       map[id] = null;
     } else if (def.isLookup) {
       map[id] = 'lookup';
+    } else if (id === 'frictionFactor') {
+      // Churchill 1977 handles all flow regimes (laminar, transition, turbulent)
+      map[id] = 'churchill1977';
     } else {
       const keys = Object.keys(def.methods);
       map[id] = keys.length > 0 ? keys[0] : null;

@@ -7,20 +7,69 @@ import { createPropertyResult, createErrorResult } from './properties.js';
 import { ErrorType, PropertyError } from './errors.js';
 
 /**
+ * Phase-dependent method selection map.
+ * For each property, maps phase value to the best method key.
+ */
+const PHASE_METHOD_MAP = {
+  density:             { liquid: 'perryLiquidCorrelation', gas: 'idealGas', vapor: 'idealGas' },
+  viscosity:           { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
+  cp:                  { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
+  thermalConductivity: { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
+};
+
+/**
+ * Auto-select methods based on computed phase and flow regime.
+ * Only overrides methods that the user hasn't explicitly chosen.
+ * Mutates activeMethodMap in place for affected properties.
+ *
+ * @param {Object} results - Already-computed results (must include phase)
+ * @param {Object} registry - Property definitions
+ * @param {Object} activeMethodMap - Current method selections (mutated)
+ * @param {Set} userMethodOverrides - Properties where the user explicitly chose a method
+ * @returns {string[]} List of property IDs whose method was changed
+ */
+function autoSelectMethods(results, registry, activeMethodMap, userMethodOverrides) {
+  const changed = [];
+
+  // Phase-dependent properties
+  const phaseResult = results.phase;
+  if (phaseResult?.isValid && phaseResult.value) {
+    const phase = String(phaseResult.value).toLowerCase();
+    for (const [propId, phaseMap] of Object.entries(PHASE_METHOD_MAP)) {
+      if (userMethodOverrides.has(propId)) continue;
+      const desired = phaseMap[phase];
+      if (!desired) continue;
+      // Verify the method exists on this property
+      if (!registry[propId]?.methods?.[desired]) continue;
+      if (activeMethodMap[propId] !== desired) {
+        activeMethodMap[propId] = desired;
+        changed.push(propId);
+      }
+    }
+  }
+
+  return changed;
+}
+
+/**
  * @typedef {Object} SolveInput
  * @property {Object} registry - All property definitions
  * @property {Object} activeMethodMap - propertyId -> method key (or null)
  * @property {Object} userValues - propertyId -> { value, unit } for user-entered values
  * @property {Object} chemData - Chemical data object for selected chemical
  * @property {Object} pipeData - Pipe data context { dimensions, materials, selectedMaterial, selectedStandard, ... }
+ * @property {Set} [userMethodOverrides] - Properties where the user explicitly chose a method
  */
 
 /**
  * Solve all properties in dependency order.
+ * After the first pass, auto-selects methods based on phase/regime,
+ * then re-evaluates any properties whose method changed.
  * @param {SolveInput} input
  * @returns {Object} Map of propertyId -> PropertyResult
  */
-export function solve({ registry, activeMethodMap, userValues, chemData, pipeData }) {
+export function solve({ registry, activeMethodMap, userValues, chemData, pipeData, userMethodOverrides }) {
+  const overrides = userMethodOverrides || new Set();
   const { sorted, hasCycle, cycleNodes } = topologicalSort(registry, activeMethodMap);
   const results = {};
 
@@ -35,9 +84,28 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
     }
   }
 
-  // Evaluate in topological order
+  // First pass: evaluate in topological order
   for (const id of sorted) {
     results[id] = evaluateProperty(id, registry, activeMethodMap, userValues, results, chemData, pipeData);
+  }
+
+  // Auto-select methods based on computed phase
+  const changed = autoSelectMethods(results, registry, activeMethodMap, overrides);
+
+  // Re-evaluate properties whose method changed (and their downstream dependents)
+  if (changed.length > 0) {
+    // Re-sort with updated methods (dependencies may have changed)
+    const { sorted: reSorted } = topologicalSort(registry, activeMethodMap);
+    // Find the earliest changed property in the topological order
+    const changedSet = new Set(changed);
+    let startIdx = reSorted.findIndex(id => changedSet.has(id));
+    if (startIdx >= 0) {
+      // Re-evaluate from that point forward
+      for (let i = startIdx; i < reSorted.length; i++) {
+        const id = reSorted[i];
+        results[id] = evaluateProperty(id, registry, activeMethodMap, userValues, results, chemData, pipeData);
+      }
+    }
   }
 
   return results;

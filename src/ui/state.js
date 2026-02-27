@@ -17,6 +17,7 @@ export class AppState {
     this.unitSystem = null;
     this.expandedSections = new Set();
     this.dirtyFields = new Set();
+    this.userMethodOverrides = new Set();
 
     // Set defaults from registry
     for (const [id, def] of Object.entries(REGISTRY)) {
@@ -133,6 +134,7 @@ export class AppState {
    */
   setMethod(propertyId, methodKey) {
     this.activeMethodMap[propertyId] = methodKey;
+    this.userMethodOverrides.add(propertyId);
     this.recalculate();
   }
 
@@ -201,6 +203,7 @@ export class AppState {
       userValues: this.userValues,
       chemData,
       pipeData,
+      userMethodOverrides: this.userMethodOverrides,
     });
 
     this.notify();

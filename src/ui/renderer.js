@@ -764,6 +764,9 @@ function updateAll(state) {
     }
   }
 
+  // Sync method selectors with auto-selected methods
+  updateMethodSelectors(state);
+
   // Update source tooltips on field rows
   updateSourceTooltips(state);
 
@@ -790,6 +793,22 @@ function updateAll(state) {
 
   // Sync input values with state (e.g. after unit conversion)
   updateInputValues(state);
+}
+
+/**
+ * Sync method selector dropdowns with activeMethodMap (which may have been
+ * updated by auto-selection in the solver).
+ */
+function updateMethodSelectors(state) {
+  const selectors = document.querySelectorAll('.method-selector');
+  for (const select of selectors) {
+    const propId = select.dataset.propId;
+    const current = state.activeMethodMap[propId];
+    if (current && select.value !== current) {
+      select.value = current;
+      autoSizeSelect(select);
+    }
+  }
 }
 
 /**
