@@ -152,6 +152,12 @@ function buildSection(section, state) {
     }
     fluidRow.appendChild(buildChemicalCard(state));
     bodyEl.appendChild(fluidRow);
+  } else if (section.inline && primaryEl.children.length > 0) {
+    const inlineRow = el('div', { className: 'inline-primary' });
+    while (primaryEl.firstChild) {
+      inlineRow.appendChild(primaryEl.firstChild);
+    }
+    bodyEl.appendChild(inlineRow);
   } else if (primaryEl.children.length > 0) {
     bodyEl.appendChild(primaryEl);
   }

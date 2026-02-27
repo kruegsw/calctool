@@ -562,6 +562,18 @@ body {
   color: #dc2626;
 }
 
+/* ─── Inline primary: flex row for compact sections ─── */
+.inline-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.inline-primary .field-row {
+  flex-shrink: 0;
+}
+
 /* ─── Fluid section: search + card on one line ─── */
 .fluid-primary-row {
   display: flex;
@@ -604,6 +616,12 @@ body {
 .chemical-card-value {
   font-weight: 600;
   color: var(--color-text);
+}
+
+/* ─── Fluid detail: 2-column grid for lookup fields ─── */
+.section[data-section-id="fluid"] .detail-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 /* ─── Results hero layout ─── */
@@ -853,9 +871,18 @@ body {
     min-width: 0;
   }
 
+  .inline-primary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .fluid-primary-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .section[data-section-id="fluid"] .detail-fields {
+    grid-template-columns: 1fr;
   }
 
   .chemical-card {

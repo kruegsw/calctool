@@ -17,6 +17,7 @@ export const SECTIONS = [
     title: 'At what conditions?',
     stepNumber: 2,
     accentColor: '#0d9488',  // teal
+    inline: true,
     primary: ['temperature', 'pressure'],
     detail: ['phase', 'vaporPressure', 'density', 'viscosity',
              'cp', 'cv', 'cpCvRatio',
@@ -27,22 +28,15 @@ export const SECTIONS = [
     title: 'Through what pipe?',
     stepNumber: 3,
     accentColor: '#475569',  // slate
-    primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength'],
+    inline: true,
+    primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength', 'massFlowRate'],
     detail: ['pipeMaterial', 'pipeInnerDiameter', 'pipeCrossSectionalArea',
-             'pipeAbsoluteRoughness'],
-  },
-  {
-    id: 'flow',
-    title: 'How much flow?',
-    stepNumber: 4,
-    accentColor: '#d97706',  // amber
-    primary: ['massFlowRate'],
-    detail: ['volumeFlowRate', 'velocity'],
+             'pipeAbsoluteRoughness', 'volumeFlowRate', 'velocity'],
   },
   {
     id: 'results',
     title: 'Results',
-    stepNumber: 5,
+    stepNumber: 4,
     accentColor: '#4f46e5',  // indigo
     primary: ['reynoldsNumber', 'frictionFactor', 'pressureDropTotal'],
     detail: [],
