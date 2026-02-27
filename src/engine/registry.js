@@ -57,12 +57,17 @@ function evalPerry(equation, coeffs, T) {
 }
 
 /**
- * Check if temperature is within Perry correlation validity range.
+ * Get Perry correlation validity range for a given property.
+ * @param {Object} chemData - Chemical data object
+ * @param {string} phase - 'gaseous' or 'liquid'
+ * @param {string} property - e.g., 'density', 'viscosity', 'vaporPressure'
+ * @returns {{ Tmin: number, Tmax: number }|null}
  */
-function inPerryRange(T, coeffs) {
-  if (coeffs.Tmin != null && T < coeffs.Tmin) return false;
-  if (coeffs.Tmax != null && T > coeffs.Tmax) return false;
-  return true;
+export function getPerryRange(chemData, phase, property) {
+  const corr = getPerryCorrelation(chemData, phase, property);
+  if (!corr) return null;
+  if (corr.Tmin == null && corr.Tmax == null) return null;
+  return { Tmin: corr.Tmin, Tmax: corr.Tmax };
 }
 
 /**

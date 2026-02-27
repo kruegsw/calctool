@@ -5,6 +5,7 @@ import { topologicalSort, getDependencies } from './graph.js';
 import { toSI, fromSI } from './units.js';
 import { createPropertyResult, createErrorResult } from './properties.js';
 import { ErrorType, PropertyError } from './errors.js';
+import { getPerryRange } from './registry.js';
 
 /**
  * Phase-dependent method selection map.
@@ -15,6 +16,22 @@ const PHASE_METHOD_MAP = {
   viscosity:           { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
   cp:                  { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
   thermalConductivity: { liquid: 'perryLiquidCorrelation', gas: 'perryVaporCorrelation', vapor: 'perryVaporCorrelation' },
+};
+
+/**
+ * Maps (propertyId, methodKey) to the Perry correlation lookup parameters
+ * needed for range checking.
+ */
+const PERRY_RANGE_MAP = {
+  'vaporPressure:perryCorrelation':           { phase: 'gaseous', perryProp: 'vaporPressure' },
+  'density:perryLiquidCorrelation':           { phase: 'liquid',  perryProp: 'density' },
+  'viscosity:perryLiquidCorrelation':         { phase: 'liquid',  perryProp: 'viscosity' },
+  'viscosity:perryVaporCorrelation':          { phase: 'gaseous', perryProp: 'viscosity' },
+  'cp:perryLiquidCorrelation':               { phase: 'liquid',  perryProp: 'cp' },
+  'cp:perryVaporCorrelation':                { phase: 'gaseous', perryProp: 'cp' },
+  'thermalConductivity:perryLiquidCorrelation': { phase: 'liquid',  perryProp: 'thermalConductivity' },
+  'thermalConductivity:perryVaporCorrelation':  { phase: 'gaseous', perryProp: 'thermalConductivity' },
+  'heatOfVaporization:perryCorrelation':      { phase: 'liquid',  perryProp: 'heatVaporization' },
 };
 
 /**
@@ -218,7 +235,26 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
       displayValue = siValue;
     }
 
-    return createPropertyResult(id, siValue, displayValue, displayUnit, methodKey, depIds);
+    const result = createPropertyResult(id, siValue, displayValue, displayUnit, methodKey, depIds);
+
+    // Range-check Perry correlations
+    const rangeKey = `${id}:${methodKey}`;
+    const rangeEntry = PERRY_RANGE_MAP[rangeKey];
+    if (rangeEntry && chemData) {
+      const T = results.temperature?.value;
+      if (T != null) {
+        const range = getPerryRange(chemData, rangeEntry.phase, rangeEntry.perryProp);
+        if (range) {
+          if (T < range.Tmin || T > range.Tmax) {
+            result.warnings.push(
+              `T = ${Math.round(T)} K is outside valid range ${Math.round(range.Tmin)}–${Math.round(range.Tmax)} K`
+            );
+          }
+        }
+      }
+    }
+
+    return result;
   } catch (e) {
     return createErrorResult(id, new PropertyError(ErrorType.CALCULATION_ERROR, e.message, id));
   }

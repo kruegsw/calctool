@@ -764,8 +764,11 @@ function updateAll(state) {
     }
   }
 
-  // Sync method selectors with auto-selected methods
+  // Sync method selectors with auto-selected methods and auto-badges
   updateMethodSelectors(state);
+
+  // Update range warning badges
+  updateWarnings(state);
 
   // Update source tooltips on field rows
   updateSourceTooltips(state);
@@ -800,6 +803,10 @@ function updateAll(state) {
  * updated by auto-selection in the solver).
  */
 function updateMethodSelectors(state) {
+  // Remove previous auto-badges
+  const prevBadges = document.querySelectorAll('.auto-badge');
+  for (const b of prevBadges) b.remove();
+
   const selectors = document.querySelectorAll('.method-selector');
   for (const select of selectors) {
     const propId = select.dataset.propId;
@@ -808,6 +815,46 @@ function updateMethodSelectors(state) {
       select.value = current;
       autoSizeSelect(select);
     }
+
+    // Add "auto" badge if this property has multiple methods and user hasn't overridden
+    const def = REGISTRY[propId];
+    const methodKeys = Object.keys(def?.methods || {});
+    if (methodKeys.length > 1 && !state.userMethodOverrides.has(propId)) {
+      const badge = el('span', {
+        className: 'auto-badge',
+        title: 'Automatically selected based on phase',
+      }, 'auto');
+      select.parentNode.insertBefore(badge, select.nextSibling);
+    }
+  }
+}
+
+/**
+ * Display warning badges on fields whose results carry warnings (e.g. extrapolation).
+ */
+function updateWarnings(state) {
+  // Remove previous warning badges and has-warning class
+  const prevBadges = document.querySelectorAll('.warning-badge');
+  for (const b of prevBadges) b.remove();
+  const prevWarned = document.querySelectorAll('.field-row.has-warning');
+  for (const r of prevWarned) r.classList.remove('has-warning');
+
+  for (const [propId, result] of Object.entries(state.results)) {
+    if (!result.warnings || result.warnings.length === 0) continue;
+
+    const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
+    if (!row) continue;
+
+    row.classList.add('has-warning');
+
+    const label = row.querySelector('.field-label');
+    if (!label) continue;
+
+    const badge = el('span', {
+      className: 'warning-badge',
+      title: result.warnings.join('; '),
+    }, 'extrapolated');
+    label.appendChild(badge);
   }
 }
 

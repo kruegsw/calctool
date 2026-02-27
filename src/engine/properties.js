@@ -36,6 +36,7 @@
  * @property {boolean} isValid
  * @property {import('./errors.js').PropertyError|null} error
  * @property {string[]} dependencies - IDs of properties this depends on
+ * @property {string[]} warnings - Advisory messages (e.g. extrapolation outside valid range)
  */
 
 export function createPropertyResult(id, value, displayValue, unit, method, dependencies) {
@@ -48,6 +49,7 @@ export function createPropertyResult(id, value, displayValue, unit, method, depe
     isValid: value !== null && value !== undefined && !Number.isNaN(value),
     error: null,
     dependencies,
+    warnings: [],
   };
 }
 
@@ -61,5 +63,6 @@ export function createErrorResult(id, error) {
     isValid: false,
     error,
     dependencies: [],
+    warnings: [],
   };
 }
