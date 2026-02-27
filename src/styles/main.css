@@ -868,7 +868,8 @@ body {
 }
 
 /* Input-group unit selector: visible button style, no ghost caret */
-.input-group .unit-selector {
+.input-group .unit-selector,
+.input-group .unit-selector:hover {
   background-image: none;
   padding-right: 0.375rem;
 }
