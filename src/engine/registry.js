@@ -218,6 +218,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.molecularWeight?.value;
           return v ? +v : null;
@@ -237,6 +238,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.criticalTemperature?.value;
           return v ? +v : null; // stored in K
@@ -256,6 +258,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.criticalPressure?.value;
           return v ? +v * 1e6 : null; // stored in MPa -> Pa
@@ -275,6 +278,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.criticalMolarVolume?.value;
           return v ? +v / 1000 : null; // stored in m3/kmol -> m3/mol
@@ -294,6 +298,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.criticalCompressibilityFactorZc?.value;
           return v ? +v : null;
@@ -313,6 +318,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.acentricFactor?.value;
           return v ? +v : null;
@@ -332,6 +338,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => {
           const v = chemData?.normalBoilingTemperature?.value;
           return v ? +v : null; // stored in K
@@ -813,6 +820,7 @@ export const REGISTRY = {
       fromPipeInfo: {
         name: 'From pipe tables',
         inputs: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule'],
+        source: 'pipingHandbook',
         calculate: (inputs, chemData, pipeData) => {
           const standard = inputs.pipeStandard;
           const nomDia = inputs.pipeNominalDiameter;
@@ -883,6 +891,7 @@ export const REGISTRY = {
       fromMaterial: {
         name: 'From pipe material',
         inputs: ['pipeMaterial'],
+        source: 'moody',
         calculate: (inputs, chemData, pipeData) => {
           const materialName = inputs.pipeMaterial;
           if (!pipeData) return null;
