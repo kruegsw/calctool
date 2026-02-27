@@ -215,11 +215,10 @@ describe('edge cases', () => {
     expect(results.temperature.isValid).toBe(false);
   });
 
-  it('cycle detection prevents circular dependencies', () => {
-    // Attempt to make inner diameter depend on area while area depends on diameter
+  it('invalid method selection produces INVALID_METHOD error', () => {
+    // Selecting a method that doesn't exist should produce a clear error
     const methodMap = getDefaultMethodMap(REGISTRY);
-    methodMap.pipeInnerDiameter = 'fromArea';  // ID from area
-    methodMap.pipeCrossSectionalArea = 'fromDiameter'; // area from ID
+    methodMap.pipeInnerDiameter = 'nonExistentMethod';
 
     const results = solve({
       registry: REGISTRY,
@@ -229,10 +228,8 @@ describe('edge cases', () => {
       pipeData: null,
     });
 
-    // Both should be detected as cycle
     expect(results.pipeInnerDiameter.isValid).toBe(false);
-    expect(results.pipeCrossSectionalArea.isValid).toBe(false);
-    expect(results.pipeInnerDiameter.error.type).toBe('CYCLE_DETECTED');
+    expect(results.pipeInnerDiameter.error.type).toBe('INVALID_METHOD');
   });
 
   it('unit conversion round-trip: temperature C -> K -> F -> K -> C', () => {

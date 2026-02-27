@@ -30,7 +30,7 @@ export const SECTIONS = [
     accentColor: '#475569',  // slate
     inline: true,
     primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength', 'massFlowRate'],
-    detail: ['pipeMaterial', 'pipeInnerDiameter', 'pipeCrossSectionalArea',
+    detail: ['pipeMaterial', 'pipeInnerDiameter',
              'pipeAbsoluteRoughness', 'volumeFlowRate', 'velocity'],
   },
   {

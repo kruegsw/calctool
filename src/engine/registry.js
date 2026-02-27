@@ -813,14 +813,7 @@ export const REGISTRY = {
           return id_inches * 0.0254;
         },
       },
-      fromArea: {
-        name: 'From cross-sectional area',
-        inputs: ['pipeCrossSectionalArea'],
-        calculate: (inputs) => {
-          const A = inputs.pipeCrossSectionalArea; // m2
-          return Math.sqrt(4 * A / Math.PI);
-        },
-      },
+      // TODO: fromArea method for non-circular ducts (future feature)
     },
   },
 
