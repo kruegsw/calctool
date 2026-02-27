@@ -3,7 +3,7 @@
 import { REGISTRY } from '../engine/registry.js';
 import { UNITS, unitOptionsFor, filteredUnitOptionsFor, CONDITIONAL_UNITS, fromSI, toSI } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
-import { formatNumber, flowRegimeLabel } from './formatting.js';
+import { formatNumber, flowRegimeLabel, countSigFigs } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
@@ -592,8 +592,10 @@ function buildNumberInput(propId, state) {
   if (current?.value != null) input.value = current.value;
 
   input.addEventListener('input', () => {
-    const val = input.value === '' ? null : +input.value;
-    state.setValue(propId, val, state.userValues[propId]?.unit);
+    const raw = input.value;
+    const val = raw === '' ? null : +raw;
+    const sf = raw === '' ? undefined : countSigFigs(raw);
+    state.setValue(propId, val, state.userValues[propId]?.unit, sf);
   });
 
   return input;
@@ -616,8 +618,10 @@ function buildOverrideInput(propId, state) {
   if (current?.value != null && current.value !== '') input.value = current.value;
 
   input.addEventListener('input', () => {
-    const val = input.value === '' ? null : +input.value;
-    state.setValue(propId, val, state.userValues[propId]?.unit);
+    const raw = input.value;
+    const val = raw === '' ? null : +raw;
+    const sf = raw === '' ? undefined : countSigFigs(raw);
+    state.setValue(propId, val, state.userValues[propId]?.unit, sf);
   });
 
   return input;
@@ -835,7 +839,7 @@ function updateOverrideFields(state) {
           ? fromSI(def.quantity, displayUnit, result.value)
           : result.value;
         input.placeholder = typeof displayVal === 'number'
-          ? displayVal.toPrecision(6).replace(/\.?0+$/, '')
+          ? formatNumber(displayVal)
           : String(displayVal);
       } else if (!overridden) {
         input.placeholder = '';

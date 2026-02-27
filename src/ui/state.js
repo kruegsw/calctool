@@ -5,6 +5,7 @@ import { solve } from '../engine/solver.js';
 import { convertUnits } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
+import { countSigFigs, roundToSigFigs } from './formatting.js';
 
 export class AppState {
   constructor() {
@@ -22,6 +23,7 @@ export class AppState {
         this.userValues[id] = {
           value: def.defaultValue,
           unit: def.defaultUnit,
+          sigFigs: countSigFigs(String(def.defaultValue)),
         };
       }
     }
@@ -47,10 +49,19 @@ export class AppState {
 
   /**
    * Set a user value and re-solve.
+   * @param {string} propertyId
+   * @param {*} value
+   * @param {string} [unit]
+   * @param {number} [sigFigs] - Significant figures from user input string
    */
-  setValue(propertyId, value, unit) {
+  setValue(propertyId, value, unit, sigFigs) {
     this.dirtyFields.add(propertyId);
-    this.userValues[propertyId] = { value, unit: unit || this.userValues[propertyId]?.unit || null };
+    const existing = this.userValues[propertyId];
+    this.userValues[propertyId] = {
+      value,
+      unit: unit || existing?.unit || null,
+      sigFigs: sigFigs !== undefined ? sigFigs : existing?.sigFigs,
+    };
     this.recalculate();
   }
 
@@ -66,7 +77,11 @@ export class AppState {
     if (entry) {
       // Convert value when we have a numeric value, a known old unit, and a quantity
       if (entry.value != null && oldUnit && oldUnit !== unit && quantity) {
-        entry.value = convertUnits(quantity, entry.value, oldUnit, unit);
+        let converted = convertUnits(quantity, entry.value, oldUnit, unit);
+        if (entry.sigFigs && isFinite(converted)) {
+          converted = roundToSigFigs(converted, entry.sigFigs);
+        }
+        entry.value = converted;
       }
       entry.unit = unit;
     } else {
