@@ -412,19 +412,19 @@ function buildChemicalCard(state) {
 function buildFittingsEditor(state) {
   const wrapper = el('div', { className: 'fittings-editor', dataset: { fittingsEditor: 'true' } });
 
-  // Method selector row
-  const methodRow = el('div', { className: 'fittings-method-row' });
-  const methodLabel = el('span', { className: 'fittings-method-label' }, 'K-factor method:');
-  const methodSelect = el('select', { className: 'fittings-method-select', dataset: { fittingsMethod: 'true' } });
-  methodSelect.appendChild(el('option', { value: 'fixedK' }, 'Fixed K \u2014 Crane'));
-  methodSelect.appendChild(el('option', { value: 'threeK' }, '3-K \u2014 Darby'));
+  // Method selector (ghost style, matching property method selectors)
+  const methodGroup = el('div', { className: 'method-selector-group fittings-method-group', dataset: { fittingsMethod: 'true' } });
+  const methodSelect = el('select', { className: 'method-selector' });
+  methodSelect.appendChild(el('option', { value: 'fixedK' }, '\u2699 Fixed K (Crane)'));
+  methodSelect.appendChild(el('option', { value: 'threeK' }, '\u2699 3-K (Darby)'));
   methodSelect.value = state.fittingsMethod;
+  requestAnimationFrame(() => autoSizeSelect(methodSelect));
   methodSelect.addEventListener('change', () => {
     state.setFittingsMethod(methodSelect.value);
+    autoSizeSelect(methodSelect);
   });
-  methodRow.appendChild(methodLabel);
-  methodRow.appendChild(methodSelect);
-  wrapper.appendChild(methodRow);
+  methodGroup.appendChild(methodSelect);
+  wrapper.appendChild(methodGroup);
 
   // Add-fitting controls row
   const addRow = el('div', { className: 'fittings-add-row' });
@@ -552,9 +552,11 @@ function updateFittingsList(state) {
   list.textContent = '';
 
   // Sync method dropdown value
-  const methodSelect = document.querySelector('[data-fittings-method]');
+  const methodGroup = document.querySelector('[data-fittings-method]');
+  const methodSelect = methodGroup?.querySelector('.method-selector');
   if (methodSelect && methodSelect.value !== state.fittingsMethod) {
     methodSelect.value = state.fittingsMethod;
+    autoSizeSelect(methodSelect);
   }
 
   if (state.fittings.length === 0) return;
