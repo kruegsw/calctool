@@ -447,6 +447,14 @@ function buildChemicalSearch(state) {
   }
 
   input.addEventListener('input', () => {
+    // Deselect the current chemical when the user edits the search text
+    const selectedCas = state.userValues.chemicalSearch?.value;
+    if (selectedCas) {
+      const chem = getChemicalByCAS(selectedCas);
+      if (!chem || input.value.trim() !== chem.name) {
+        state.selectChemical(null);
+      }
+    }
     showResults(input.value);
   });
 
@@ -974,10 +982,9 @@ function updateInputValidation(state) {
     el.classList.remove('input-invalid');
   }
 
-  // Check user-input fields: mark as invalid if value is null/empty and field has been touched
+  // Check user-input fields: mark as invalid if value is null/empty
   for (const [propId, def] of Object.entries(REGISTRY)) {
     if (!def.isUserInput) continue;
-    if (!state.dirtyFields.has(propId)) continue;
     const val = state.userValues[propId]?.value;
     if (val != null && val !== '') continue;
 
