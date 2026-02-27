@@ -206,7 +206,7 @@ body {
 /* ─── Field row ─── */
 .field-row {
   display: grid;
-  grid-template-columns: 200px 1fr auto auto;
+  grid-template-columns: 200px 1fr auto;
   gap: 0.5rem;
   align-items: center;
   padding: 0.25rem 0.5rem;
@@ -251,6 +251,58 @@ body {
   max-width: 140px;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+/* ─── Input-group: fused value + unit ─── */
+.input-group {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  max-width: 220px;
+}
+
+.input-group:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-light);
+}
+
+.input-group .field-input-control {
+  border: none;
+  border-radius: 4px 0 0 4px;
+  box-shadow: none;
+}
+
+.input-group .field-input-control:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.input-group .unit-selector {
+  border: none;
+  border-left: 1px solid var(--color-border);
+  border-radius: 0 4px 4px 0;
+  background: #f9fafb;
+  margin-left: 0;
+  padding: 0.375rem 0.375rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.input-group .unit-selector:focus {
+  outline: none;
+  color: var(--color-primary);
+}
+
+/* ─── Output-group: value + ghost unit inline ─── */
+.output-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .chemical-search {
@@ -300,45 +352,55 @@ body {
   color: var(--color-text-muted);
 }
 
-/* ─── Unit selector: flush against value ─── */
+/* ─── Unit selector: ghost style (standalone / output rows) ─── */
 .unit-selector {
-  padding: 0.25rem 0.375rem;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
   font-size: 0.75rem;
   font-family: inherit;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   cursor: pointer;
-  margin-left: -0.25rem;
+  padding: 0.125rem 0.25rem;
+  border-bottom: 1px dotted transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.unit-selector:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .unit-selector:focus {
   outline: none;
-  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
-/* ─── Method selector: compact gear style ─── */
+/* ─── Method selector: ghost style ─── */
 .method-selector {
-  padding: 0.125rem 0.375rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0.125rem 0.25rem;
   font-size: 0.6875rem;
   font-family: inherit;
-  background: #f3f4f6;
   color: var(--color-text-muted);
   cursor: pointer;
-  max-width: 160px;
-  transition: border-color 0.15s;
+  max-width: 180px;
+  border-bottom: 1px dotted transparent;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 .method-selector:hover {
-  border-color: var(--color-border);
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 
 .method-selector:focus {
   outline: none;
-  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* ─── Phase badge ─── */
@@ -437,8 +499,33 @@ body {
 .hero-unit {
   font-size: 0.75rem;
   font-weight: 400;
-  color: var(--color-text-secondary);
-  margin-left: 0.25rem;
+  color: var(--color-text-muted);
+  margin-top: 0.125rem;
+}
+
+.hero-unit-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.125rem 0.25rem;
+  border-bottom: 1px dotted transparent;
+  transition: color 0.15s, border-color 0.15s;
+  text-align: center;
+}
+
+.hero-unit-select:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.hero-unit-select:focus {
+  outline: none;
+  color: var(--color-primary);
 }
 
 .hero-value.empty {
@@ -498,6 +585,11 @@ body {
 
 /* ─── Invalid input: red border ─── */
 .field-row.input-invalid .field-input-control {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 2px var(--color-error-light);
+}
+
+.field-row.input-invalid .input-group {
   border-color: var(--color-error);
   box-shadow: 0 0 0 2px var(--color-error-light);
 }
@@ -593,6 +685,10 @@ body {
     gap: 0.25rem;
   }
 
+  .input-group {
+    max-width: 100%;
+  }
+
   .field-label {
     font-weight: 600;
   }
@@ -658,6 +754,12 @@ body {
 
   .field-row {
     grid-template-columns: 200px 1fr;
+  }
+
+  .unit-selector,
+  .hero-unit-select {
+    appearance: auto;
+    -webkit-appearance: auto;
   }
 
   .field-row.row-input .print-value {

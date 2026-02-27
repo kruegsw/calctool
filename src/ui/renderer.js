@@ -158,8 +158,7 @@ function buildResultsHero(state) {
   dpItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop'));
   const dpValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropTotal' } }, '\u2014');
   dpItem.appendChild(dpValue);
-  const dpUnit = el('div', { className: 'hero-unit', dataset: { unitFor: 'pressureDropTotal' } });
-  dpItem.appendChild(dpUnit);
+  dpItem.appendChild(buildHeroUnitSelect('pressureDropTotal', state));
   hero.appendChild(dpItem);
 
   // Reynolds Number with regime badge
@@ -192,11 +191,42 @@ function buildResultsHero(state) {
   dpPipeItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop (Pipe)'));
   const dpPipeValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropPipe' } }, '\u2014');
   dpPipeItem.appendChild(dpPipeValue);
-  const dpPipeUnit = el('div', { className: 'hero-unit', dataset: { unitFor: 'pressureDropPipe' } });
-  dpPipeItem.appendChild(dpPipeUnit);
+  dpPipeItem.appendChild(buildHeroUnitSelect('pressureDropPipe', state));
   hero.appendChild(dpPipeItem);
 
   return hero;
+}
+
+/**
+ * Build a ghost unit select for hero cards.
+ */
+function buildHeroUnitSelect(propId, state) {
+  const def = REGISTRY[propId];
+  if (!def?.quantity) return el('div', { className: 'hero-unit' });
+
+  const wrapper = el('div', { className: 'hero-unit' });
+  const select = el('select', {
+    className: 'hero-unit-select',
+    dataset: { heroUnit: propId },
+  });
+
+  const options = unitOptionsFor(def.quantity);
+  for (const opt of options) {
+    select.appendChild(el('option', { value: opt.key }, opt.symbol));
+  }
+
+  const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
+  if (currentUnit) select.value = currentUnit;
+
+  select.addEventListener('change', () => {
+    state.setUnit(propId, select.value);
+    // Sync the matching field-row unit selector if present
+    const fieldSelect = document.querySelector(`.unit-selector[data-prop-id="${propId}"]`);
+    if (fieldSelect) fieldSelect.value = select.value;
+  });
+
+  wrapper.appendChild(select);
+  return wrapper;
 }
 
 /**
@@ -260,17 +290,28 @@ function buildPropertyField(propId, state) {
   } else if (def.isSelection && !def.quantity) {
     inputArea.appendChild(buildSelectionDropdown(propId, state));
   } else if (def.isUserInput) {
-    inputArea.appendChild(buildNumberInput(propId, state));
+    // Number input: fuse input + unit in a single bordered group
+    if (def.quantity) {
+      const group = el('div', { className: 'input-group' });
+      group.appendChild(buildNumberInput(propId, state));
+      group.appendChild(buildUnitSelector(propId, state));
+      inputArea.appendChild(group);
+    } else {
+      inputArea.appendChild(buildNumberInput(propId, state));
+    }
   } else {
-    inputArea.appendChild(buildOutputDisplay(propId, state));
+    // Output: inline value + ghost unit
+    if (def.quantity) {
+      const group = el('div', { className: 'output-group' });
+      group.appendChild(buildOutputDisplay(propId, state));
+      group.appendChild(buildUnitSelector(propId, state));
+      inputArea.appendChild(group);
+    } else {
+      inputArea.appendChild(buildOutputDisplay(propId, state));
+    }
   }
 
   row.appendChild(inputArea);
-
-  // Unit selector (if has quantity)
-  if (def.quantity) {
-    row.appendChild(buildUnitSelector(propId, state));
-  }
 
   // Method selector (if has multiple methods) — skip for frictionFactor (it's in the hero)
   if (propId !== 'frictionFactor') {
@@ -309,6 +350,7 @@ function buildChemicalSearch(state) {
     const allChems = getAllChemicals();
     const match = allChems.find(c => c.cas === val || c.searchTerm === val);
     if (match) {
+      input.value = match.name;
       state.selectChemical(match.cas);
     }
   });
@@ -318,7 +360,7 @@ function buildChemicalSearch(state) {
     const allChems = getAllChemicals();
     const match = allChems.find(c => c.cas === val || c.searchTerm === val || c.name === val);
     if (match) {
-      input.value = match.cas;
+      input.value = match.name;
       state.selectChemical(match.cas);
     }
   });
@@ -560,17 +602,13 @@ function updateResultsHero(state) {
     }
   }
 
-  // Update pressure drop units
+  // Sync hero unit selects with current state
   for (const propId of ['pressureDropTotal', 'pressureDropPipe']) {
-    const unitEl = document.querySelector(`[data-unit-for="${propId}"]`);
-    if (unitEl) {
+    const heroSelect = document.querySelector(`[data-hero-unit="${propId}"]`);
+    if (heroSelect) {
       const def = REGISTRY[propId];
       const currentUnit = state.userValues[propId]?.unit || def?.defaultUnit;
-      if (currentUnit) {
-        const options = unitOptionsFor(def.quantity);
-        const opt = options.find(o => o.key === currentUnit);
-        unitEl.textContent = opt ? opt.symbol : currentUnit;
-      }
+      if (currentUnit) heroSelect.value = currentUnit;
     }
   }
 
