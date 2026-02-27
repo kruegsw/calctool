@@ -1166,10 +1166,10 @@ function updateInputValues(state) {
     if (!input || input.type !== 'number') continue;
     // Don't overwrite while the user is typing
     if (document.activeElement === input) continue;
-    // Display with user's sig figs (the stored value is unrounded)
+    // Display with user's sig figs if set, otherwise default formatting
     const displayVal = entry.sigFigs && isFinite(entry.value)
       ? roundToSigFigs(entry.value, entry.sigFigs)
-      : entry.value;
+      : isFinite(entry.value) ? formatNumber(entry.value) : entry.value;
     const stateStr = String(displayVal);
     if (input.value === stateStr) continue;
     input.value = stateStr;

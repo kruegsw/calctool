@@ -80,6 +80,9 @@ export class AppState {
       // Convert value when we have a numeric value, a known old unit, and a quantity
       if (entry.value != null && oldUnit && oldUnit !== unit && quantity) {
         entry.value = convertUnits(quantity, entry.value, oldUnit, unit);
+        // Recount sig figs from converted value so display adapts
+        // (avoids e.g. 0 psig → 10 psia when original had only 1 sig fig)
+        entry.sigFigs = undefined;
       }
       entry.unit = unit;
     } else {
@@ -112,6 +115,7 @@ export class AppState {
 
       if (entry && entry.value != null) {
         entry.value = convertUnits(quantity, entry.value, oldUnit, targetUnit);
+        entry.sigFigs = undefined;
         entry.unit = targetUnit;
       } else if (entry) {
         entry.unit = targetUnit;
