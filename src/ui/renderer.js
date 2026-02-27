@@ -46,7 +46,7 @@ function el(tag, attrs = {}, ...children) {
 }
 
 /** Theme icon characters for each mode. */
-const THEME_ICONS = { system: '\u2699', light: '\u2600', dark: '\u263E' };
+const THEME_ICONS = { light: '\u2600', dark: '\u263E' };
 const THEME_LABELS = { system: 'System theme', light: 'Light theme', dark: 'Dark theme' };
 
 /**
@@ -1348,8 +1348,12 @@ function updateThemeToggle(state) {
   applyTheme(state.theme);
   const btn = document.querySelector('[data-theme-btn]');
   if (btn) {
-    btn.textContent = THEME_ICONS[state.theme] || THEME_ICONS.system;
-    btn.title = THEME_LABELS[state.theme] || THEME_LABELS.system;
+    // Show sun/moon based on resolved theme (not the setting)
+    const resolved = state.theme === 'system'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : state.theme;
+    btn.textContent = THEME_ICONS[resolved];
+    btn.title = THEME_LABELS[state.theme];
   }
 }
 
