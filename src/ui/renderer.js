@@ -75,11 +75,9 @@ export function buildApp(root, state) {
   const resultsEl = main.querySelector('[data-section-id="results"]');
   if (resultsEl) resultsEl.classList.add('expanded');
 
-  // Initial calculation
-  state.recalculate();
-
-  // Subscribe to updates
+  // Subscribe to updates, then run initial calculation
   state.subscribe(() => updateAll(state));
+  state.recalculate();
 
   // Set up hover highlighting
   setupHoverHighlighting(root, state);
