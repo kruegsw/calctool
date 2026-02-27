@@ -570,6 +570,7 @@ function updateFittingsList(state) {
     const { k, source, tooltip } = computeFittingK(entry, fitting, state);
 
     const row = el('div', { className: 'fittings-list-item' });
+    if (source === 'darby') row.dataset.darby = 'true';
 
     const nameSpan = el('span', { className: 'fittings-item-name' }, name);
 

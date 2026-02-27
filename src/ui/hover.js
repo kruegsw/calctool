@@ -16,13 +16,30 @@ export function setupHoverHighlighting(root, state) {
   const HOVER_DELAY = 300; // ms before highlights appear
 
   root.addEventListener('mouseenter', (e) => {
-    const el = e.target.closest('.field-row') || e.target.closest('.hero-item');
+    const el = e.target.closest('.field-row') || e.target.closest('.hero-item')
+             || e.target.closest('.fittings-list-item[data-darby]');
     if (!el || el === activeEl) return;
 
     // Clear previous highlights and pending timer
     clearHighlights(root);
     clearTimeout(hoverTimer);
     activeEl = el;
+
+    // Darby fitting items highlight Re + Dnom as inputs
+    if (el.classList.contains('fittings-list-item')) {
+      hoverTimer = setTimeout(() => {
+        if (activeEl !== el) return;
+        for (const depId of ['reynoldsNumber', 'pipeNominalDiameter']) {
+          const depEl = findPropElement(root, depId);
+          if (depEl) {
+            depEl.classList.add('highlight-dependency');
+            addHoverLabel(depEl, 'input', 'highlight-label-input');
+          }
+        }
+        el.classList.add('highlight-self');
+      }, HOVER_DELAY);
+      return;
+    }
 
     const propId = el.dataset.propId || el.dataset.heroId;
     if (!propId) return;
@@ -59,7 +76,8 @@ export function setupHoverHighlighting(root, state) {
   }, true);
 
   root.addEventListener('mouseleave', (e) => {
-    const el = e.target.closest('.field-row') || e.target.closest('.hero-item');
+    const el = e.target.closest('.field-row') || e.target.closest('.hero-item')
+             || e.target.closest('.fittings-list-item[data-darby]');
     if (!el) return;
 
     // Only clear if we're leaving the active element

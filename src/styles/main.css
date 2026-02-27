@@ -1207,7 +1207,8 @@ body {
 }
 
 .field-row.highlight-self,
-.hero-item.highlight-self {
+.hero-item.highlight-self,
+.fittings-list-item.highlight-self {
   background: var(--color-highlight-self) !important;
 }
 
