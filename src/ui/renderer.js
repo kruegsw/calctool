@@ -526,15 +526,21 @@ function updateFittingsList(state) {
     const nameSpan = el('span', { className: 'fittings-item-name' }, name);
 
     // Source citation badge
-    const sourceKey = entry.id === '__custom__' ? null : getFittingById(entry.id)?.source;
-    if (sourceKey) {
-      const sources = getSources();
-      const sourceEntry = sources?.[sourceKey];
-      const badge = el('span', { className: 'source-badge' }, sourceKey);
-      if (sourceEntry?.reference) {
-        badge.title = sourceEntry.reference;
-      }
+    if (entry.id === '__custom__') {
+      const badge = el('span', { className: 'source-badge' }, 'user');
+      badge.title = 'User-specified K-factor';
       nameSpan.appendChild(badge);
+    } else {
+      const sourceKey = getFittingById(entry.id)?.source;
+      if (sourceKey) {
+        const sources = getSources();
+        const sourceEntry = sources?.[sourceKey];
+        const badge = el('span', { className: 'source-badge' }, sourceKey);
+        if (sourceEntry?.reference) {
+          badge.title = sourceEntry.reference;
+        }
+        nameSpan.appendChild(badge);
+      }
     }
 
     const qtyInput = el('input', {
