@@ -90,6 +90,17 @@ function autoSelectMethods(results, registry, activeMethodMap, userMethodOverrid
     }
   }
 
+  // pressureDropTotal: use pipeOnly when fittings result is not valid
+  if (!userMethodOverrides.has('pressureDropTotal')) {
+    const fitResult = results.pressureDropFittings;
+    const hasFittings = fitResult?.isValid && fitResult.value > 0;
+    const desired = hasFittings ? 'pipeAndFittings' : 'pipeOnly';
+    if (activeMethodMap.pressureDropTotal !== desired) {
+      activeMethodMap.pressureDropTotal = desired;
+      changed.push('pressureDropTotal');
+    }
+  }
+
   return changed;
 }
 

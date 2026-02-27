@@ -160,10 +160,7 @@ export function buildApp(root, state) {
 
   root.appendChild(main);
 
-  // Results section starts expanded
-  state.expandedSections.add('results');
-  const resultsEl = main.querySelector('[data-section-id="results"]');
-  if (resultsEl) resultsEl.classList.add('expanded');
+  // Results section starts collapsed (details hidden, hero always visible)
 
   // Initialize source popover singleton
   initSourcePopover();
