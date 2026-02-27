@@ -14,6 +14,8 @@
   --color-highlight-dep: #fef9c3;
   --color-highlight-dependent: #dbeafe;
   --color-highlight-self: #e0f2fe;
+  --color-highlight-input-text: #92400e;
+  --color-highlight-output-text: #1d4ed8;
   --radius: 6px;
   --shadow: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
@@ -97,6 +99,8 @@
   --color-highlight-dep: #3b3520;
   --color-highlight-dependent: #1e2a4a;
   --color-highlight-self: #1a2e3e;
+  --color-highlight-input-text: #fbbf24;
+  --color-highlight-output-text: #93bbfd;
   --shadow: 0 1px 3px rgba(0,0,0,0.3);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
 
@@ -1146,6 +1150,25 @@ body {
 
 .field-row.highlight-self {
   background: var(--color-highlight-self) !important;
+}
+
+/* ─── Hover highlight labels ─── */
+.highlight-label {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.0625rem 0.3rem;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.highlight-label-input {
+  color: var(--color-highlight-input-text);
+}
+
+.highlight-label-output {
+  color: var(--color-highlight-output-text);
 }
 
 /* ─── Invalid input: red border ─── */

@@ -1,6 +1,7 @@
 // Dependency hover highlighting
 // When hovering over a property field, highlight its dependencies and dependents.
 // Uses CSS transitions for smooth fade in/out.
+// Shows "input" / "output" labels on highlighted rows to explain the relationship.
 
 import { getTransitiveDependencies, getTransitiveDependents } from '../engine/graph.js';
 
@@ -27,16 +28,22 @@ export function setupHoverHighlighting(root, state) {
     const deps = getTransitiveDependencies(state.registry, propId, state.activeMethodMap);
     const dependents = getTransitiveDependents(state.registry, propId, state.activeMethodMap);
 
-    // Highlight dependency rows
+    // Highlight dependency rows (inputs)
     for (const depId of deps) {
       const depRow = root.querySelector(`.field-row[data-prop-id="${depId}"]`);
-      if (depRow) depRow.classList.add('highlight-dependency');
+      if (depRow) {
+        depRow.classList.add('highlight-dependency');
+        addHoverLabel(depRow, 'input', 'highlight-label-input');
+      }
     }
 
-    // Highlight dependent rows
+    // Highlight dependent rows (outputs)
     for (const depId of dependents) {
       const depRow = root.querySelector(`.field-row[data-prop-id="${depId}"]`);
-      if (depRow) depRow.classList.add('highlight-dependent');
+      if (depRow) {
+        depRow.classList.add('highlight-dependent');
+        addHoverLabel(depRow, 'output', 'highlight-label-output');
+      }
     }
 
     // Mark the hovered row itself
@@ -55,9 +62,19 @@ export function setupHoverHighlighting(root, state) {
   }, true);
 }
 
+function addHoverLabel(row, text, className) {
+  const label = document.createElement('span');
+  label.className = `highlight-label ${className}`;
+  label.textContent = text;
+  row.appendChild(label);
+}
+
 function clearHighlights(root) {
   const highlighted = root.querySelectorAll('.highlight-dependency, .highlight-dependent, .highlight-self');
   for (const el of highlighted) {
     el.classList.remove('highlight-dependency', 'highlight-dependent', 'highlight-self');
   }
+  // Remove all hover labels
+  const labels = root.querySelectorAll('.highlight-label');
+  for (const el of labels) el.remove();
 }
