@@ -51,6 +51,12 @@ function evalPerry(equation, coeffs, T) {
       // For heat of vaporization: C1 * tau^(C2 + C3*Tr + C4*Tr^2), Tc in coefficients context
       // We handle this specially in the property that uses it
       return null;
+    case 107: {
+      // Aly-Lee (DIPPR): C1 + C2*(C3/T/sinh(C3/T))^2 + C4*(C5/T/cosh(C5/T))^2
+      const x = C3 / T;
+      const y = C5 / T;
+      return C1 + C2 * Math.pow(x / Math.sinh(x), 2) + C4 * Math.pow(y / Math.cosh(y), 2);
+    }
     default:
       return null;
   }
