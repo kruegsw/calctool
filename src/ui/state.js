@@ -170,6 +170,11 @@ export class AppState {
    */
   clearMethodOverride(propertyId) {
     this.userMethodOverrides.delete(propertyId);
+    // Reset to default method (auto-selection will override if phase-dependent)
+    const defaults = getDefaultMethodMap(this.registry);
+    if (defaults[propertyId]) {
+      this.activeMethodMap[propertyId] = defaults[propertyId];
+    }
     this.recalculate();
   }
 
