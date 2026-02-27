@@ -1481,31 +1481,10 @@ function updateResultsHero(state) {
     }
   }
 
-  // Pressure drop method chip
+  // Pressure drop method chip (hidden — only Darcy-Weisbach available)
   const dpMethodChip = document.querySelector('[data-dp-method-chip]');
-  if (dpMethodChip) {
-    const dpPipeResult = state.results.pressureDropPipe;
-    if (dpPipeResult?.isValid) {
-      const methodKey = state.activeMethodMap.pressureDropPipe;
-      const methodDef = REGISTRY.pressureDropPipe?.methods?.[methodKey];
-      if (methodDef) {
-        dpMethodChip.textContent = methodDef.name;
-        dpMethodChip.style.display = '';
-      } else {
-        dpMethodChip.style.display = 'none';
-      }
-    } else {
-      dpMethodChip.style.display = 'none';
-    }
-  }
+  if (dpMethodChip) dpMethodChip.style.display = 'none';
 
-  // Conditional visibility: pressureDropPipe row (show when fittings present)
-  const dpPipeRow = document.querySelector('.field-row[data-prop-id="pressureDropPipe"]');
-  if (dpPipeRow) {
-    const hasFittings = state.results.pressureDropFittings?.isValid &&
-                        state.results.pressureDropFittings.value > 0;
-    dpPipeRow.style.display = hasFittings ? '' : 'none';
-  }
 }
 
 /**

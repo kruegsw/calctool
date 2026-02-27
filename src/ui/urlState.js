@@ -194,7 +194,7 @@ export function deserializeState(search, state) {
     found = true;
     for (const part of mo.split('|')) {
       const [propId, methodKey] = part.split(':');
-      if (propId && methodKey) {
+      if (propId && methodKey && state.registry[propId]?.methods?.[methodKey]) {
         state.activeMethodMap[propId] = methodKey;
         state.userMethodOverrides.add(propId);
       }
