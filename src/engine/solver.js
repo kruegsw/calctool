@@ -125,19 +125,59 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
     }
   }
 
-  // Post-solve: Mach number warning on velocity
-  const velResult = results.velocity;
-  const sonicResult = results.sonicVelocity;
-  if (velResult?.isValid && sonicResult?.isValid && sonicResult.value > 0) {
-    const mach = velResult.value / sonicResult.value;
+  // Post-solve: Mach number warnings
+  const machResult = results.machNumber;
+  if (machResult?.isValid) {
+    const mach = machResult.value;
     if (mach > 1) {
-      velResult.warnings.push(
+      machResult.warnings.push(
         'Velocity exceeds sonic velocity \u2014 compressible flow effects not modeled'
       );
     } else if (mach > 0.3) {
-      velResult.warnings.push(
+      machResult.warnings.push(
         'Mach > 0.3 \u2014 compressibility effects may be significant'
       );
+    }
+  }
+
+  // Post-solve: Negative Reynolds number
+  const reResult = results.reynoldsNumber;
+  if (reResult?.isValid && reResult.value < 0) {
+    reResult.warnings.push(
+      'Negative Reynolds number \u2014 check flow direction'
+    );
+  }
+
+  // Post-solve: Vacuum pressure warning (cavitation)
+  const pressResult = results.pressure;
+  const vpResult = results.vaporPressure;
+  if (pressResult?.isValid && vpResult?.isValid && pressResult.value < vpResult.value) {
+    pressResult.warnings.push(
+      'Operating pressure below vapor pressure \u2014 cavitation likely'
+    );
+  }
+
+  // Post-solve: Near-critical temperature and negative density warnings
+  const densResult = results.density;
+  if (densResult?.isValid) {
+    if (densResult.value <= 0) {
+      densResult.warnings.push(
+        'Non-physical density \u2014 check inputs'
+      );
+    }
+    const tempResult = results.temperature;
+    const tcResult = results.criticalTemperature;
+    const phaseResult = results.phase;
+    if (tempResult?.isValid && tcResult?.isValid && tcResult.value > 0 && phaseResult?.isValid) {
+      const phase = String(phaseResult.value).toLowerCase();
+      if (phase === 'gas' || phase === 'vapor') {
+        const ratio = tempResult.value / tcResult.value;
+        if (ratio >= 0.95 && ratio <= 1.05) {
+          densResult.warnings.push(
+            'Temperature near critical point \u2014 ideal gas assumption unreliable'
+          );
+        }
+      }
     }
   }
 
@@ -224,7 +264,7 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
     if (!depResult || !depResult.isValid) {
       return createErrorResult(id, new PropertyError(
         ErrorType.DEPENDENCY_ERROR,
-        `Dependency "${depId}" is not available`,
+        `Requires ${registry[depId]?.name || depId}`,
         id
       ));
     }
