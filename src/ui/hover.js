@@ -63,10 +63,12 @@ export function setupHoverHighlighting(root, state) {
 }
 
 function addHoverLabel(row, text, className) {
+  const fieldLabel = row.querySelector('.field-label');
+  if (!fieldLabel) return;
   const label = document.createElement('span');
   label.className = `highlight-label ${className}`;
   label.textContent = text;
-  row.appendChild(label);
+  fieldLabel.appendChild(label);
 }
 
 function clearHighlights(root) {

@@ -17,7 +17,6 @@ export const SECTIONS = [
     title: 'At what conditions?',
     stepNumber: 2,
     accentColor: '#0d9488',  // teal
-    inline: true,
     primary: ['temperature', 'pressure'],
     detail: ['phase', 'vaporPressure', 'density', 'viscosity',
              'cp', 'cv', 'cpCvRatio',
@@ -29,7 +28,6 @@ export const SECTIONS = [
     title: 'Through what pipe?',
     stepNumber: 3,
     accentColor: '#475569',  // slate
-    inline: true,
     primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength', 'massFlowRate'],
     detail: ['pipeMaterial', 'pipeInnerDiameter',
              'pipeAbsoluteRoughness', 'volumeFlowRate', 'velocity', 'machNumber'],
