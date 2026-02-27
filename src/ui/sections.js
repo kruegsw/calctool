@@ -32,7 +32,7 @@ export const SECTIONS = [
     inline: true,
     primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength', 'massFlowRate'],
     detail: ['pipeMaterial', 'pipeInnerDiameter',
-             'pipeAbsoluteRoughness', 'volumeFlowRate', 'velocity'],
+             'pipeAbsoluteRoughness', 'volumeFlowRate', 'velocity', 'machNumber'],
   },
   {
     id: 'results',

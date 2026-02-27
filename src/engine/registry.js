@@ -960,6 +960,25 @@ export const REGISTRY = {
     },
   },
 
+  machNumber: {
+    id: 'machNumber',
+    name: 'Mach Number',
+    quantity: null,
+    category: 'system-condition',
+    defaultUnit: null,
+    methods: {
+      standard: {
+        name: 'Ma = v / c',
+        inputs: ['velocity', 'sonicVelocity'],
+        calculate: (inputs) => {
+          const v = inputs.velocity;       // m/s
+          const c = inputs.sonicVelocity;  // m/s
+          return v / c;
+        },
+      },
+    },
+  },
+
   reynoldsNumber: {
     id: 'reynoldsNumber',
     name: 'Reynolds Number',
