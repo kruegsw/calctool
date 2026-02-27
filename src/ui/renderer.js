@@ -7,6 +7,7 @@ import { formatNumber, flowRegimeLabel } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
+import { getSources } from '../data/sources.js';
 
 /**
  * Size a ghost select to fit its currently selected option text + caret padding.
@@ -704,6 +705,9 @@ function updateAll(state) {
     }
   }
 
+  // Update source tooltips on field rows
+  updateSourceTooltips(state);
+
   // Update override (pinned) field states
   updateOverrideFields(state);
 
@@ -718,6 +722,43 @@ function updateAll(state) {
 
   // Update dependent dropdowns
   updateDependentDropdowns(state);
+}
+
+/**
+ * Update source citation tooltips on calculated property rows.
+ * Shows method name + full reference on hover.
+ */
+function updateSourceTooltips(state) {
+  const sources = getSources();
+
+  // Remove previous source badges
+  const prevSourceBadges = document.querySelectorAll('.source-badge');
+  for (const b of prevSourceBadges) b.remove();
+
+  for (const [propId, result] of Object.entries(state.results)) {
+    if (!result.isValid || !result.method) continue;
+
+    const def = REGISTRY[propId];
+    if (!def) continue;
+
+    const method = def.methods?.[result.method];
+    if (!method?.source) continue;
+
+    const sourceEntry = sources?.[method.source];
+    if (!sourceEntry) continue;
+
+    const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
+    if (!row) continue;
+
+    const label = row.querySelector('.field-label');
+    if (!label) continue;
+
+    const badge = el('span', {
+      className: 'source-badge',
+      title: sourceEntry.reference,
+    }, method.source);
+    label.appendChild(badge);
+  }
 }
 
 /**

@@ -2,6 +2,7 @@
 
 import { loadChemicals } from '../data/chemicals.js';
 import { loadPipeData } from '../data/pipe.js';
+import { loadSources } from '../data/sources.js';
 import { AppState } from './state.js';
 import { buildApp } from './renderer.js';
 
@@ -42,6 +43,7 @@ async function init() {
     await Promise.all([
       loadChemicals(),
       loadPipeData(),
+      loadSources(),
     ]);
 
     // Create state and build UI
