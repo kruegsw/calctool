@@ -5,10 +5,37 @@ import { loadPipeData } from '../data/pipe.js';
 import { AppState } from './state.js';
 import { buildApp } from './renderer.js';
 
+function showLoadingSkeleton(root) {
+  root.textContent = '';
+
+  // Accent strip
+  const strip = document.createElement('div');
+  strip.className = 'accent-strip';
+  root.appendChild(strip);
+
+  const skeleton = document.createElement('div');
+  skeleton.className = 'loading-skeleton';
+
+  const header = document.createElement('div');
+  header.className = 'shimmer-header';
+  skeleton.appendChild(header);
+
+  const subtitle = document.createElement('div');
+  subtitle.className = 'shimmer-subtitle';
+  skeleton.appendChild(subtitle);
+
+  for (let i = 0; i < 5; i++) {
+    const card = document.createElement('div');
+    card.className = 'shimmer-card';
+    skeleton.appendChild(card);
+  }
+
+  root.appendChild(skeleton);
+}
+
 async function init() {
-  // Show loading state
   const root = document.getElementById('app');
-  root.textContent = 'Loading data...';
+  showLoadingSkeleton(root);
 
   try {
     // Load data in parallel

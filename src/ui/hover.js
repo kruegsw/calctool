@@ -1,5 +1,6 @@
 // Dependency hover highlighting
 // When hovering over a property field, highlight its dependencies and dependents.
+// Uses CSS transitions for smooth fade in/out.
 
 import { getTransitiveDependencies, getTransitiveDependents } from '../engine/graph.js';
 
@@ -9,9 +10,15 @@ import { getTransitiveDependencies, getTransitiveDependents } from '../engine/gr
  * @param {import('./state.js').AppState} state
  */
 export function setupHoverHighlighting(root, state) {
+  let activeRow = null;
+
   root.addEventListener('mouseenter', (e) => {
     const row = e.target.closest('.field-row');
-    if (!row) return;
+    if (!row || row === activeRow) return;
+
+    // Clear previous highlights first
+    clearHighlights(root);
+    activeRow = row;
 
     const propId = row.dataset.propId;
     if (!propId) return;
@@ -40,10 +47,17 @@ export function setupHoverHighlighting(root, state) {
     const row = e.target.closest('.field-row');
     if (!row) return;
 
-    // Clear all highlights
-    const highlighted = root.querySelectorAll('.highlight-dependency, .highlight-dependent, .highlight-self');
-    for (const el of highlighted) {
-      el.classList.remove('highlight-dependency', 'highlight-dependent', 'highlight-self');
+    // Only clear if we're leaving the active row
+    if (row === activeRow) {
+      clearHighlights(root);
+      activeRow = null;
     }
   }, true);
+}
+
+function clearHighlights(root) {
+  const highlighted = root.querySelectorAll('.highlight-dependency, .highlight-dependent, .highlight-self');
+  for (const el of highlighted) {
+    el.classList.remove('highlight-dependency', 'highlight-dependent', 'highlight-self');
+  }
 }

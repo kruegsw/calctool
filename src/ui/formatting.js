@@ -35,3 +35,15 @@ export function formatWithUnit(value, symbol) {
   if (!formatted || !symbol) return formatted;
   return `${formatted} ${symbol}`;
 }
+
+/**
+ * Return a flow regime label based on Reynolds number.
+ * @param {number} re - Reynolds number
+ * @returns {{ label: string, type: string }} label text and type for CSS class
+ */
+export function flowRegimeLabel(re) {
+  if (re == null || !isFinite(re)) return null;
+  if (re < 2100) return { label: 'Laminar', type: 'laminar' };
+  if (re < 4000) return { label: 'Transitional', type: 'transitional' };
+  return { label: 'Turbulent', type: 'turbulent' };
+}

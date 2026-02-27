@@ -3,8 +3,8 @@
 import { REGISTRY } from '../engine/registry.js';
 import { UNITS, unitOptionsFor } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
-import { formatNumber } from './formatting.js';
-import { getAllChemicals, searchChemicals } from '../data/chemicals.js';
+import { formatNumber, flowRegimeLabel } from './formatting.js';
+import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
 
@@ -33,9 +33,13 @@ function el(tag, attrs = {}, ...children) {
 export function buildApp(root, state) {
   root.textContent = '';
 
+  // Accent strip
+  root.appendChild(el('div', { className: 'accent-strip' }));
+
   const header = el('header', { className: 'app-header' },
     el('h1', {}, 'Pressure Drop Calculator'),
-    el('p', { className: 'subtitle' }, 'Single-phase pipe flow — Darcy-Weisbach method'),
+    el('span', { className: 'version-badge' }, 'v2'),
+    el('p', { className: 'subtitle' }, 'Single-phase pipe flow \u2014 Darcy-Weisbach method'),
   );
   root.appendChild(header);
 
@@ -46,6 +50,11 @@ export function buildApp(root, state) {
   }
 
   root.appendChild(main);
+
+  // Results section starts expanded
+  state.expandedSections.add('results');
+  const resultsEl = main.querySelector('[data-section-id="results"]');
+  if (resultsEl) resultsEl.classList.add('expanded');
 
   // Initial calculation
   state.recalculate();
@@ -66,26 +75,64 @@ function buildSection(section, state) {
     dataset: { sectionId: section.id },
   });
 
+  // Accent top bar
+  const accentBar = el('div', { className: 'section-accent-top' });
+  accentBar.style.background = section.accentColor;
+  sectionEl.appendChild(accentBar);
+
+  // Step number circle
+  const stepCircle = el('span', { className: 'step-number', textContent: String(section.stepNumber) });
+  stepCircle.style.background = section.accentColor;
+
+  // Toggle label + icon
+  const toggleLabel = el('span', { className: 'toggle-label' }, 'Show details');
+  const toggleIcon = el('span', { className: 'toggle-icon' }, '\u25B6');
+
   const headerEl = el('div', {
     className: 'section-header',
     onClick: () => {
       state.toggleSection(section.id);
-      sectionEl.classList.toggle('expanded', state.expandedSections.has(section.id));
+      const isExpanded = state.expandedSections.has(section.id);
+      sectionEl.classList.toggle('expanded', isExpanded);
+      toggleLabel.textContent = isExpanded ? 'Hide details' : 'Show details';
     },
   },
+    stepCircle,
     el('h2', {}, section.title),
-    el('span', { className: 'toggle-icon' }, '\u25B6'),
+    toggleLabel,
+    toggleIcon,
   );
+
+  // Hide toggle controls on results section (no detail fields)
+  if (section.detail.length === 0) {
+    toggleLabel.style.display = 'none';
+    toggleIcon.style.display = 'none';
+  }
+
   sectionEl.appendChild(headerEl);
 
   const bodyEl = el('div', { className: 'section-body' });
 
+  // Results section: hero layout
+  if (section.id === 'results') {
+    bodyEl.appendChild(buildResultsHero(state));
+  }
+
   // Primary fields (always visible)
   const primaryEl = el('div', { className: 'fields primary-fields' });
   for (const propId of section.primary) {
+    // Skip results hero properties from the flat list
+    if (section.id === 'results') continue;
     primaryEl.appendChild(buildPropertyField(propId, state));
   }
-  bodyEl.appendChild(primaryEl);
+  if (primaryEl.children.length > 0) {
+    bodyEl.appendChild(primaryEl);
+  }
+
+  // Chemical summary card (shown after search input in fluid section)
+  if (section.id === 'fluid') {
+    bodyEl.appendChild(buildChemicalCard(state));
+  }
 
   // Detail fields (shown when expanded)
   if (section.detail.length > 0) {
@@ -101,14 +148,101 @@ function buildSection(section, state) {
 }
 
 /**
+ * Build results hero section with large numbers and badges.
+ */
+function buildResultsHero(state) {
+  const hero = el('div', { className: 'results-hero' });
+
+  // Pressure Drop (Total) — main hero
+  const dpItem = el('div', { className: 'hero-item', dataset: { heroId: 'pressureDropTotal' } });
+  dpItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop'));
+  const dpValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropTotal' } }, '\u2014');
+  dpItem.appendChild(dpValue);
+  const dpUnit = el('div', { className: 'hero-unit', dataset: { unitFor: 'pressureDropTotal' } });
+  dpItem.appendChild(dpUnit);
+  hero.appendChild(dpItem);
+
+  // Reynolds Number with regime badge
+  const reItem = el('div', { className: 'hero-item', dataset: { heroId: 'reynoldsNumber' } });
+  reItem.appendChild(el('div', { className: 'hero-label' }, 'Reynolds Number'));
+  const reValue = el('div', { className: 'hero-value empty', dataset: { propId: 'reynoldsNumber' } }, '\u2014');
+  reItem.appendChild(reValue);
+  const reBadge = el('div', { className: 'regime-badge', dataset: { regimeBadge: 'true' } });
+  reBadge.style.display = 'none';
+  reItem.appendChild(reBadge);
+  hero.appendChild(reItem);
+
+  // Friction Factor with method chip
+  const ffItem = el('div', { className: 'hero-item', dataset: { heroId: 'frictionFactor' } });
+  ffItem.appendChild(el('div', { className: 'hero-label' }, 'Friction Factor'));
+  const ffValue = el('div', { className: 'hero-value empty', dataset: { propId: 'frictionFactor' } }, '\u2014');
+  ffItem.appendChild(ffValue);
+  const ffChip = el('div', { className: 'method-chip', dataset: { methodChip: 'true' } });
+  ffChip.style.display = 'none';
+  ffItem.appendChild(ffChip);
+  // Method selector below the hero value
+  const ffMethods = REGISTRY.frictionFactor?.methods || {};
+  if (Object.keys(ffMethods).length > 1) {
+    ffItem.appendChild(buildMethodSelector('frictionFactor', state));
+  }
+  hero.appendChild(ffItem);
+
+  // Pressure Drop (Pipe) — secondary
+  const dpPipeItem = el('div', { className: 'hero-item', dataset: { heroId: 'pressureDropPipe' } });
+  dpPipeItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop (Pipe)'));
+  const dpPipeValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropPipe' } }, '\u2014');
+  dpPipeItem.appendChild(dpPipeValue);
+  const dpPipeUnit = el('div', { className: 'hero-unit', dataset: { unitFor: 'pressureDropPipe' } });
+  dpPipeItem.appendChild(dpPipeUnit);
+  hero.appendChild(dpPipeItem);
+
+  return hero;
+}
+
+/**
+ * Build a chemical summary card (name, family, MW).
+ */
+function buildChemicalCard(state) {
+  const card = el('div', { className: 'chemical-card', dataset: { chemCard: 'true' } });
+  card.style.display = 'none';
+
+  card.appendChild(
+    el('div', { className: 'chemical-card-item' },
+      el('span', { className: 'chemical-card-label' }, 'Name'),
+      el('span', { className: 'chemical-card-value', dataset: { chemCardName: 'true' } }, ''),
+    )
+  );
+  card.appendChild(
+    el('div', { className: 'chemical-card-item' },
+      el('span', { className: 'chemical-card-label' }, 'Family'),
+      el('span', { className: 'chemical-card-value', dataset: { chemCardFamily: 'true' } }, ''),
+    )
+  );
+  card.appendChild(
+    el('div', { className: 'chemical-card-item' },
+      el('span', { className: 'chemical-card-label' }, 'MW'),
+      el('span', { className: 'chemical-card-value', dataset: { chemCardMw: 'true' } }, ''),
+    )
+  );
+
+  return card;
+}
+
+/**
  * Build a single property field row.
  */
 function buildPropertyField(propId, state) {
   const def = REGISTRY[propId];
   if (!def) return el('div', {}, `Unknown property: ${propId}`);
 
+  // Determine row type class
+  let rowType = 'row-output';
+  if (def.isUserInput && !def.isSelection) rowType = 'row-input';
+  else if (def.isSelection) rowType = 'row-input';
+  else if (def.isLookup) rowType = 'row-lookup';
+
   const row = el('div', {
-    className: 'field-row',
+    className: `field-row ${rowType}`,
     dataset: { propId: propId },
   });
 
@@ -121,6 +255,8 @@ function buildPropertyField(propId, state) {
 
   if (propId === 'chemicalSearch') {
     inputArea.appendChild(buildChemicalSearch(state));
+  } else if (propId === 'phase') {
+    inputArea.appendChild(buildPhaseDisplay(propId, state));
   } else if (def.isSelection && !def.quantity) {
     inputArea.appendChild(buildSelectionDropdown(propId, state));
   } else if (def.isUserInput) {
@@ -136,10 +272,12 @@ function buildPropertyField(propId, state) {
     row.appendChild(buildUnitSelector(propId, state));
   }
 
-  // Method selector (if has multiple methods)
-  const methodKeys = Object.keys(def.methods || {});
-  if (methodKeys.length > 1) {
-    row.appendChild(buildMethodSelector(propId, state));
+  // Method selector (if has multiple methods) — skip for frictionFactor (it's in the hero)
+  if (propId !== 'frictionFactor') {
+    const methodKeys = Object.keys(def.methods || {});
+    if (methodKeys.length > 1) {
+      row.appendChild(buildMethodSelector(propId, state));
+    }
   }
 
   return row;
@@ -168,7 +306,6 @@ function buildChemicalSearch(state) {
 
   input.addEventListener('input', () => {
     const val = input.value.trim();
-    // Check if it's a valid CAS number selection
     const allChems = getAllChemicals();
     const match = allChems.find(c => c.cas === val || c.searchTerm === val);
     if (match) {
@@ -192,7 +329,19 @@ function buildChemicalSearch(state) {
 }
 
 /**
- * Build a dropdown for selection properties (pipe standard, material, schedule, etc.).
+ * Build phase display as a colored badge.
+ */
+function buildPhaseDisplay(propId, state) {
+  const badge = el('span', {
+    id: `output-${propId}`,
+    className: 'phase-badge',
+    dataset: { propId },
+  });
+  return badge;
+}
+
+/**
+ * Build a dropdown for selection properties.
  */
 function buildSelectionDropdown(propId, state) {
   const select = el('select', {
@@ -207,7 +356,6 @@ function buildSelectionDropdown(propId, state) {
     state.setValue(propId, select.value);
   });
 
-  // Set initial value
   const current = state.userValues[propId]?.value;
   if (current) select.value = current;
 
@@ -251,7 +399,6 @@ function buildNumberInput(propId, state) {
     dataset: { propId },
   });
 
-  // Set initial value
   const current = state.userValues[propId];
   if (current?.value != null) input.value = current.value;
 
@@ -269,9 +416,9 @@ function buildNumberInput(propId, state) {
 function buildOutputDisplay(propId, state) {
   const span = el('span', {
     id: `output-${propId}`,
-    className: 'field-output',
+    className: 'field-output empty',
     dataset: { propId },
-  });
+  }, '\u2014');
   return span;
 }
 
@@ -292,7 +439,6 @@ function buildUnitSelector(propId, state) {
     select.appendChild(el('option', { value: opt.key }, opt.symbol));
   }
 
-  // Set current unit
   const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
   if (currentUnit) select.value = currentUnit;
 
@@ -304,7 +450,7 @@ function buildUnitSelector(propId, state) {
 }
 
 /**
- * Build method selector dropdown.
+ * Build method selector dropdown (compact style with gear prefix).
  */
 function buildMethodSelector(propId, state) {
   const def = REGISTRY[propId];
@@ -318,7 +464,7 @@ function buildMethodSelector(propId, state) {
   });
 
   for (const key of keys) {
-    select.appendChild(el('option', { value: key }, methods[key].name));
+    select.appendChild(el('option', { value: key }, '\u2699 ' + methods[key].name));
   }
 
   const current = state.activeMethodMap[propId];
@@ -336,17 +482,26 @@ function buildMethodSelector(propId, state) {
  */
 function updateAll(state) {
   for (const [propId, result] of Object.entries(state.results)) {
-    // Update output displays
+    // Update standard output displays
     const outputEl = document.getElementById(`output-${propId}`);
     if (outputEl) {
-      if (result.isValid) {
+      if (propId === 'phase') {
+        updatePhaseDisplay(outputEl, result);
+      } else if (result.isValid) {
         outputEl.textContent = formatNumber(result.displayValue);
-        outputEl.classList.remove('error');
+        outputEl.classList.remove('error', 'empty');
         outputEl.title = '';
+      } else if (result.error) {
+        // Dependency errors: show dash with tooltip
+        outputEl.textContent = '\u2014';
+        outputEl.classList.remove('error');
+        outputEl.classList.add('empty');
+        outputEl.title = result.error.message || '';
       } else {
-        outputEl.textContent = result.error?.message || '—';
-        outputEl.classList.add('error');
-        outputEl.title = result.error?.message || '';
+        outputEl.textContent = '\u2014';
+        outputEl.classList.remove('error');
+        outputEl.classList.add('empty');
+        outputEl.title = '';
       }
     }
 
@@ -358,8 +513,162 @@ function updateAll(state) {
     }
   }
 
-  // Update dependent dropdowns (schedules change when standard/diameter change)
+  // Update results hero
+  updateResultsHero(state);
+
+  // Update chemical card
+  updateChemicalCard(state);
+
+  // Validate user inputs (red border on invalid)
+  updateInputValidation(state);
+
+  // Update dependent dropdowns
   updateDependentDropdowns(state);
+}
+
+/**
+ * Update the phase display as a colored badge.
+ */
+function updatePhaseDisplay(el, result) {
+  el.className = 'phase-badge';
+  if (result.isValid && result.displayValue) {
+    const phase = String(result.displayValue).toLowerCase();
+    el.textContent = result.displayValue;
+    el.classList.add(`phase-${phase}`);
+  } else {
+    el.textContent = '\u2014';
+  }
+}
+
+/**
+ * Update results hero values.
+ */
+function updateResultsHero(state) {
+  const heroProps = ['pressureDropTotal', 'pressureDropPipe', 'reynoldsNumber', 'frictionFactor'];
+
+  for (const propId of heroProps) {
+    const heroValue = document.querySelector(`.hero-value[data-prop-id="${propId}"]`);
+    if (!heroValue) continue;
+
+    const result = state.results[propId];
+    if (result?.isValid) {
+      heroValue.textContent = formatNumber(result.displayValue);
+      heroValue.classList.remove('empty');
+    } else {
+      heroValue.textContent = '\u2014';
+      heroValue.classList.add('empty');
+    }
+  }
+
+  // Update pressure drop units
+  for (const propId of ['pressureDropTotal', 'pressureDropPipe']) {
+    const unitEl = document.querySelector(`[data-unit-for="${propId}"]`);
+    if (unitEl) {
+      const def = REGISTRY[propId];
+      const currentUnit = state.userValues[propId]?.unit || def?.defaultUnit;
+      if (currentUnit) {
+        const options = unitOptionsFor(def.quantity);
+        const opt = options.find(o => o.key === currentUnit);
+        unitEl.textContent = opt ? opt.symbol : currentUnit;
+      }
+    }
+  }
+
+  // Reynolds number regime badge
+  const reBadge = document.querySelector('[data-regime-badge]');
+  if (reBadge) {
+    const reResult = state.results.reynoldsNumber;
+    if (reResult?.isValid) {
+      const regime = flowRegimeLabel(reResult.displayValue);
+      if (regime) {
+        reBadge.textContent = regime.label;
+        reBadge.className = `regime-badge regime-${regime.type}`;
+        reBadge.style.display = '';
+      } else {
+        reBadge.style.display = 'none';
+      }
+    } else {
+      reBadge.style.display = 'none';
+    }
+  }
+
+  // Friction factor method chip
+  const ffChip = document.querySelector('[data-method-chip]');
+  if (ffChip) {
+    const ffResult = state.results.frictionFactor;
+    if (ffResult?.isValid) {
+      const methodKey = state.activeMethodMap.frictionFactor;
+      const methodDef = REGISTRY.frictionFactor?.methods?.[methodKey];
+      if (methodDef) {
+        ffChip.textContent = methodDef.name;
+        ffChip.style.display = '';
+      } else {
+        ffChip.style.display = 'none';
+      }
+    } else {
+      ffChip.style.display = 'none';
+    }
+  }
+}
+
+/**
+ * Update chemical summary card.
+ */
+function updateChemicalCard(state) {
+  const card = document.querySelector('[data-chem-card]');
+  if (!card) return;
+
+  const cas = state.userValues.chemicalSearch?.value;
+  if (!cas) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const chem = getChemicalByCAS(cas);
+  if (!chem) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = '';
+
+  const nameEl = card.querySelector('[data-chem-card-name]');
+  if (nameEl) nameEl.textContent = chem.name || '\u2014';
+
+  const familyEl = card.querySelector('[data-chem-card-family]');
+  if (familyEl) familyEl.textContent = chem.family?.value || '\u2014';
+
+  const mwEl = card.querySelector('[data-chem-card-mw]');
+  if (mwEl) {
+    const mw = chem.molecularWeight?.value;
+    mwEl.textContent = mw ? formatNumber(+mw) + ' g/mol' : '\u2014';
+  }
+}
+
+/**
+ * Mark user input fields with red border when they have invalid/missing values
+ * that cause downstream errors.
+ */
+function updateInputValidation(state) {
+  // Clear all previous invalid markers
+  const prevInvalid = document.querySelectorAll('.input-invalid');
+  for (const el of prevInvalid) {
+    el.classList.remove('input-invalid');
+  }
+
+  // Check user-input fields: mark as invalid if value is null/empty and a dependent has an error
+  for (const [propId, def] of Object.entries(REGISTRY)) {
+    if (!def.isUserInput) continue;
+    const val = state.userValues[propId]?.value;
+    if (val != null && val !== '') continue;
+
+    // Check if any result depends on this and has an error
+    const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
+    if (row) {
+      // Only flag required inputs that haven't been filled
+      row.classList.add('input-invalid');
+    }
+  }
 }
 
 /**

@@ -6,6 +6,7 @@
   --color-border: #dde1e6;
   --color-text: #1a1a2e;
   --color-text-secondary: #555;
+  --color-text-muted: #8b8fa3;
   --color-primary: #2563eb;
   --color-primary-light: #dbeafe;
   --color-error: #dc2626;
@@ -15,6 +16,7 @@
   --color-highlight-self: #e0f2fe;
   --radius: 6px;
   --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 *, *::before, *::after {
@@ -29,11 +31,20 @@ body {
   line-height: 1.5;
 }
 
-/* Header */
+/* ─── Accent strip ─── */
+.accent-strip {
+  height: 4px;
+  background: linear-gradient(90deg, #2563eb, #4f46e5, #7c3aed);
+}
+
+/* ─── Header ─── */
 .app-header {
   padding: 1.5rem 2rem 1rem;
   max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
 }
 
 .app-header h1 {
@@ -42,13 +53,26 @@ body {
   font-weight: 600;
 }
 
-.app-header .subtitle {
-  margin: 0.25rem 0 0;
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
+.version-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
-/* Sections */
+.app-header .subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  flex: 1;
+}
+
+/* ─── Sections container ─── */
 .sections {
   max-width: 900px;
   margin: 0 auto;
@@ -58,6 +82,7 @@ body {
   gap: 1rem;
 }
 
+/* ─── Section card ─── */
 .section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -66,29 +91,56 @@ body {
   overflow: hidden;
 }
 
+.section-accent-top {
+  height: 3px;
+}
+
+/* ─── Section header ─── */
 .section-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.625rem;
   padding: 0.75rem 1rem;
   cursor: pointer;
   user-select: none;
   border-bottom: 1px solid transparent;
+  transition: background 0.15s;
 }
 
 .section-header:hover {
   background: var(--color-bg);
 }
 
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
 .section-header h2 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+  flex: 1;
+}
+
+.toggle-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  transition: color 0.15s;
 }
 
 .toggle-icon {
-  font-size: 0.75rem;
-  color: var(--color-text-secondary);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
   transition: transform 0.2s;
 }
 
@@ -100,40 +152,69 @@ body {
   border-bottom-color: var(--color-border);
 }
 
-/* Section body */
+/* ─── Results section distinct look ─── */
+.section[data-section-id="results"] {
+  background: #fafaff;
+  border-color: #c7d2fe;
+}
+
+.section[data-section-id="results"] .section-header {
+  background: #eef2ff;
+}
+
+.section[data-section-id="results"] .section-header:hover {
+  background: #e0e7ff;
+}
+
+/* ─── Section body ─── */
 .section-body {
   padding: 0.75rem 1rem;
 }
 
-/* Detail fields: hidden by default, shown when expanded */
+/* ─── Detail fields: animated expand/collapse ─── */
 .detail-fields {
-  display: none;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid var(--color-border);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+  opacity: 0;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 1px solid transparent;
 }
 
 .section.expanded .detail-fields {
-  display: block;
+  max-height: 1200px;
+  opacity: 1;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top-color: var(--color-border);
 }
 
-/* Fields */
+/* ─── Fields container ─── */
 .fields {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.field-row {
-  display: grid;
-  grid-template-columns: 180px 1fr auto auto;
-  gap: 0.5rem;
-  align-items: center;
-  padding: 0.25rem 0;
+/* Alternating subtle backgrounds in detail sections */
+.detail-fields .field-row:nth-child(even) {
+  background: #f8f9fb;
   border-radius: 4px;
-  transition: background 0.15s;
 }
 
+/* ─── Field row ─── */
+.field-row {
+  display: grid;
+  grid-template-columns: 200px 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+/* ─── Field label ─── */
 .field-label {
   font-size: 0.875rem;
   font-weight: 500;
@@ -147,7 +228,7 @@ body {
   min-width: 0;
 }
 
-/* Input controls */
+/* ─── Input controls ─── */
 .field-input-control {
   width: 100%;
   padding: 0.375rem 0.5rem;
@@ -157,6 +238,7 @@ body {
   font-family: inherit;
   background: var(--color-surface);
   color: var(--color-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .field-input-control:focus {
@@ -179,7 +261,27 @@ body {
   max-width: 240px;
 }
 
-/* Output display */
+/* ─── Visual distinction: input rows ─── */
+.field-row.row-input {
+  border-left: 3px solid var(--color-primary-light);
+  background: #fff;
+}
+
+/* ─── Visual distinction: output rows ─── */
+.field-row.row-output .field-output {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+}
+
+/* ─── Visual distinction: lookup rows ─── */
+.field-row.row-lookup .field-output {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Output display ─── */
 .field-output {
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
@@ -193,9 +295,13 @@ body {
   font-size: 0.75rem;
 }
 
-/* Unit and method selectors */
-.unit-selector,
-.method-selector {
+/* Empty/pending output: gray dash */
+.field-output.empty {
+  color: var(--color-text-muted);
+}
+
+/* ─── Unit selector: flush against value ─── */
+.unit-selector {
   padding: 0.25rem 0.375rem;
   border: 1px solid var(--color-border);
   border-radius: 4px;
@@ -204,39 +310,279 @@ body {
   background: var(--color-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
+  margin-left: -0.25rem;
 }
 
-.unit-selector:focus,
+.unit-selector:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ─── Method selector: compact gear style ─── */
+.method-selector {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-family: inherit;
+  background: #f3f4f6;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  max-width: 160px;
+  transition: border-color 0.15s;
+}
+
+.method-selector:hover {
+  border-color: var(--color-border);
+}
+
 .method-selector:focus {
   outline: none;
   border-color: var(--color-primary);
 }
 
-.method-selector {
-  max-width: 200px;
+/* ─── Phase badge ─── */
+.phase-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
 }
 
-/* Hover highlighting */
+.phase-badge.phase-liquid {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.phase-badge.phase-vapor {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.phase-badge.phase-gas {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* ─── Chemical summary card ─── */
+.chemical-card {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+}
+
+.chemical-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+}
+
+.chemical-card-label {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.chemical-card-value {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ─── Results hero layout ─── */
+.results-hero {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.hero-item {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface);
+  border: 1px solid #e0e7ff;
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.hero-label {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.hero-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.hero-unit {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  margin-left: 0.25rem;
+}
+
+.hero-value.empty {
+  color: var(--color-text-muted);
+  font-size: 1.25rem;
+}
+
+/* ─── Flow regime badge ─── */
+.regime-badge {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.regime-badge.regime-laminar {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.regime-badge.regime-transitional {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.regime-badge.regime-turbulent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ─── Friction method chip ─── */
+.method-chip {
+  display: inline-block;
+  margin-top: 0.125rem;
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+/* ─── Hover highlighting (with fade transition) ─── */
 .field-row.highlight-dependency {
-  background: var(--color-highlight-dep);
+  background: var(--color-highlight-dep) !important;
 }
 
 .field-row.highlight-dependent {
-  background: var(--color-highlight-dependent);
+  background: var(--color-highlight-dependent) !important;
 }
 
 .field-row.highlight-self {
-  background: var(--color-highlight-self);
+  background: var(--color-highlight-self) !important;
 }
 
-/* Valid/invalid states */
+/* ─── Invalid input: red border ─── */
+.field-row.input-invalid .field-input-control {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 2px var(--color-error-light);
+}
+
+/* ─── Error tooltip ─── */
+.error-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.error-tooltip .error-tooltip-text {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 4px;
+  padding: 0.375rem 0.625rem;
+  background: #1f2937;
+  color: #fff;
+  font-size: 0.6875rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.error-tooltip:hover .error-tooltip-text {
+  display: block;
+}
+
+/* ─── Shimmer loading skeleton ─── */
+.loading-skeleton {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.shimmer-header {
+  height: 2rem;
+  width: 280px;
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.shimmer-subtitle {
+  height: 1rem;
+  width: 200px;
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.shimmer-card {
+  height: 52px;
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ─── Valid/invalid states ─── */
 .field-row.invalid .field-output {
   color: var(--color-error);
 }
 
-/* Responsive */
+/* ─── Responsive ─── */
 @media (max-width: 640px) {
-  .app-header,
+  .app-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
   .sections {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -255,5 +601,66 @@ body {
   .chemical-search,
   .selection-dropdown {
     max-width: 100%;
+  }
+
+  .results-hero {
+    flex-direction: column;
+  }
+
+  .hero-item {
+    min-width: 0;
+  }
+
+  .chemical-card {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* ─── Print stylesheet ─── */
+@media print {
+  .accent-strip,
+  .version-badge,
+  .toggle-icon,
+  .toggle-label,
+  .method-selector,
+  .unit-selector,
+  .section-header {
+    cursor: default;
+  }
+
+  .field-input-control,
+  .selection-dropdown,
+  .chemical-search,
+  .method-selector {
+    display: none;
+  }
+
+  .section {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+
+  .detail-fields {
+    max-height: none !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+  }
+
+  .section-body {
+    display: block;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .field-row {
+    grid-template-columns: 200px 1fr;
+  }
+
+  .field-row.row-input .print-value {
+    display: block;
   }
 }
