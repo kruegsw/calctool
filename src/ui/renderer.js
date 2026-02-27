@@ -45,6 +45,26 @@ function el(tag, attrs = {}, ...children) {
   return elem;
 }
 
+/** Theme icon characters for each mode. */
+const THEME_ICONS = { system: '\u2699', light: '\u2600', dark: '\u263E' };
+const THEME_LABELS = { system: 'System theme', light: 'Light theme', dark: 'Dark theme' };
+
+/**
+ * Apply the resolved theme to the document.
+ * @param {'system'|'light'|'dark'} theme
+ */
+function applyTheme(theme) {
+  let resolved = theme;
+  if (theme === 'system') {
+    resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  if (resolved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
+}
+
 /**
  * Build the full application DOM.
  * @param {HTMLElement} root
@@ -55,6 +75,36 @@ export function buildApp(root, state) {
 
   // Accent strip
   root.appendChild(el('div', { className: 'accent-strip' }));
+
+  // Theme toggle button
+  const themeBtn = el('button', {
+    className: 'theme-toggle-btn',
+    type: 'button',
+    title: 'Toggle theme',
+    dataset: { themeBtn: 'true' },
+  });
+  themeBtn.addEventListener('click', () => {
+    const next = state.theme === 'system' ? 'light'
+               : state.theme === 'light' ? 'dark'
+               : 'system';
+    state.setTheme(next);
+  });
+
+  // Share button
+  const shareBtn = el('button', {
+    className: 'share-btn',
+    type: 'button',
+  }, 'Share');
+  shareBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      shareBtn.textContent = 'Copied!';
+      shareBtn.classList.add('copied');
+      setTimeout(() => {
+        shareBtn.textContent = 'Share';
+        shareBtn.classList.remove('copied');
+      }, 1500);
+    });
+  });
 
   const unitToggle = el('div', { className: 'unit-system-toggle' },
     el('button', {
@@ -71,13 +121,27 @@ export function buildApp(root, state) {
     }),
   );
 
+  const headerControls = el('div', { className: 'header-controls' },
+    themeBtn,
+    shareBtn,
+    unitToggle,
+  );
+
   const header = el('header', { className: 'app-header' },
     el('h1', {}, 'Pressure Drop Calculator'),
     el('span', { className: 'version-badge' }, 'v2'),
     el('p', { className: 'subtitle' }, 'Single-phase pipe flow \u2014 Darcy-Weisbach method'),
-    unitToggle,
+    headerControls,
   );
   root.appendChild(header);
+
+  // Apply initial theme
+  applyTheme(state.theme);
+
+  // Listen for OS theme changes when user is on 'system'
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.theme === 'system') applyTheme('system');
+  });
 
   const main = el('main', { className: 'sections' });
 
@@ -832,6 +896,9 @@ function updateAll(state) {
 
   // Sync input values with state (e.g. after unit conversion)
   updateInputValues(state);
+
+  // Sync theme toggle button
+  updateThemeToggle(state);
 }
 
 /**
@@ -1271,6 +1338,18 @@ function updateUnitSystemToggle(state) {
       select.value = currentUnit;
       autoSizeSelect(select);
     }
+  }
+}
+
+/**
+ * Sync theme toggle button icon and apply theme to document.
+ */
+function updateThemeToggle(state) {
+  applyTheme(state.theme);
+  const btn = document.querySelector('[data-theme-btn]');
+  if (btn) {
+    btn.textContent = THEME_ICONS[state.theme] || THEME_ICONS.system;
+    btn.title = THEME_LABELS[state.theme] || THEME_LABELS.system;
   }
 }
 

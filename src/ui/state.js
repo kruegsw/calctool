@@ -8,6 +8,7 @@ import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js'
 import { countSigFigs } from './formatting.js';
 
 const UNIT_SYSTEM_STORAGE_KEY = 'calctool:unitSystem';
+const THEME_STORAGE_KEY = 'calctool:theme';
 
 export class AppState {
   constructor() {
@@ -17,6 +18,7 @@ export class AppState {
     this.results = {};
     this.listeners = [];
     this.unitSystem = null;
+    this.theme = 'system';
     this.expandedSections = new Set();
     this.dirtyFields = new Set();
     this.userMethodOverrides = new Set();
@@ -32,8 +34,37 @@ export class AppState {
       }
     }
 
-    // Restore saved unit system preference
+    // Restore saved preferences
     this._restoreUnitSystem();
+    this._restoreTheme();
+  }
+
+  /**
+   * Restore theme preference from localStorage (if available).
+   */
+  _restoreTheme() {
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (saved && ['system', 'light', 'dark'].includes(saved)) {
+        this.theme = saved;
+      }
+    } catch {
+      // localStorage unavailable — ignore
+    }
+  }
+
+  /**
+   * Set the theme preference and persist it.
+   */
+  setTheme(theme) {
+    if (!['system', 'light', 'dark'].includes(theme)) return;
+    this.theme = theme;
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // localStorage unavailable — ignore
+    }
+    this.notify();
   }
 
   /**

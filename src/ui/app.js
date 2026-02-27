@@ -5,6 +5,7 @@ import { loadPipeData } from '../data/pipe.js';
 import { loadSources } from '../data/sources.js';
 import { AppState } from './state.js';
 import { buildApp } from './renderer.js';
+import { deserializeState, syncURL } from './urlState.js';
 
 function showLoadingSkeleton(root) {
   root.textContent = '';
@@ -46,9 +47,13 @@ async function init() {
       loadSources(),
     ]);
 
-    // Create state and build UI
+    // Create state and restore from URL if present
     const state = new AppState();
+    deserializeState(window.location.search, state);
+
+    // Build UI, then subscribe URL sync
     buildApp(root, state);
+    state.subscribe(() => syncURL(state));
   } catch (err) {
     root.textContent = `Error loading application: ${err.message}`;
     console.error(err);

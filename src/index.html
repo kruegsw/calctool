@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pressure Drop Calculator</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='38' width='80' height='24' rx='12' fill='%232563eb'/><rect x='0' y='42' width='15' height='16' rx='3' fill='%234f46e5'/><rect x='85' y='42' width='15' height='16' rx='3' fill='%234f46e5'/><circle cx='50' cy='50' r='4' fill='%23fff'/></svg>">
+  <script>
+    // Prevent flash of wrong theme (FOUC)
+    (function() {
+      var t = 'system';
+      try { t = localStorage.getItem('calctool:theme') || 'system'; } catch(e) {}
+      var dark = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
   <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>

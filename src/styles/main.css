@@ -17,6 +17,157 @@
   --radius: 6px;
   --shadow: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+
+  /* Surfaces */
+  --color-on-primary: #fff;
+  --color-input-row-bg: #fff;
+  --color-unit-selector-bg: #f9fafb;
+  --color-output-bg: #f3f4f6;
+  --color-alt-row: #f8f9fb;
+  --color-chemical-card-bg: #f8fafc;
+  --color-chemical-card-border: #e2e8f0;
+
+  /* Results section */
+  --color-results-bg: #fafaff;
+  --color-results-border: #c7d2fe;
+  --color-results-header: #eef2ff;
+  --color-results-header-hover: #e0e7ff;
+  --color-hero-border: #e0e7ff;
+
+  /* Badges: pinned / warning (amber) */
+  --color-pinned-text: #92400e;
+  --color-pinned-bg: #fef3c7;
+  --color-pinned-hover-bg: #fde68a;
+  --color-pinned-hover-text: #78350f;
+  --color-pinned-border: #f59e0b;
+  --color-pinned-row-bg: #fffbeb;
+
+  /* Badges: source (green) */
+  --color-source-bg: #f0fdf4;
+  --color-source-border: #bbf7d0;
+
+  /* Badges: auto (teal) */
+  --color-auto-text: #0e7490;
+  --color-auto-bg: #e0f2fe;
+
+  /* Badges: range (teal/cyan) */
+  --color-range-text: #0e7490;
+  --color-range-bg: #ecfeff;
+
+  /* Badges: bypassed / method-chip (gray) */
+  --color-chip-bg: #f3f4f6;
+
+  /* Phase badges */
+  --color-phase-liquid-bg: #dbeafe;
+  --color-phase-liquid-text: #1d4ed8;
+  --color-phase-vapor-bg: #ffedd5;
+  --color-phase-vapor-text: #c2410c;
+  --color-phase-gas-bg: #fef2f2;
+  --color-phase-gas-text: #dc2626;
+
+  /* Regime badges */
+  --color-regime-laminar-bg: #d1fae5;
+  --color-regime-laminar-text: #065f46;
+  --color-regime-transitional-bg: #fef3c7;
+  --color-regime-transitional-text: #92400e;
+  --color-regime-turbulent-bg: #fee2e2;
+  --color-regime-turbulent-text: #991b1b;
+
+  /* Tooltip */
+  --color-tooltip-bg: #1f2937;
+  --color-tooltip-text: #fff;
+
+  /* Shimmer */
+  --color-shimmer-base: #e5e7eb;
+  --color-shimmer-highlight: #f3f4f6;
+}
+
+/* ─── Dark theme ─── */
+[data-theme="dark"] {
+  --color-bg: #0f1117;
+  --color-surface: #1a1d27;
+  --color-border: #2e3244;
+  --color-text: #e2e4ea;
+  --color-text-secondary: #a0a4b8;
+  --color-text-muted: #6b7084;
+  --color-primary: #5b8def;
+  --color-primary-light: #1e2a4a;
+  --color-error: #f87171;
+  --color-error-light: #3b1c1c;
+  --color-highlight-dep: #3b3520;
+  --color-highlight-dependent: #1e2a4a;
+  --color-highlight-self: #1a2e3e;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+
+  --color-on-primary: #fff;
+  --color-input-row-bg: #1e2130;
+  --color-unit-selector-bg: #252838;
+  --color-output-bg: #252838;
+  --color-alt-row: #1e2130;
+  --color-chemical-card-bg: #1e2130;
+  --color-chemical-card-border: #2e3244;
+
+  --color-results-bg: #181b28;
+  --color-results-border: #3b4060;
+  --color-results-header: #1e2240;
+  --color-results-header-hover: #252850;
+  --color-hero-border: #3b4060;
+
+  --color-pinned-text: #fbbf24;
+  --color-pinned-bg: #3b3520;
+  --color-pinned-hover-bg: #4a4228;
+  --color-pinned-hover-text: #fcd34d;
+  --color-pinned-border: #d97706;
+  --color-pinned-row-bg: #2a2515;
+
+  --color-source-bg: #162317;
+  --color-source-border: #2d4a2e;
+
+  --color-auto-text: #67e8f9;
+  --color-auto-bg: #162a35;
+
+  --color-range-text: #67e8f9;
+  --color-range-bg: #162a35;
+
+  --color-chip-bg: #252838;
+
+  --color-phase-liquid-bg: #1e2a4a;
+  --color-phase-liquid-text: #93bbfd;
+  --color-phase-vapor-bg: #3b2a15;
+  --color-phase-vapor-text: #fdba74;
+  --color-phase-gas-bg: #3b1c1c;
+  --color-phase-gas-text: #fca5a5;
+
+  --color-regime-laminar-bg: #162317;
+  --color-regime-laminar-text: #6ee7b7;
+  --color-regime-transitional-bg: #3b3520;
+  --color-regime-transitional-text: #fbbf24;
+  --color-regime-turbulent-bg: #3b1c1c;
+  --color-regime-turbulent-text: #fca5a5;
+
+  --color-tooltip-bg: #e2e4ea;
+  --color-tooltip-text: #1a1d27;
+
+  --color-shimmer-base: #252838;
+  --color-shimmer-highlight: #2e3244;
+}
+
+/* Dark mode SVG caret overrides */
+[data-theme="dark"] .unit-selector,
+[data-theme="dark"] .method-selector,
+[data-theme="dark"] .hero-unit-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%236b7084'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .unit-selector:hover,
+[data-theme="dark"] .method-selector:hover,
+[data-theme="dark"] .hero-unit-select:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%235b8def'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .chemical-search {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7084' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
 }
 
 *, *::before, *::after {
@@ -72,6 +223,66 @@ body {
   flex: 1;
 }
 
+/* ─── Header controls (theme toggle + share + unit toggle) ─── */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Theme toggle button ─── */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border-color: var(--color-text-muted);
+}
+
+/* ─── Share button ─── */
+.share-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.share-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  border-color: var(--color-text-muted);
+}
+
+.share-btn.copied {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 /* ─── Unit system toggle ─── */
 .unit-system-toggle {
   display: flex;
@@ -100,7 +311,7 @@ body {
 
 .unit-system-btn.active {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-on-primary);
 }
 
 /* ─── Sections container ─── */
@@ -151,7 +362,7 @@ body {
   border-radius: 50%;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-on-primary);
   flex-shrink: 0;
 }
 
@@ -185,16 +396,16 @@ body {
 
 /* ─── Results section distinct look ─── */
 .section[data-section-id="results"] {
-  background: #fafaff;
-  border-color: #c7d2fe;
+  background: var(--color-results-bg);
+  border-color: var(--color-results-border);
 }
 
 .section[data-section-id="results"] .section-header {
-  background: #eef2ff;
+  background: var(--color-results-header);
 }
 
 .section[data-section-id="results"] .section-header:hover {
-  background: #e0e7ff;
+  background: var(--color-results-header-hover);
 }
 
 /* ─── Section body ─── */
@@ -230,7 +441,7 @@ body {
 
 /* Alternating subtle backgrounds in detail sections */
 .detail-fields .field-row:nth-child(even) {
-  background: #f8f9fb;
+  background: var(--color-alt-row);
   border-radius: 4px;
 }
 
@@ -315,7 +526,7 @@ body {
   border: none;
   border-left: 1px solid var(--color-border);
   border-radius: 0 4px 4px 0;
-  background: #f9fafb;
+  background: var(--color-unit-selector-bg);
   margin-left: 0;
   padding: 0.375rem 0.375rem;
   font-size: 0.75rem;
@@ -401,7 +612,7 @@ body {
 /* ─── Visual distinction: input rows ─── */
 .field-row.row-input {
   border-left: 3px solid var(--color-primary-light);
-  background: #fff;
+  background: var(--color-input-row-bg);
 }
 
 /* ─── Visual distinction: overridable (pinned) rows ─── */
@@ -410,8 +621,8 @@ body {
 }
 
 .field-row.row-override.is-pinned {
-  border-left-color: #f59e0b;
-  background: #fffbeb;
+  border-left-color: var(--color-pinned-border);
+  background: var(--color-pinned-row-bg);
 }
 
 .pinned-badge {
@@ -419,16 +630,16 @@ body {
   padding: 0.0625rem 0.375rem;
   font-size: 0.625rem;
   font-weight: 600;
-  color: #92400e;
-  background: #fef3c7;
+  color: var(--color-pinned-text);
+  background: var(--color-pinned-bg);
   border-radius: 9999px;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .pinned-badge:hover {
-  background: #fde68a;
-  color: #78350f;
+  background: var(--color-pinned-hover-bg);
+  color: var(--color-pinned-hover-text);
 }
 
 .override-input::placeholder {
@@ -442,7 +653,7 @@ body {
   font-size: 0.5625rem;
   font-weight: 500;
   color: var(--color-text-muted);
-  background: #f3f4f6;
+  background: var(--color-chip-bg);
   border-radius: 3px;
   text-transform: uppercase;
   cursor: default;
@@ -456,8 +667,8 @@ body {
   font-weight: 500;
   font-style: italic;
   color: var(--color-text-muted);
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
+  background: var(--color-source-bg);
+  border: 1px solid var(--color-source-border);
   border-radius: 3px;
   cursor: help;
 }
@@ -505,8 +716,8 @@ body {
 .source-popover-range {
   margin-bottom: 0.375rem;
   font-size: 0.75rem;
-  color: #0e7490;
-  background: #ecfeff;
+  color: var(--color-range-text);
+  background: var(--color-range-bg);
   display: inline-block;
   padding: 0.125rem 0.375rem;
   border-radius: 3px;
@@ -526,8 +737,8 @@ body {
   padding: 0.0625rem 0.3rem;
   font-size: 0.5625rem;
   font-weight: 500;
-  color: #92400e;
-  background: #fef3c7;
+  color: var(--color-pinned-text);
+  background: var(--color-pinned-bg);
   border-radius: 9999px;
   cursor: help;
 }
@@ -550,30 +761,30 @@ body {
 }
 
 .method-status-badge.status-auto {
-  color: #0e7490;
-  background: #e0f2fe;
+  color: var(--color-auto-text);
+  background: var(--color-auto-bg);
 }
 
 .method-status-badge.status-pinned {
-  color: #92400e;
-  background: #fef3c7;
+  color: var(--color-pinned-text);
+  background: var(--color-pinned-bg);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .method-status-badge.status-pinned:hover {
-  background: #fde68a;
-  color: #78350f;
+  background: var(--color-pinned-hover-bg);
+  color: var(--color-pinned-hover-text);
 }
 
 .field-row.has-warning {
-  border-left: 2px solid #f59e0b;
+  border-left: 2px solid var(--color-pinned-border);
 }
 
 /* ─── Visual distinction: output rows ─── */
 .field-row.row-output .field-output {
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-  background: #f3f4f6;
+  background: var(--color-output-bg);
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
 }
@@ -696,18 +907,18 @@ body {
 }
 
 .phase-badge.phase-liquid {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--color-phase-liquid-bg);
+  color: var(--color-phase-liquid-text);
 }
 
 .phase-badge.phase-vapor {
-  background: #ffedd5;
-  color: #c2410c;
+  background: var(--color-phase-vapor-bg);
+  color: var(--color-phase-vapor-text);
 }
 
 .phase-badge.phase-gas {
-  background: #fef2f2;
-  color: #dc2626;
+  background: var(--color-phase-gas-bg);
+  color: var(--color-phase-gas-text);
 }
 
 /* ─── Inline primary: flex row for compact sections ─── */
@@ -739,8 +950,8 @@ body {
   display: flex;
   gap: 1.5rem;
   padding: 0.375rem 0.75rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--color-chemical-card-bg);
+  border: 1px solid var(--color-chemical-card-border);
   border-radius: var(--radius);
   font-size: 0.8125rem;
   flex: 1;
@@ -785,7 +996,7 @@ body {
   min-width: 180px;
   padding: 0.75rem 1rem;
   background: var(--color-surface);
-  border: 1px solid #e0e7ff;
+  border: 1px solid var(--color-hero-border);
   border-radius: var(--radius);
   text-align: center;
 }
@@ -892,18 +1103,18 @@ body {
 }
 
 .regime-badge.regime-laminar {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--color-regime-laminar-bg);
+  color: var(--color-regime-laminar-text);
 }
 
 .regime-badge.regime-transitional {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--color-regime-transitional-bg);
+  color: var(--color-regime-transitional-text);
 }
 
 .regime-badge.regime-turbulent {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--color-regime-turbulent-bg);
+  color: var(--color-regime-turbulent-text);
 }
 
 /* ─── Friction method chip ─── */
@@ -913,7 +1124,7 @@ body {
   padding: 0.0625rem 0.375rem;
   font-size: 0.625rem;
   color: var(--color-text-muted);
-  background: #f3f4f6;
+  background: var(--color-chip-bg);
   border-radius: 4px;
 }
 
@@ -961,8 +1172,8 @@ body {
   right: 0;
   margin-bottom: 4px;
   padding: 0.375rem 0.625rem;
-  background: #1f2937;
-  color: #fff;
+  background: var(--color-tooltip-bg);
+  color: var(--color-tooltip-text);
   font-size: 0.6875rem;
   border-radius: 4px;
   white-space: nowrap;
@@ -984,7 +1195,7 @@ body {
 .shimmer-header {
   height: 2rem;
   width: 280px;
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, var(--color-shimmer-base) 25%, var(--color-shimmer-highlight) 50%, var(--color-shimmer-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -994,7 +1205,7 @@ body {
 .shimmer-subtitle {
   height: 1rem;
   width: 200px;
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, var(--color-shimmer-base) 25%, var(--color-shimmer-highlight) 50%, var(--color-shimmer-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 4px;
@@ -1003,7 +1214,7 @@ body {
 
 .shimmer-card {
   height: 52px;
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, var(--color-shimmer-base) 25%, var(--color-shimmer-highlight) 50%, var(--color-shimmer-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--radius);
@@ -1079,6 +1290,11 @@ body {
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .header-controls {
+    justify-content: flex-end;
+    width: 100%;
+  }
 }
 
 /* ─── Print stylesheet ─── */
@@ -1096,7 +1312,9 @@ body {
   .field-input-control,
   .selection-dropdown,
   .chemical-search,
-  .method-selector {
+  .method-selector,
+  .theme-toggle-btn,
+  .share-btn {
     display: none;
   }
 
