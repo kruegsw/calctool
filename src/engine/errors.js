@@ -12,9 +12,10 @@ export const ErrorType = Object.freeze({
 });
 
 export class PropertyError {
-  constructor(type, message, propertyId) {
+  constructor(type, message, propertyId, dependencyId = null) {
     this.type = type;
     this.message = message;
     this.propertyId = propertyId;
+    this.dependencyId = dependencyId;
   }
 }

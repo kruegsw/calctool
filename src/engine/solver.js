@@ -265,7 +265,8 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
       return createErrorResult(id, new PropertyError(
         ErrorType.DEPENDENCY_ERROR,
         `Requires ${registry[depId]?.name || depId}`,
-        id
+        id,
+        depId
       ));
     }
     inputValues[depId] = depResult.value;

@@ -851,6 +851,29 @@ body {
   margin-top: 0.125rem;
 }
 
+.field-error-link {
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline dotted;
+  font-size: 0.6875rem;
+  font-style: italic;
+  margin-top: 0.125rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.field-error-link:hover {
+  text-decoration: underline solid;
+}
+
+@keyframes field-highlight {
+  0% { background-color: rgba(37, 99, 235, 0.12); }
+  100% { background-color: transparent; }
+}
+.field-row.highlight { animation: field-highlight 1.5s ease-out; }
+
 /* ─── Ghost caret for appearance:none selects ─── */
 .unit-selector,
 .method-selector,

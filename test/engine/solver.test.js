@@ -96,6 +96,25 @@ describe('solver', () => {
     // density depends on pressure which is invalid
     expect(results.density.isValid).toBe(false);
     expect(results.density.error.type).toBe('DEPENDENCY_ERROR');
+    expect(results.density.error.dependencyId).toBe('pressure');
+  });
+
+  it('includes dependencyId pointing to the missing dependency', () => {
+    const results = solve({
+      registry: testRegistry,
+      activeMethodMap: { temp: null, pressure: null, mw: 'lookup', density: 'idealGas' },
+      userValues: {
+        pressure: { value: 101325, unit: 'Pa' },
+        // temp not provided, mw also missing (no chemData)
+      },
+      chemData: null,
+      pipeData: null,
+    });
+
+    // density depends on temp (first missing dep in inputs list)
+    expect(results.density.isValid).toBe(false);
+    expect(results.density.error.type).toBe('DEPENDENCY_ERROR');
+    expect(results.density.error.dependencyId).toBe('temp');
   });
 
   it('handles missing chemical data gracefully', () => {

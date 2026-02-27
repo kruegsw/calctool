@@ -1061,11 +1061,45 @@ function buildMethodSelector(propId, state) {
 }
 
 /**
+ * Scroll to a field row, expanding its section if needed, then briefly highlight it.
+ */
+function scrollToField(propId, state) {
+  // Find which section contains this property
+  for (const section of SECTIONS) {
+    const inDetail = section.detail.includes(propId);
+    const inPrimary = section.primary.includes(propId);
+    if (!inDetail && !inPrimary) continue;
+
+    // If the field is in a detail area and the section isn't expanded, expand it
+    if (inDetail && !state.expandedSections.has(section.id)) {
+      state.expandedSections.add(section.id);
+      const sectionEl = document.querySelector(`[data-section-id="${section.id}"]`);
+      if (sectionEl) {
+        sectionEl.classList.add('expanded');
+        const toggleLabel = sectionEl.querySelector('.toggle-label');
+        if (toggleLabel) toggleLabel.textContent = 'Hide details';
+      }
+      state.notify();
+    }
+    break;
+  }
+
+  // Wait a frame for the DOM to update after expansion
+  requestAnimationFrame(() => {
+    const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
+    if (!row) return;
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.add('highlight');
+    row.addEventListener('animationend', () => row.classList.remove('highlight'), { once: true });
+  });
+}
+
+/**
  * Update all output displays with current results.
  */
 function updateAll(state) {
   // Clean up previous error hint elements
-  for (const hint of document.querySelectorAll('.field-error-hint')) hint.remove();
+  for (const hint of document.querySelectorAll('.field-error-hint, .field-error-link')) hint.remove();
 
   for (const [propId, result] of Object.entries(state.results)) {
     // Update standard output displays
@@ -1084,8 +1118,17 @@ function updateAll(state) {
         outputEl.classList.add('empty');
         outputEl.title = result.error.message || '';
         if (result.error.type === 'DEPENDENCY_ERROR' && result.error.message) {
-          const hint = el('div', { className: 'field-error-hint' }, result.error.message);
-          outputEl.parentNode.insertBefore(hint, outputEl.nextSibling);
+          if (result.error.dependencyId) {
+            const link = el('button', {
+              className: 'field-error-link',
+              type: 'button',
+              onClick: () => scrollToField(result.error.dependencyId, state),
+            }, result.error.message);
+            outputEl.parentNode.insertBefore(link, outputEl.nextSibling);
+          } else {
+            const hint = el('div', { className: 'field-error-hint' }, result.error.message);
+            outputEl.parentNode.insertBefore(hint, outputEl.nextSibling);
+          }
         }
       } else {
         outputEl.textContent = '\u2014';
