@@ -938,7 +938,8 @@ function buildNumberInput(propId, state) {
     const raw = input.value;
     const val = raw === '' ? null : +raw;
     const sf = raw === '' ? undefined : countSigFigs(raw);
-    state.setValue(propId, val, state.userValues[propId]?.unit, sf);
+    const unit = state.userValues[propId]?.unit || REGISTRY[propId]?.defaultUnit;
+    state.setValue(propId, val, unit, sf);
   });
 
   return input;
@@ -964,7 +965,8 @@ function buildOverrideInput(propId, state) {
     const raw = input.value;
     const val = raw === '' ? null : +raw;
     const sf = raw === '' ? undefined : countSigFigs(raw);
-    state.setValue(propId, val, state.userValues[propId]?.unit, sf);
+    const unit = state.userValues[propId]?.unit || REGISTRY[propId]?.defaultUnit;
+    state.setValue(propId, val, unit, sf);
   });
 
   return input;
