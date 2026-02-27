@@ -1030,7 +1030,6 @@ function buildMethodSelector(propId, state) {
   // Single method: static label (no dropdown needed)
   if (keys.length === 1) {
     const method = methods[keys[0]];
-    if (method.source) return el('span'); // source badge handles citation
     const label = el('span', { className: 'method-label' }, '\u2699 ' + method.name);
     wrapper.appendChild(label);
     return wrapper;
