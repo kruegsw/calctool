@@ -1251,10 +1251,19 @@ function updateWarnings(state) {
     const label = row.querySelector('.field-label');
     if (!label) continue;
 
+    // Context-dependent badge text
+    const warningText = result.warnings.join('; ');
+    let badgeLabel = 'warning';
+    if (/outside valid range/i.test(warningText)) badgeLabel = 'extrapolated';
+    else if (/chok/i.test(warningText)) badgeLabel = 'choked';
+    else if (/mach|compressib/i.test(warningText)) badgeLabel = 'compressible';
+    else if (/critical point/i.test(warningText)) badgeLabel = 'near critical';
+    else if (/cavitation/i.test(warningText)) badgeLabel = 'cavitation risk';
+
     const badge = el('span', {
       className: 'warning-badge',
-      title: result.warnings.join('; '),
-    }, 'extrapolated');
+      title: warningText,
+    }, badgeLabel);
     label.appendChild(badge);
   }
 }

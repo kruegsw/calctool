@@ -19,6 +19,14 @@ const PHASE_METHOD_MAP = {
 };
 
 /**
+ * Mach-dependent method auto-selection.
+ * Switches to compressible flow methods when Ma exceeds threshold.
+ */
+const MACH_METHOD_MAP = {
+  pressureDropPipe: { threshold: 0.3, method: 'fanno', fallback: 'darcy' },
+};
+
+/**
  * Maps (propertyId, methodKey) to the Perry correlation lookup parameters
  * needed for range checking.
  */
@@ -50,13 +58,30 @@ function autoSelectMethods(results, registry, activeMethodMap, userMethodOverrid
 
   // Phase-dependent properties
   const phaseResult = results.phase;
-  if (phaseResult?.isValid && phaseResult.value) {
-    const phase = String(phaseResult.value).toLowerCase();
+  const phase = (phaseResult?.isValid && phaseResult.value)
+    ? String(phaseResult.value).toLowerCase() : null;
+
+  if (phase) {
     for (const [propId, phaseMap] of Object.entries(PHASE_METHOD_MAP)) {
       if (userMethodOverrides.has(propId)) continue;
       const desired = phaseMap[phase];
       if (!desired) continue;
       // Verify the method exists on this property
+      if (!registry[propId]?.methods?.[desired]) continue;
+      if (activeMethodMap[propId] !== desired) {
+        activeMethodMap[propId] = desired;
+        changed.push(propId);
+      }
+    }
+  }
+
+  // Mach-dependent auto-selection (gas/vapor only)
+  const machResult = results.machNumber;
+  if (phase && (phase === 'gas' || phase === 'vapor') &&
+      machResult?.isValid && machResult.value > 0) {
+    for (const [propId, cfg] of Object.entries(MACH_METHOD_MAP)) {
+      if (userMethodOverrides.has(propId)) continue;
+      const desired = machResult.value > cfg.threshold ? cfg.method : cfg.fallback;
       if (!registry[propId]?.methods?.[desired]) continue;
       if (activeMethodMap[propId] !== desired) {
         activeMethodMap[propId] = desired;
@@ -106,11 +131,11 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
     results[id] = evaluateProperty(id, registry, activeMethodMap, userValues, results, chemData, pipeData);
   }
 
-  // Auto-select methods based on computed phase
-  const changed = autoSelectMethods(results, registry, activeMethodMap, overrides);
+  // Auto-select methods based on computed phase and Mach number.
+  // May need multiple passes: phase changes methods → re-evaluation reveals Mach → Mach changes methods.
+  let changed = autoSelectMethods(results, registry, activeMethodMap, overrides);
 
-  // Re-evaluate properties whose method changed (and their downstream dependents)
-  if (changed.length > 0) {
+  for (let pass = 0; pass < 2 && changed.length > 0; pass++) {
     // Re-sort with updated methods (dependencies may have changed)
     const { sorted: reSorted } = topologicalSort(registry, activeMethodMap);
     // Find the earliest changed property in the topological order
@@ -123,20 +148,43 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
         results[id] = evaluateProperty(id, registry, activeMethodMap, userValues, results, chemData, pipeData);
       }
     }
+    // Check if re-evaluation changed any values that trigger further method switches
+    changed = autoSelectMethods(results, registry, activeMethodMap, overrides);
   }
 
   // Post-solve: Mach number warnings
   const machResult = results.machNumber;
   if (machResult?.isValid) {
     const mach = machResult.value;
+    const dpMethod = activeMethodMap.pressureDropPipe;
     if (mach > 1) {
       machResult.warnings.push(
-        'Velocity exceeds sonic velocity \u2014 compressible flow effects not modeled'
+        'Velocity exceeds sonic velocity \u2014 results unreliable'
+      );
+    } else if (mach > 0.3 && (dpMethod === 'fanno' || dpMethod === 'isothermal')) {
+      machResult.warnings.push(
+        'Mach > 0.3 \u2014 compressible flow method active'
       );
     } else if (mach > 0.3) {
       machResult.warnings.push(
-        'Mach > 0.3 \u2014 compressibility effects may be significant'
+        'Mach > 0.3 \u2014 compressibility effects may be significant; consider Fanno method'
       );
+    }
+  }
+
+  // Post-solve: Choking warnings
+  const fannoMaxResult = results.fannoMaxLength;
+  const pipeLengthResult = results.pipeLength;
+  if (fannoMaxResult?.isValid && pipeLengthResult?.isValid && fannoMaxResult.value > 0) {
+    const ratio = pipeLengthResult.value / fannoMaxResult.value;
+    if (ratio >= 1.0) {
+      fannoMaxResult.warnings.push('Flow is choked \u2014 pipe exceeds Fanno max length');
+      const dpResult = results.pressureDropPipe;
+      if (dpResult?.isValid) {
+        dpResult.warnings.push('Flow is choked \u2014 pipe exceeds Fanno max length');
+      }
+    } else if (ratio > 0.8) {
+      fannoMaxResult.warnings.push('Approaching choked flow');
     }
   }
 

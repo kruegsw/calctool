@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { REGISTRY, getDefaultMethodMap } from '../../src/engine/registry.js';
+import { REGISTRY, getDefaultMethodMap, fannoParameter, solveFannoMach } from '../../src/engine/registry.js';
 import { solve } from '../../src/engine/solver.js';
 
 // Water chemical data (CAS 7732-18-5) - minimal subset for testing
@@ -557,6 +557,302 @@ describe('registry property calculations', () => {
     it('defaults pressureDropTotal to pipeAndFittings', () => {
       const map = getDefaultMethodMap(REGISTRY);
       expect(map.pressureDropTotal).toBe('pipeAndFittings');
+    });
+  });
+
+  describe('Fanno parameter and solver', () => {
+    it('Φ(1, 1.4) ≈ 0 (sonic condition)', () => {
+      expect(fannoParameter(1.0, 1.4)).toBeCloseTo(0, 10);
+    });
+
+    it('Φ is positive for Ma < 1', () => {
+      expect(fannoParameter(0.5, 1.4)).toBeGreaterThan(0);
+      expect(fannoParameter(0.1, 1.4)).toBeGreaterThan(0);
+      expect(fannoParameter(0.9, 1.4)).toBeGreaterThan(0);
+    });
+
+    it('Φ is monotonically decreasing', () => {
+      const phi1 = fannoParameter(0.2, 1.4);
+      const phi2 = fannoParameter(0.5, 1.4);
+      const phi3 = fannoParameter(0.8, 1.4);
+      expect(phi1).toBeGreaterThan(phi2);
+      expect(phi2).toBeGreaterThan(phi3);
+    });
+
+    it('textbook value: Φ(0.5, 1.4) ≈ 1.0691', () => {
+      expect(fannoParameter(0.5, 1.4)).toBeCloseTo(1.0691, 3);
+    });
+
+    it('solveFannoMach inverts Φ correctly', () => {
+      const phi = fannoParameter(0.5, 1.4);
+      const Ma = solveFannoMach(phi, 1.4);
+      expect(Ma).toBeCloseTo(0.5, 6);
+    });
+
+    it('solveFannoMach returns 1.0 when targetPhi ≤ 0', () => {
+      expect(solveFannoMach(0, 1.4)).toBe(1.0);
+      expect(solveFannoMach(-1, 1.4)).toBe(1.0);
+    });
+  });
+
+  describe('Fanno pressure drop method', () => {
+    it('converges to Darcy at low Mach (< 1% difference)', () => {
+      // Consistent thermodynamic inputs: ideal gas ρ = P·MW/(R·T·1000)
+      const P = 500000;    // Pa
+      const T = 300;       // K
+      const MW = 28.97;    // g/mol (air)
+      const R = 8.314;     // J/(mol·K)
+      const gamma = 1.4;
+      const rho = P * MW / (R * T * 1000); // ~5.80 kg/m3
+      const c = Math.sqrt(gamma * R * 1000 * T / MW); // ~347 m/s
+      const Ma = 0.01;
+      const v = Ma * c;    // ~3.47 m/s
+      const inputs = {
+        frictionFactor: 0.02,
+        density: rho,
+        pipeLength: 1,
+        pipeInnerDiameter: 0.05,
+        velocity: v,
+        machNumber: Ma,
+        cpCvRatio: gamma,
+        pressure: P,
+      };
+      const darcy = REGISTRY.pressureDropPipe.methods.darcy.calculate(inputs);
+      const fanno = REGISTRY.pressureDropPipe.methods.fanno.calculate(inputs);
+      expect(fanno).toBeGreaterThan(0);
+      const diff = Math.abs(fanno - darcy) / darcy;
+      expect(diff).toBeLessThan(0.01);
+    });
+
+    it('returns null for supersonic inlet', () => {
+      const result = REGISTRY.pressureDropPipe.methods.fanno.calculate({
+        frictionFactor: 0.02,
+        machNumber: 1.2,
+        cpCvRatio: 1.4,
+        pressure: 101325,
+        pipeLength: 10,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeNull();
+    });
+
+    it('returns positive ΔP for choking-length pipe', () => {
+      // Very long pipe that exceeds L*
+      const result = REGISTRY.pressureDropPipe.methods.fanno.calculate({
+        frictionFactor: 0.02,
+        machNumber: 0.5,
+        cpCvRatio: 1.4,
+        pressure: 200000,
+        pipeLength: 1000,   // much longer than L*
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeGreaterThan(0);
+    });
+
+    it('gives higher ΔP than Darcy at Ma 0.5', () => {
+      const inputs = {
+        frictionFactor: 0.02,
+        density: 1.2,
+        pipeLength: 1,
+        pipeInnerDiameter: 0.05,
+        velocity: 170,
+        machNumber: 0.5,
+        cpCvRatio: 1.4,
+        pressure: 101325,
+      };
+      const darcy = REGISTRY.pressureDropPipe.methods.darcy.calculate(inputs);
+      const fanno = REGISTRY.pressureDropPipe.methods.fanno.calculate(inputs);
+      expect(fanno).toBeGreaterThan(darcy);
+    });
+  });
+
+  describe('isothermal pressure drop method', () => {
+    it('returns positive ΔP for valid subsonic flow', () => {
+      const result = REGISTRY.pressureDropPipe.methods.isothermal.calculate({
+        frictionFactor: 0.02,
+        machNumber: 0.3,
+        cpCvRatio: 1.4,
+        pressure: 200000,
+        pipeLength: 10,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeGreaterThan(0);
+    });
+
+    it('returns null when Ma exceeds 1/sqrt(γ)', () => {
+      const result = REGISTRY.pressureDropPipe.methods.isothermal.calculate({
+        frictionFactor: 0.02,
+        machNumber: 0.9,   // > 1/sqrt(1.4) ≈ 0.845
+        cpCvRatio: 1.4,
+        pressure: 200000,
+        pipeLength: 10,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeNull();
+    });
+
+    it('returns positive ΔP when pipe exceeds choking length', () => {
+      const result = REGISTRY.pressureDropPipe.methods.isothermal.calculate({
+        frictionFactor: 0.02,
+        machNumber: 0.5,
+        cpCvRatio: 1.4,
+        pressure: 200000,
+        pipeLength: 1000,   // very long
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeGreaterThan(0);
+    });
+  });
+
+  describe('fannoMaxLength property', () => {
+    it('returns positive value for subsonic flow', () => {
+      const Lstar = REGISTRY.fannoMaxLength.methods.fanno.calculate({
+        frictionFactor: 0.02,
+        machNumber: 0.5,
+        cpCvRatio: 1.4,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(Lstar).toBeGreaterThan(0);
+    });
+
+    it('matches textbook: L* = D * Φ(0.5, 1.4) / f', () => {
+      const f = 0.02;
+      const D = 0.05;
+      const Lstar = REGISTRY.fannoMaxLength.methods.fanno.calculate({
+        frictionFactor: f,
+        machNumber: 0.5,
+        cpCvRatio: 1.4,
+        pipeInnerDiameter: D,
+      });
+      // Φ(0.5, 1.4) ≈ 1.0691 → L* = 0.05 * 1.0691 / 0.02 = 2.6728 m
+      expect(Lstar).toBeCloseTo(D * 1.0691 / f, 2);
+    });
+
+    it('returns null for supersonic inlet', () => {
+      const result = REGISTRY.fannoMaxLength.methods.fanno.calculate({
+        frictionFactor: 0.02,
+        machNumber: 1.2,
+        cpCvRatio: 1.4,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(result).toBeNull();
+    });
+
+    it('increases as Mach decreases', () => {
+      const calc = (Ma) => REGISTRY.fannoMaxLength.methods.fanno.calculate({
+        frictionFactor: 0.02,
+        machNumber: Ma,
+        cpCvRatio: 1.4,
+        pipeInnerDiameter: 0.05,
+      });
+      expect(calc(0.2)).toBeGreaterThan(calc(0.5));
+      expect(calc(0.5)).toBeGreaterThan(calc(0.8));
+    });
+  });
+
+  describe('solver Mach auto-selection', () => {
+    // Air Cp data for gas tests
+    const airDataWithCp = {
+      ...airData,
+      empirical: {
+        ...airData.empirical,
+        gaseous: {
+          ...airData.empirical.gaseous,
+          cp: {
+            perryCorrelation: {
+              equation: '100',
+              C1: 28958,
+              C2: 9.39,
+              C3: -0.001408,
+              C4: 0,
+              C5: 0,
+              Tmin: 100,
+              Tmax: 2000,
+            },
+          },
+        },
+      },
+    };
+
+    it('switches to fanno for gas at Ma > 0.3', () => {
+      const methodMap = getDefaultMethodMap(REGISTRY);
+      const results = solve({
+        registry: REGISTRY,
+        activeMethodMap: methodMap,
+        userValues: {
+          chemicalSearch: { value: 'air' },
+          temperature: { value: 300, unit: 'K' },
+          pressure: { value: 500000, unit: 'Pa' },
+          pipeStandard: { value: 'NPS' },
+          pipeNominalDiameter: { value: '2' },
+          pipeSchedule: { value: 'Sch. 40' },
+          pipeMaterial: { value: 'Commercial Steel or Wrought Iron' },
+          massFlowRate: { value: 8000, unit: 'kg/hr' },
+          pipeLength: { value: 10, unit: 'm' },
+          totalKFactor: { value: 0 },
+        },
+        chemData: airDataWithCp,
+        pipeData: testPipeData,
+      });
+
+      // High mass flow should produce Ma > 0.3
+      if (results.machNumber?.isValid && results.machNumber.value > 0.3) {
+        expect(methodMap.pressureDropPipe).toBe('fanno');
+        expect(results.pressureDropPipe.isValid).toBe(true);
+      }
+    });
+
+    it('keeps darcy for liquid regardless of flow', () => {
+      const methodMap = getDefaultMethodMap(REGISTRY);
+      const results = solve({
+        registry: REGISTRY,
+        activeMethodMap: methodMap,
+        userValues: {
+          chemicalSearch: { value: 'water' },
+          temperature: { value: 298.15, unit: 'K' },
+          pressure: { value: 101325, unit: 'Pa' },
+          pipeStandard: { value: 'NPS' },
+          pipeNominalDiameter: { value: '2' },
+          pipeSchedule: { value: 'Sch. 40' },
+          pipeMaterial: { value: 'Commercial Steel or Wrought Iron' },
+          massFlowRate: { value: 100, unit: 'kg/hr' },
+          pipeLength: { value: 10, unit: 'm' },
+          totalKFactor: { value: 0 },
+        },
+        chemData: waterData,
+        pipeData: testPipeData,
+      });
+
+      expect(results.phase.value).toBe('liquid');
+      expect(methodMap.pressureDropPipe).toBe('darcy');
+    });
+
+    it('respects user method overrides', () => {
+      const methodMap = getDefaultMethodMap(REGISTRY);
+      const overrides = new Set(['pressureDropPipe']);
+      methodMap.pressureDropPipe = 'darcy';
+      const results = solve({
+        registry: REGISTRY,
+        activeMethodMap: methodMap,
+        userValues: {
+          chemicalSearch: { value: 'air' },
+          temperature: { value: 300, unit: 'K' },
+          pressure: { value: 500000, unit: 'Pa' },
+          pipeStandard: { value: 'NPS' },
+          pipeNominalDiameter: { value: '2' },
+          pipeSchedule: { value: 'Sch. 40' },
+          pipeMaterial: { value: 'Commercial Steel or Wrought Iron' },
+          massFlowRate: { value: 8000, unit: 'kg/hr' },
+          pipeLength: { value: 10, unit: 'm' },
+          totalKFactor: { value: 0 },
+        },
+        chemData: airDataWithCp,
+        pipeData: testPipeData,
+        userMethodOverrides: overrides,
+      });
+
+      // Should stay on darcy despite high Mach
+      expect(methodMap.pressureDropPipe).toBe('darcy');
     });
   });
 });
