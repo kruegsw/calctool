@@ -422,7 +422,6 @@ body {
   color: #92400e;
   background: #fef3c7;
   border-radius: 9999px;
-  text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
@@ -558,6 +557,19 @@ body {
 .method-status-badge.status-pinned {
   color: #92400e;
   background: #fef3c7;
+  cursor: default;
+}
+
+.method-status-dismiss {
+  cursor: pointer;
+  margin-left: 0.125rem;
+  font-weight: 700;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.method-status-dismiss:hover {
+  opacity: 1;
 }
 
 .field-row.has-warning {

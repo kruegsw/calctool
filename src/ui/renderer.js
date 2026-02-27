@@ -327,7 +327,7 @@ function buildPropertyField(propId, state) {
 
   // "Pinned ×" badge (hidden by default) for override fields — click to un-pin
   if (def.allowUserOverride) {
-    const badge = el('span', { className: 'pinned-badge', dataset: { pinnedBadge: propId } }, 'Pinned \u00d7');
+    const badge = el('span', { className: 'pinned-badge', dataset: { pinnedBadge: propId } }, 'pinned \u00d7');
     badge.style.display = 'none';
     badge.addEventListener('click', (e) => {
       e.preventDefault();
@@ -834,10 +834,20 @@ function updateMethodSelectors(state) {
         title: 'Automatically selected based on phase',
       }, 'auto'));
     } else {
-      group.appendChild(el('span', {
+      const badge = el('span', {
         className: 'method-status-badge status-pinned',
-        title: 'Method selected by user',
-      }, 'pinned'));
+        title: 'Method selected by user — click × to return to auto',
+      }, 'pinned ');
+      const dismiss = el('span', {
+        className: 'method-status-dismiss',
+        textContent: '\u00d7',
+      });
+      dismiss.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.clearMethodOverride(propId);
+      });
+      badge.appendChild(dismiss);
+      group.appendChild(badge);
     }
   }
 }

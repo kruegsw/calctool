@@ -139,6 +139,14 @@ export class AppState {
   }
 
   /**
+   * Clear a user method override, returning the property to auto-selection.
+   */
+  clearMethodOverride(propertyId) {
+    this.userMethodOverrides.delete(propertyId);
+    this.recalculate();
+  }
+
+  /**
    * Select a chemical by CAS number.
    */
   selectChemical(cas) {
