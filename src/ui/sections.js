@@ -21,7 +21,8 @@ export const SECTIONS = [
     primary: ['temperature', 'pressure'],
     detail: ['phase', 'vaporPressure', 'density', 'viscosity',
              'cp', 'cv', 'cpCvRatio',
-             'heatOfVaporization', 'thermalConductivity', 'sonicVelocity'],
+             'heatOfVaporization', 'thermalConductivity', 'sonicVelocity',
+             'prandtlNumber'],
   },
   {
     id: 'pipe',

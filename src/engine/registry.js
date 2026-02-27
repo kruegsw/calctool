@@ -730,6 +730,27 @@ export const REGISTRY = {
     },
   },
 
+  prandtlNumber: {
+    id: 'prandtlNumber',
+    name: 'Prandtl Number',
+    quantity: null,
+    category: 'chemical-condition',
+    defaultUnit: null,
+    allowUserOverride: true,
+    methods: {
+      standard: {
+        name: 'Pr = Cp*mu/k',
+        inputs: ['cp', 'viscosity', 'thermalConductivity'],
+        calculate: (inputs) => {
+          const Cp = inputs.cp;                    // J/(kg*K)
+          const mu = inputs.viscosity;             // Pa*s
+          const k = inputs.thermalConductivity;    // W/(m*K)
+          return Cp * mu / k;
+        },
+      },
+    },
+  },
+
   // =========================================================================
   // SYSTEM PROPERTIES (pipe)
   // =========================================================================
