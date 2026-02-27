@@ -6,7 +6,7 @@ import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel, countSigFigs, roundToSigFigs } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
-import { getAllFittings, getFittingsByType, getFittingById } from '../data/fittings.js';
+import { getAllFittings, getFittingsByType, getFittingById, parseNominalDiameter } from '../data/fittings.js';
 import { setupHoverHighlighting } from './hover.js';
 import { getSources } from '../data/sources.js';
 import { initSourcePopover, bindSourceBadge, hideSourcePopover } from './sourcePopover.js';
@@ -412,6 +412,20 @@ function buildChemicalCard(state) {
 function buildFittingsEditor(state) {
   const wrapper = el('div', { className: 'fittings-editor', dataset: { fittingsEditor: 'true' } });
 
+  // Method selector row
+  const methodRow = el('div', { className: 'fittings-method-row' });
+  const methodLabel = el('span', { className: 'fittings-method-label' }, 'K-factor method:');
+  const methodSelect = el('select', { className: 'fittings-method-select', dataset: { fittingsMethod: 'true' } });
+  methodSelect.appendChild(el('option', { value: 'fixedK' }, 'Fixed K \u2014 Crane'));
+  methodSelect.appendChild(el('option', { value: 'threeK' }, '3-K \u2014 Darby'));
+  methodSelect.value = state.fittingsMethod;
+  methodSelect.addEventListener('change', () => {
+    state.setFittingsMethod(methodSelect.value);
+  });
+  methodRow.appendChild(methodLabel);
+  methodRow.appendChild(methodSelect);
+  wrapper.appendChild(methodRow);
+
   // Add-fitting controls row
   const addRow = el('div', { className: 'fittings-add-row' });
 
@@ -499,6 +513,36 @@ function buildFittingsEditor(state) {
 }
 
 /**
+ * Compute the effective K-factor for a single fitting given the active method.
+ * Returns { k, source, tooltip } where source is 'crane', 'darby', or 'user'.
+ */
+function computeFittingK(entry, fitting, state) {
+  if (entry.id === '__custom__') {
+    const k = entry.k || 0;
+    return { k, source: 'user', tooltip: `K = ${formatNumber(k)} (user-specified)` };
+  }
+  if (!fitting) return { k: 0, source: 'crane', tooltip: '' };
+
+  const useThreeK = state.fittingsMethod === 'threeK';
+  const Re = state.results?.reynoldsNumber?.value;
+  const Dnom = parseNominalDiameter(state.userValues.pipeNominalDiameter?.value);
+
+  if (useThreeK && fitting.k1 != null && Re > 0 && Dnom > 0) {
+    const k3 = fitting.k1 / Re + fitting.ki * (1 + fitting.kd / Math.pow(Dnom, 0.3));
+    const ReStr = formatNumber(Re);
+    const DnomStr = formatNumber(Dnom);
+    const tooltip = `K = K\u2081/Re + K\u1d62(1+K_d/D\u207f\u2070\u00b7\u00b3) = ${fitting.k1}/${ReStr} + ${fitting.ki}\u00d7(1+${fitting.kd}/${DnomStr}\u2070\u00b7\u00b3) = ${formatNumber(k3)}`;
+    return { k: k3, source: 'darby', tooltip };
+  }
+
+  // Fixed K (or 3-K fallback for fittings without coefficients)
+  const sources = getSources();
+  const ref = sources?.[fitting.source]?.reference || '';
+  const sourceLabel = useThreeK && fitting.k1 == null ? fitting.source : fitting.source;
+  return { k: fitting.k, source: sourceLabel, tooltip: `K = ${formatNumber(fitting.k)} (${ref || 'Crane TP-410'})` };
+}
+
+/**
  * Rebuild the fittings list display from current state.
  */
 function updateFittingsList(state) {
@@ -506,42 +550,36 @@ function updateFittingsList(state) {
   if (!list) return;
 
   list.textContent = '';
+
+  // Sync method dropdown value
+  const methodSelect = document.querySelector('[data-fittings-method]');
+  if (methodSelect && methodSelect.value !== state.fittingsMethod) {
+    methodSelect.value = state.fittingsMethod;
+  }
+
   if (state.fittings.length === 0) return;
 
   for (let i = 0; i < state.fittings.length; i++) {
     const entry = state.fittings[i];
-    let name, k;
-    if (entry.id === '__custom__') {
-      name = entry.name || 'Custom';
-      k = entry.k || 0;
-    } else {
-      const fitting = getFittingById(entry.id);
-      if (!fitting) continue;
-      name = fitting.name;
-      k = fitting.k;
-    }
+    const fitting = entry.id !== '__custom__' ? getFittingById(entry.id) : null;
+    if (entry.id !== '__custom__' && !fitting) continue;
+
+    const name = entry.id === '__custom__' ? (entry.name || 'Custom') : fitting.name;
+    const { k, source, tooltip } = computeFittingK(entry, fitting, state);
 
     const row = el('div', { className: 'fittings-list-item' });
 
     const nameSpan = el('span', { className: 'fittings-item-name' }, name);
 
     // Source citation badge
-    if (entry.id === '__custom__') {
-      const badge = el('span', { className: 'source-badge' }, 'user');
-      badge.title = 'User-specified K-factor';
-      nameSpan.appendChild(badge);
-    } else {
-      const sourceKey = getFittingById(entry.id)?.source;
-      if (sourceKey) {
-        const sources = getSources();
-        const sourceEntry = sources?.[sourceKey];
-        const badge = el('span', { className: 'source-badge' }, sourceKey);
-        if (sourceEntry?.reference) {
-          badge.title = sourceEntry.reference;
-        }
-        nameSpan.appendChild(badge);
-      }
+    const sources = getSources();
+    const sourceEntry = sources?.[source];
+    const badge = el('span', { className: 'source-badge' }, source);
+    badge.title = tooltip;
+    if (sourceEntry?.reference) {
+      bindSourceBadge(badge, source);
     }
+    nameSpan.appendChild(badge);
 
     const qtyInput = el('input', {
       type: 'number',

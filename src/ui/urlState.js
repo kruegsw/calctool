@@ -112,6 +112,11 @@ export function serializeState(state) {
     }
   }
 
+  // Fittings method (omit when default fixedK)
+  if (state.fittingsMethod && state.fittingsMethod !== 'fixedK') {
+    params.set('fm', state.fittingsMethod);
+  }
+
   // Fittings list (overrides totalKFactor param when present)
   if (state.fittings && state.fittings.length > 0) {
     const fitParts = state.fittings.map(f => {
@@ -194,6 +199,13 @@ export function deserializeState(search, state) {
         state.userMethodOverrides.add(propId);
       }
     }
+  }
+
+  // Fittings method
+  const fm = params.get('fm');
+  if (fm && (fm === 'fixedK' || fm === 'threeK')) {
+    state.fittingsMethod = fm;
+    found = true;
   }
 
   // Fittings list

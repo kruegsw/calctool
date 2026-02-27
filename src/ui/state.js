@@ -5,7 +5,7 @@ import { solve } from '../engine/solver.js';
 import { convertUnits, UNIT_PRESETS } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
-import { getFittingById } from '../data/fittings.js';
+import { getFittingById, parseNominalDiameter } from '../data/fittings.js';
 import { countSigFigs } from './formatting.js';
 
 const UNIT_SYSTEM_STORAGE_KEY = 'calctool:unitSystem';
@@ -24,6 +24,7 @@ export class AppState {
     this.dirtyFields = new Set();
     this.userMethodOverrides = new Set();
     this.fittings = []; // [{ id, qty }, ...]
+    this.fittingsMethod = 'fixedK'; // 'fixedK' or 'threeK'
 
     // Set defaults from registry
     for (const [id, def] of Object.entries(REGISTRY)) {
@@ -299,16 +300,38 @@ export class AppState {
   }
 
   /**
+   * Set the fittings K-factor method and recompute.
+   * @param {'fixedK'|'threeK'} method
+   */
+  setFittingsMethod(method) {
+    if (method !== 'fixedK' && method !== 'threeK') return;
+    this.fittingsMethod = method;
+    this._syncTotalKFactor();
+  }
+
+  /**
    * Recompute totalKFactor from fittings list and trigger recalculate.
    */
   _syncTotalKFactor() {
     let sum = 0;
+    const useThreeK = this.fittingsMethod === 'threeK';
+    const Re = useThreeK ? this.results?.reynoldsNumber?.value : null;
+    const Dnom = useThreeK
+      ? parseNominalDiameter(this.userValues.pipeNominalDiameter?.value)
+      : NaN;
+
     for (const entry of this.fittings) {
       if (entry.id === '__custom__') {
         sum += (entry.k || 0) * entry.qty;
       } else {
         const fitting = getFittingById(entry.id);
-        if (fitting) sum += fitting.k * entry.qty;
+        if (!fitting) continue;
+        if (useThreeK && fitting.k1 != null && Re > 0 && Dnom > 0) {
+          const k3 = fitting.k1 / Re + fitting.ki * (1 + fitting.kd / Math.pow(Dnom, 0.3));
+          sum += k3 * entry.qty;
+        } else {
+          sum += fitting.k * entry.qty;
+        }
       }
     }
     this.setValue('totalKFactor', sum);
@@ -316,6 +339,8 @@ export class AppState {
 
   /**
    * Run the solver with current state.
+   * When 3-K method is active and fittings exist, does a two-pass solve:
+   * first pass computes Re, second pass recomputes K with fresh Re and re-solves.
    */
   recalculate() {
     const chemData = this.getChemData();
@@ -329,6 +354,49 @@ export class AppState {
       pipeData,
       userMethodOverrides: this.userMethodOverrides,
     });
+
+    // Two-pass: if 3-K active and fittings exist, recompute K with fresh Re
+    if (this.fittingsMethod === 'threeK' && this.fittings.length > 0) {
+      const oldK = this.userValues.totalKFactor?.value;
+      const Re = this.results?.reynoldsNumber?.value;
+      const Dnom = parseNominalDiameter(this.userValues.pipeNominalDiameter?.value);
+
+      if (Re > 0 && Dnom > 0) {
+        let sum = 0;
+        for (const entry of this.fittings) {
+          if (entry.id === '__custom__') {
+            sum += (entry.k || 0) * entry.qty;
+          } else {
+            const fitting = getFittingById(entry.id);
+            if (!fitting) continue;
+            if (fitting.k1 != null) {
+              const k3 = fitting.k1 / Re + fitting.ki * (1 + fitting.kd / Math.pow(Dnom, 0.3));
+              sum += k3 * entry.qty;
+            } else {
+              sum += fitting.k * entry.qty;
+            }
+          }
+        }
+
+        if (sum !== oldK) {
+          this.userValues.totalKFactor = {
+            value: sum,
+            unit: null,
+            sigFigs: this.userValues.totalKFactor?.sigFigs,
+          };
+          this.dirtyFields.add('totalKFactor');
+
+          this.results = solve({
+            registry: this.registry,
+            activeMethodMap: this.activeMethodMap,
+            userValues: this.userValues,
+            chemData,
+            pipeData,
+            userMethodOverrides: this.userMethodOverrides,
+          });
+        }
+      }
+    }
 
     this.notify();
   }

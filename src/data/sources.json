@@ -46,5 +46,8 @@
   },
   "haaland": {
     "reference": "Haaland, S.E. (1983). \"Simple and Explicit Formulas for the Friction Factor in Turbulent Pipe Flow\". Journal of Fluids Engineering. 105 (1): 89-90."
+  },
+  "darby": {
+    "reference": "Darby, R. (2001). \"Correlate Pressure Drops Through Fittings.\" Chemical Engineering, 108(4), 127-130."
   }
 }
