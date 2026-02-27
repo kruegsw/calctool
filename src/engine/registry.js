@@ -736,7 +736,6 @@ export const REGISTRY = {
     quantity: null,
     category: 'chemical-condition',
     defaultUnit: null,
-    allowUserOverride: true,
     methods: {
       standard: {
         name: 'Pr = Cp*mu/k',
@@ -978,7 +977,6 @@ export const REGISTRY = {
     quantity: null,
     category: 'system-condition',
     defaultUnit: null,
-    allowUserOverride: true,
     methods: {
       standard: {
         name: 'Ma = v / c',
