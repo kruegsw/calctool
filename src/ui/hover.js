@@ -11,73 +11,80 @@ import { getTransitiveDependencies, getTransitiveDependents } from '../engine/gr
  * @param {import('./state.js').AppState} state
  */
 export function setupHoverHighlighting(root, state) {
-  let activeRow = null;
+  let activeEl = null;
   let hoverTimer = null;
   const HOVER_DELAY = 300; // ms before highlights appear
 
   root.addEventListener('mouseenter', (e) => {
-    const row = e.target.closest('.field-row');
-    if (!row || row === activeRow) return;
+    const el = e.target.closest('.field-row') || e.target.closest('.hero-item');
+    if (!el || el === activeEl) return;
 
     // Clear previous highlights and pending timer
     clearHighlights(root);
     clearTimeout(hoverTimer);
-    activeRow = row;
+    activeEl = el;
 
-    const propId = row.dataset.propId;
+    const propId = el.dataset.propId || el.dataset.heroId;
     if (!propId) return;
 
     hoverTimer = setTimeout(() => {
-      // Verify mouse is still on this row
-      if (activeRow !== row) return;
+      // Verify mouse is still on this element
+      if (activeEl !== el) return;
 
       // Get dependencies and dependents
       const deps = getTransitiveDependencies(state.registry, propId, state.activeMethodMap);
       const dependents = getTransitiveDependents(state.registry, propId, state.activeMethodMap);
 
-      // Highlight dependency rows (inputs)
+      // Highlight dependency elements (inputs)
       for (const depId of deps) {
-        const depRow = root.querySelector(`.field-row[data-prop-id="${depId}"]`);
-        if (depRow) {
-          depRow.classList.add('highlight-dependency');
-          addHoverLabel(depRow, 'input', 'highlight-label-input');
+        const depEl = findPropElement(root, depId);
+        if (depEl) {
+          depEl.classList.add('highlight-dependency');
+          addHoverLabel(depEl, 'input', 'highlight-label-input');
         }
       }
 
-      // Highlight dependent rows (outputs)
+      // Highlight dependent elements (outputs)
       for (const depId of dependents) {
-        const depRow = root.querySelector(`.field-row[data-prop-id="${depId}"]`);
-        if (depRow) {
-          depRow.classList.add('highlight-dependent');
-          addHoverLabel(depRow, 'output', 'highlight-label-output');
+        const depEl = findPropElement(root, depId);
+        if (depEl) {
+          depEl.classList.add('highlight-dependent');
+          addHoverLabel(depEl, 'output', 'highlight-label-output');
         }
       }
 
-      // Mark the hovered row itself
-      row.classList.add('highlight-self');
+      // Mark the hovered element itself
+      el.classList.add('highlight-self');
     }, HOVER_DELAY);
   }, true);
 
   root.addEventListener('mouseleave', (e) => {
-    const row = e.target.closest('.field-row');
-    if (!row) return;
+    const el = e.target.closest('.field-row') || e.target.closest('.hero-item');
+    if (!el) return;
 
-    // Only clear if we're leaving the active row
-    if (row === activeRow) {
+    // Only clear if we're leaving the active element
+    if (el === activeEl) {
       clearTimeout(hoverTimer);
       clearHighlights(root);
-      activeRow = null;
+      activeEl = null;
     }
   }, true);
 }
 
-function addHoverLabel(row, text, className) {
-  const fieldLabel = row.querySelector('.field-label');
-  if (!fieldLabel) return;
+/** Find the DOM element for a property — field-row or hero-item. */
+function findPropElement(root, propId) {
+  return root.querySelector(`.field-row[data-prop-id="${propId}"]`)
+      || root.querySelector(`.hero-item[data-hero-id="${propId}"]`);
+}
+
+function addHoverLabel(el, text, className) {
+  // Works for both .field-row (.field-label) and .hero-item (.hero-label)
+  const labelEl = el.querySelector('.field-label') || el.querySelector('.hero-label');
+  if (!labelEl) return;
   const label = document.createElement('span');
   label.className = `highlight-label ${className}`;
   label.textContent = text;
-  fieldLabel.appendChild(label);
+  labelEl.appendChild(label);
 }
 
 function clearHighlights(root) {

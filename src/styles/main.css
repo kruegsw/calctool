@@ -1142,15 +1142,18 @@ body {
 }
 
 /* ─── Hover highlighting (with fade transition) ─── */
-.field-row.highlight-dependency {
+.field-row.highlight-dependency,
+.hero-item.highlight-dependency {
   background: var(--color-highlight-dep) !important;
 }
 
-.field-row.highlight-dependent {
+.field-row.highlight-dependent,
+.hero-item.highlight-dependent {
   background: var(--color-highlight-dependent) !important;
 }
 
-.field-row.highlight-self {
+.field-row.highlight-self,
+.hero-item.highlight-self {
   background: var(--color-highlight-self) !important;
 }
 
