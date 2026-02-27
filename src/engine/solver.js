@@ -125,6 +125,22 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
     }
   }
 
+  // Post-solve: Mach number warning on velocity
+  const velResult = results.velocity;
+  const sonicResult = results.sonicVelocity;
+  if (velResult?.isValid && sonicResult?.isValid && sonicResult.value > 0) {
+    const mach = velResult.value / sonicResult.value;
+    if (mach > 1) {
+      velResult.warnings.push(
+        'Velocity exceeds sonic velocity \u2014 compressible flow effects not modeled'
+      );
+    } else if (mach > 0.3) {
+      velResult.warnings.push(
+        'Mach > 0.3 \u2014 compressibility effects may be significant'
+      );
+    }
+  }
+
   return results;
 }
 
@@ -248,30 +264,6 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
           if (T < range.Tmin || T > range.Tmax) {
             result.warnings.push(
               `T = ${Math.round(T)} K is outside valid range ${Math.round(range.Tmin)}–${Math.round(range.Tmax)} K`
-            );
-          }
-        }
-      }
-    }
-
-    // Mach number check: warn when velocity approaches or exceeds sonic velocity.
-    // velocity and sonicVelocity are on independent dependency chains, so either
-    // may be evaluated first. Check from whichever side is evaluated second.
-    if (id === 'velocity' || id === 'sonicVelocity') {
-      const velResult = id === 'velocity' ? result : results.velocity;
-      const sonicResult = id === 'sonicVelocity' ? result : results.sonicVelocity;
-      if (velResult?.isValid && sonicResult?.isValid && sonicResult.value > 0) {
-        const mach = velResult.value / sonicResult.value;
-        // Attach warnings to the velocity result
-        const target = id === 'velocity' ? result : results.velocity;
-        if (target) {
-          if (mach > 1) {
-            target.warnings.push(
-              'Velocity exceeds sonic velocity \u2014 compressible flow effects not modeled'
-            );
-          } else if (mach > 0.3) {
-            target.warnings.push(
-              'Mach > 0.3 \u2014 compressibility effects may be significant'
             );
           }
         }
