@@ -1,7 +1,7 @@
 // DOM construction with createElement (no innerHTML). Update loop.
 
 import { REGISTRY } from '../engine/registry.js';
-import { UNITS, unitOptionsFor, fromSI } from '../engine/units.js';
+import { UNITS, unitOptionsFor, filteredUnitOptionsFor, CONDITIONAL_UNITS, fromSI, toSI } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
@@ -355,6 +355,13 @@ function buildPropertyField(propId, state) {
     } else {
       inputArea.appendChild(buildOutputDisplay(propId, state));
     }
+  }
+
+  // SCF annotation for massFlowRate
+  if (propId === 'massFlowRate') {
+    const annotation = el('div', { className: 'scf-annotation', dataset: { scfAnnotation: 'true' } });
+    annotation.style.display = 'none';
+    inputArea.appendChild(annotation);
   }
 
   row.appendChild(inputArea);
@@ -748,6 +755,9 @@ function updateAll(state) {
   // Update dependent dropdowns
   updateDependentDropdowns(state);
 
+  // Update conditional unit dropdowns (SCFH/SCFM for air)
+  updateConditionalUnits(state);
+
   // Sync input values with state (e.g. after unit conversion)
   updateInputValues(state);
 }
@@ -994,6 +1004,62 @@ function updateInputValidation(state) {
     const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
     if (row) {
       row.classList.add('input-invalid');
+    }
+  }
+}
+
+/**
+ * Rebuild unit dropdowns for properties that have conditional units (e.g. SCFH/SCFM for air).
+ * Also manages the SCF annotation line.
+ */
+function updateConditionalUnits(state) {
+  const cas = state.userValues.chemicalSearch?.value || null;
+
+  // Properties whose unit quantity has conditional entries
+  for (const [quantity, condMap] of Object.entries(CONDITIONAL_UNITS)) {
+    // Find all property fields whose quantity matches
+    const selectors = document.querySelectorAll('.unit-selector');
+    for (const select of selectors) {
+      const propId = select.dataset.propId;
+      const def = REGISTRY[propId];
+      if (!def || def.quantity !== quantity) continue;
+
+      const filtered = filteredUnitOptionsFor(quantity, cas);
+      const currentUnit = select.value;
+
+      // If current unit is conditional and no longer valid, fallback
+      const condUnitKeys = Object.keys(condMap);
+      if (condUnitKeys.includes(currentUnit) && !filtered.some(o => o.key === currentUnit)) {
+        state.setUnit(propId, def.defaultUnit);
+      }
+
+      // Rebuild options
+      const newUnit = state.userValues[propId]?.unit || def.defaultUnit;
+      select.textContent = '';
+      for (const opt of filtered) {
+        select.appendChild(el('option', { value: opt.key }, opt.symbol));
+      }
+      select.value = newUnit;
+      autoSizeSelect(select);
+    }
+  }
+
+  // SCF annotation
+  const annotation = document.querySelector('[data-scf-annotation]');
+  if (annotation) {
+    const massFlowUnit = state.userValues.massFlowRate?.unit;
+    const isSCF = massFlowUnit === 'SCFH' || massFlowUnit === 'SCFM';
+    if (isSCF) {
+      const displayVal = state.userValues.massFlowRate?.value;
+      if (displayVal != null && displayVal !== '') {
+        const kghr = toSI('massRate', massFlowUnit, displayVal);
+        annotation.textContent = `\u2248 ${formatNumber(kghr)} kg/hr`;
+        annotation.style.display = '';
+      } else {
+        annotation.style.display = 'none';
+      }
+    } else {
+      annotation.style.display = 'none';
     }
   }
 }

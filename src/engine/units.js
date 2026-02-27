@@ -82,6 +82,8 @@ export const UNITS = {
     'kg/hr': { name: 'kilogram per hour', symbol: 'kg/hr', toSI: v => +v,                  fromSI: v => +v },
     'kg/s':  { name: 'kilogram per second',symbol: 'kg/s', toSI: v => +v * 3600,           fromSI: v => +v / 3600 },
     'lb/hr': { name: 'pound per hour',     symbol: 'lb/hr',toSI: v => +v / LB_PER_KG,      fromSI: v => +v * LB_PER_KG },
+    'SCFH':  { name: 'std ft³/hr (air, STP)',  symbol: 'SCFH', toSI: v => +v * 0.034623,  fromSI: v => +v / 0.034623 },
+    'SCFM':  { name: 'std ft³/min (air, STP)', symbol: 'SCFM', toSI: v => +v * 2.07739,   fromSI: v => +v / 2.07739 },
   },
 
   volumeRate: {
@@ -194,4 +196,30 @@ export function unitOptionsFor(quantity) {
   const q = UNITS[quantity];
   if (!q) return [];
   return Object.entries(q).map(([key, u]) => ({ key, name: u.name, symbol: u.symbol }));
+}
+
+/**
+ * Map of unit keys that should only appear when a specific chemical (CAS) is selected.
+ * Structure: { quantityKey: { unitKey: requiredCAS } }
+ */
+export const CONDITIONAL_UNITS = {
+  massRate: { 'SCFH': '132259-10-0', 'SCFM': '132259-10-0' },
+};
+
+/**
+ * Get filtered unit options for a quantity, excluding conditional units
+ * whose required CAS doesn't match the given CAS.
+ * @param {string} quantity
+ * @param {string} [cas] - Currently selected chemical CAS number
+ * @returns {Array<{key: string, name: string, symbol: string}>}
+ */
+export function filteredUnitOptionsFor(quantity, cas) {
+  const all = unitOptionsFor(quantity);
+  const conditions = CONDITIONAL_UNITS[quantity];
+  if (!conditions) return all;
+  return all.filter(opt => {
+    const requiredCas = conditions[opt.key];
+    if (!requiredCas) return true; // unconditional unit
+    return cas === requiredCas;
+  });
 }

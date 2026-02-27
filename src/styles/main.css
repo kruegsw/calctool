@@ -734,6 +734,13 @@ body {
   border-radius: 4px;
 }
 
+/* ─── SCF annotation (mass-equivalent line) ─── */
+.scf-annotation {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  margin-top: 0.125rem;
+}
+
 /* ─── Hover highlighting (with fade transition) ─── */
 .field-row.highlight-dependency {
   background: var(--color-highlight-dep) !important;

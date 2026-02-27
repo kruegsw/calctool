@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { UNITS, toSI, fromSI, convertUnits, unitKeysFor, unitOptionsFor } from '../../src/engine/units.js';
+import { UNITS, toSI, fromSI, convertUnits, unitKeysFor, unitOptionsFor, filteredUnitOptionsFor } from '../../src/engine/units.js';
 
 // Helper: check round-trip within tolerance
 function roundTrip(quantity, unit, value, tol = 1e-9) {
@@ -222,6 +222,52 @@ describe('units.js', () => {
     });
     it('throws on unknown unit', () => {
       expect(() => toSI('temperature', 'bogus', 1)).toThrow();
+    });
+  });
+
+  describe('SCFM/SCFH conversions', () => {
+    it('1 SCFM ≈ 2.0774 kg/hr', () => {
+      expect(toSI('massRate', 'SCFM', 1)).toBeCloseTo(2.07739, 3);
+    });
+    it('1 SCFH ≈ 0.034623 kg/hr', () => {
+      expect(toSI('massRate', 'SCFH', 1)).toBeCloseTo(0.034623, 4);
+    });
+    it('SCFM round-trip', () => {
+      roundTrip('massRate', 'SCFM', 100);
+    });
+    it('SCFH round-trip', () => {
+      roundTrip('massRate', 'SCFH', 100);
+    });
+    it('SCFM = 60 × SCFH', () => {
+      const scfm = toSI('massRate', 'SCFM', 1);
+      const scfh = toSI('massRate', 'SCFH', 60);
+      expect(scfm).toBeCloseTo(scfh, 3);
+    });
+  });
+
+  describe('filteredUnitOptionsFor', () => {
+    it('includes SCFH/SCFM when air CAS is provided', () => {
+      const opts = filteredUnitOptionsFor('massRate', '132259-10-0');
+      const keys = opts.map(o => o.key);
+      expect(keys).toContain('SCFH');
+      expect(keys).toContain('SCFM');
+    });
+    it('excludes SCFH/SCFM for water CAS', () => {
+      const opts = filteredUnitOptionsFor('massRate', '7732-18-15');
+      const keys = opts.map(o => o.key);
+      expect(keys).not.toContain('SCFH');
+      expect(keys).not.toContain('SCFM');
+    });
+    it('excludes SCFH/SCFM when no CAS provided', () => {
+      const opts = filteredUnitOptionsFor('massRate');
+      const keys = opts.map(o => o.key);
+      expect(keys).not.toContain('SCFH');
+      expect(keys).not.toContain('SCFM');
+    });
+    it('returns full list for quantities without conditional units', () => {
+      const filtered = filteredUnitOptionsFor('temperature', '132259-10-0');
+      const full = unitOptionsFor('temperature');
+      expect(filtered).toEqual(full);
     });
   });
 
