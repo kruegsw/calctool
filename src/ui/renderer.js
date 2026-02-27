@@ -8,6 +8,7 @@ import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chem
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
 import { setupHoverHighlighting } from './hover.js';
 import { getSources } from '../data/sources.js';
+import { initSourcePopover, bindSourceBadge, hideSourcePopover } from './sourcePopover.js';
 
 /**
  * Size a ghost select to fit its currently selected option text + caret padding.
@@ -90,6 +91,9 @@ export function buildApp(root, state) {
   state.expandedSections.add('results');
   const resultsEl = main.querySelector('[data-section-id="results"]');
   if (resultsEl) resultsEl.classList.add('expanded');
+
+  // Initialize source popover singleton
+  initSourcePopover();
 
   // Subscribe to updates, then run initial calculation
   state.subscribe(() => updateAll(state));
@@ -865,6 +869,9 @@ function updateWarnings(state) {
 function updateSourceTooltips(state) {
   const sources = getSources();
 
+  // Dismiss popover before removing old badges
+  hideSourcePopover();
+
   // Remove previous source badges
   const prevSourceBadges = document.querySelectorAll('.source-badge');
   for (const b of prevSourceBadges) b.remove();
@@ -889,9 +896,11 @@ function updateSourceTooltips(state) {
 
     const badge = el('span', {
       className: 'source-badge',
-      title: sourceEntry.reference,
     }, method.source);
     label.appendChild(badge);
+
+    // Bind rich popover hover instead of native title tooltip
+    bindSourceBadge(badge, propId, result.method, state);
   }
 }
 

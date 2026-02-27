@@ -22,7 +22,7 @@ const PHASE_METHOD_MAP = {
  * Maps (propertyId, methodKey) to the Perry correlation lookup parameters
  * needed for range checking.
  */
-const PERRY_RANGE_MAP = {
+export const PERRY_RANGE_MAP = {
   'vaporPressure:perryCorrelation':           { phase: 'gaseous', perryProp: 'vaporPressure' },
   'density:perryLiquidCorrelation':           { phase: 'liquid',  perryProp: 'density' },
   'viscosity:perryLiquidCorrelation':         { phase: 'liquid',  perryProp: 'viscosity' },

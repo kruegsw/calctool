@@ -378,6 +378,8 @@ export const REGISTRY = {
         name: 'Perry correlation',
         inputs: ['temperature'],
         source: 'perry',
+        description: 'Empirical correlation for saturation pressure vs. temperature',
+        assumption: 'Pure component; valid within correlation temperature range',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const corr = getPerryCorrelation(chemData, 'gaseous', 'vaporPressure');
@@ -425,6 +427,8 @@ export const REGISTRY = {
         name: 'Ideal Gas Law',
         inputs: ['temperature', 'pressure', 'molecularWeight'],
         source: 'crane',
+        description: 'Gas density from PV = nRT (P\u00b7MW / R\u00b7T)',
+        assumption: 'Ideal gas (Z = 1); accuracy decreases near critical point or at high pressure',
         calculate: (inputs) => {
           const T = inputs.temperature;       // K
           const P = inputs.pressure;          // Pa
@@ -438,6 +442,8 @@ export const REGISTRY = {
         name: 'Perry liquid correlation',
         inputs: ['temperature', 'molecularWeight', 'criticalTemperature'],
         source: 'perry',
+        description: 'Empirical correlation for saturated liquid density',
+        assumption: 'Incompressible liquid at saturation; pressure effects neglected',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature;  // K
           const MW = inputs.molecularWeight;
@@ -482,6 +488,8 @@ export const REGISTRY = {
         name: "Sutherland's Law",
         inputs: ['temperature'],
         source: 'crane',
+        description: 'Three-parameter kinetic-theory model for gas viscosity',
+        assumption: 'Dilute gas; not valid for liquids or high-pressure gases',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const suth = getSutherlandCoeffs(chemData);
@@ -498,6 +506,8 @@ export const REGISTRY = {
         name: 'Perry vapor correlation',
         inputs: ['temperature'],
         source: 'perry',
+        description: 'Empirical correlation for low-pressure gas viscosity',
+        assumption: 'Dilute gas at low to moderate pressure',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const corr = getPerryCorrelation(chemData, 'gaseous', 'viscosity');
@@ -510,6 +520,8 @@ export const REGISTRY = {
         name: 'Perry liquid correlation',
         inputs: ['temperature'],
         source: 'perry',
+        description: 'Empirical correlation for liquid viscosity',
+        assumption: 'Saturated liquid; pressure effects neglected',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const corr = getPerryCorrelation(chemData, 'liquid', 'viscosity');
@@ -534,6 +546,8 @@ export const REGISTRY = {
         name: 'Perry liquid Cp correlation',
         inputs: ['temperature', 'molecularWeight', 'criticalTemperature'],
         source: 'perry',
+        description: 'Empirical correlation for liquid heat capacity',
+        assumption: 'Saturated liquid; no pressure correction',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const MW = inputs.molecularWeight;
@@ -564,6 +578,8 @@ export const REGISTRY = {
         name: 'Perry vapor Cp correlation',
         inputs: ['temperature', 'molecularWeight'],
         source: 'perry',
+        description: 'DIPPR Eq. 107 (Aly-Lee) for ideal-gas heat capacity',
+        assumption: 'Ideal gas (Cp independent of pressure)',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const MW = inputs.molecularWeight;
@@ -627,6 +643,8 @@ export const REGISTRY = {
         name: 'Perry correlation',
         inputs: ['temperature', 'molecularWeight', 'criticalTemperature'],
         source: 'perry',
+        description: 'Watson-type correlation for latent heat vs. reduced temperature',
+        assumption: 'Pure component; approaches zero at critical point',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature; // K
           const MW = inputs.molecularWeight;
@@ -659,6 +677,8 @@ export const REGISTRY = {
         name: 'Perry vapor correlation',
         inputs: ['temperature'],
         source: 'perry',
+        description: 'Empirical correlation for low-pressure gas thermal conductivity',
+        assumption: 'Dilute gas; no pressure correction',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature;
           const corr = getPerryCorrelation(chemData, 'gaseous', 'thermalConductivity');
@@ -671,6 +691,8 @@ export const REGISTRY = {
         name: 'Perry liquid correlation',
         inputs: ['temperature'],
         source: 'perry',
+        description: 'Empirical correlation for liquid thermal conductivity',
+        assumption: 'Saturated liquid; pressure effects neglected',
         calculate: (inputs, chemData) => {
           const T = inputs.temperature;
           const corr = getPerryCorrelation(chemData, 'liquid', 'thermalConductivity');
@@ -693,6 +715,8 @@ export const REGISTRY = {
         name: 'Compressible gas',
         inputs: ['cpCvRatio', 'molecularWeight', 'temperature'],
         source: 'crane',
+        description: 'Speed of sound from sqrt(k\u00b7R\u00b7T / MW)',
+        assumption: 'Ideal gas with constant Cp/Cv ratio',
         calculate: (inputs) => {
           const k = inputs.cpCvRatio;
           const MW = inputs.molecularWeight; // g/mol
@@ -962,6 +986,8 @@ export const REGISTRY = {
         name: 'Churchill (1977) - all regimes',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
         source: 'churchill1977',
+        description: 'Single explicit equation spanning laminar, transitional, and turbulent flow',
+        assumption: 'Steady-state, fully developed flow in circular pipe',
         calculate: (inputs) => {
           const Re = inputs.reynoldsNumber;
           const e = inputs.pipeAbsoluteRoughness; // m
@@ -977,6 +1003,8 @@ export const REGISTRY = {
         name: 'Churchill (1973)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
         source: 'churchill1973',
+        description: 'Explicit approximation to the Colebrook equation',
+        assumption: 'Turbulent flow only; not accurate in laminar/transitional regime',
         calculate: (inputs) => {
           const Re = inputs.reynoldsNumber;
           const e = inputs.pipeAbsoluteRoughness;
@@ -1011,6 +1039,8 @@ export const REGISTRY = {
         name: 'Niazkar (Colebrook approx.)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
         source: 'niazkar',
+        description: 'High-accuracy explicit approximation to the Colebrook equation',
+        assumption: 'Turbulent flow; explicit substitute for implicit Colebrook',
         calculate: (inputs) => {
           const Re = inputs.reynoldsNumber;
           const e = inputs.pipeAbsoluteRoughness;
@@ -1027,6 +1057,8 @@ export const REGISTRY = {
         name: 'Cheng (all regimes)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
         source: 'cheng',
+        description: 'Explicit equation valid from laminar through turbulent flow',
+        assumption: 'Steady-state, fully developed flow in circular pipe',
         calculate: (inputs) => {
           const Re = inputs.reynoldsNumber;
           const e = inputs.pipeAbsoluteRoughness;
@@ -1057,6 +1089,8 @@ export const REGISTRY = {
         name: 'Darcy-Weisbach',
         inputs: ['frictionFactor', 'density', 'pipeLength', 'pipeInnerDiameter', 'velocity'],
         source: 'crane',
+        description: 'Fundamental pressure-drop equation: dP = f\u00b7(L/D)\u00b7\u03c1\u00b7v\u00b2/2',
+        assumption: 'Steady-state, incompressible, fully developed flow',
         calculate: (inputs) => {
           const f = inputs.frictionFactor;       // dimensionless (Darcy)
           const rho = inputs.density;            // kg/m3
