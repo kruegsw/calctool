@@ -38,6 +38,6 @@ export const SECTIONS = [
     stepNumber: 4,
     accentColor: '#4f46e5',  // indigo
     primary: ['reynoldsNumber', 'frictionFactor', 'pressureDropTotal'],
-    detail: ['fannoMaxLength'],
+    detail: ['pressureDropPipe', 'fannoMaxLength'],
   },
 ];
