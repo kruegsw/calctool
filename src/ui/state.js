@@ -7,6 +7,8 @@ import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
 import { countSigFigs } from './formatting.js';
 
+const UNIT_SYSTEM_STORAGE_KEY = 'calctool:unitSystem';
+
 export class AppState {
   constructor() {
     this.registry = REGISTRY;
@@ -28,6 +30,23 @@ export class AppState {
           sigFigs: countSigFigs(String(def.defaultValue)),
         };
       }
+    }
+
+    // Restore saved unit system preference
+    this._restoreUnitSystem();
+  }
+
+  /**
+   * Restore unit system preference from localStorage (if available).
+   */
+  _restoreUnitSystem() {
+    try {
+      const saved = localStorage.getItem(UNIT_SYSTEM_STORAGE_KEY);
+      if (saved && UNIT_PRESETS[saved]) {
+        this.setUnitSystem(saved);
+      }
+    } catch {
+      // localStorage unavailable (e.g. private browsing, SSR) — ignore
     }
   }
 
@@ -126,6 +145,14 @@ export class AppState {
     }
 
     this.unitSystem = system;
+
+    // Persist preference to localStorage
+    try {
+      localStorage.setItem(UNIT_SYSTEM_STORAGE_KEY, system);
+    } catch {
+      // localStorage unavailable — ignore
+    }
+
     this.recalculate();
   }
 
