@@ -700,10 +700,10 @@ function buildPropertyField(propId, state) {
 
   row.appendChild(inputArea);
 
-  // Method selector (if has multiple methods) — skip for frictionFactor (it's in the hero)
-  if (propId !== 'frictionFactor') {
+  // Method selector — skip for frictionFactor (it's in the hero), lookups, and user inputs
+  if (propId !== 'frictionFactor' && !def.isLookup && !def.isUserInput) {
     const methodKeys = Object.keys(def.methods || {});
-    if (methodKeys.length > 1) {
+    if (methodKeys.length >= 1) {
       row.appendChild(buildMethodSelector(propId, state));
     }
   }
@@ -1023,9 +1023,18 @@ function buildMethodSelector(propId, state) {
   const def = REGISTRY[propId];
   const methods = def.methods || {};
   const keys = Object.keys(methods);
-  if (keys.length <= 1) return el('span');
+  if (keys.length === 0) return el('span');
 
   const wrapper = el('div', { className: 'method-selector-group', dataset: { methodGroup: propId } });
+
+  // Single method: static label (no dropdown needed)
+  if (keys.length === 1) {
+    const method = methods[keys[0]];
+    if (method.source) return el('span'); // source badge handles citation
+    const label = el('span', { className: 'method-label' }, '\u2699 ' + method.name);
+    wrapper.appendChild(label);
+    return wrapper;
+  }
 
   const select = el('select', {
     className: 'method-selector',

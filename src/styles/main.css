@@ -925,6 +925,13 @@ body {
   color: var(--color-primary);
 }
 
+/* ─── Method label (single-method, static) ─── */
+.method-label {
+  font-size: 0.6875rem;
+  font-family: inherit;
+  color: var(--color-text-muted);
+}
+
 /* ─── Phase badge ─── */
 .phase-badge {
   display: inline-block;
