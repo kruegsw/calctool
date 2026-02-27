@@ -20,10 +20,10 @@ const PHASE_METHOD_MAP = {
 
 /**
  * Mach-dependent method auto-selection.
- * Switches to compressible flow methods when Ma exceeds threshold.
+ * Disabled: compressible flow methods (fanno/isothermal) are not currently
+ * exposed in the UI. Re-enable by adding back the pressureDropPipe entry.
  */
 const MACH_METHOD_MAP = {
-  pressureDropPipe: { threshold: 0.3, method: 'fanno', fallback: 'darcy' },
 };
 
 /**
@@ -164,39 +164,12 @@ export function solve({ registry, activeMethodMap, userValues, chemData, pipeDat
   }
 
   // Post-solve: Mach number warnings
+  // (Compressible flow methods disabled; keep supersonic warning only)
   const machResult = results.machNumber;
-  if (machResult?.isValid) {
-    const mach = machResult.value;
-    const dpMethod = activeMethodMap.pressureDropPipe;
-    if (mach > 1) {
-      machResult.warnings.push(
-        'Velocity exceeds sonic velocity \u2014 results unreliable'
-      );
-    } else if (mach > 0.3 && (dpMethod === 'fanno' || dpMethod === 'isothermal')) {
-      machResult.warnings.push(
-        'Mach > 0.3 \u2014 compressible flow method active'
-      );
-    } else if (mach > 0.3) {
-      machResult.warnings.push(
-        'Mach > 0.3 \u2014 compressibility effects may be significant; consider Fanno method'
-      );
-    }
-  }
-
-  // Post-solve: Choking warnings
-  const fannoMaxResult = results.fannoMaxLength;
-  const pipeLengthResult = results.pipeLength;
-  if (fannoMaxResult?.isValid && pipeLengthResult?.isValid && fannoMaxResult.value > 0) {
-    const ratio = pipeLengthResult.value / fannoMaxResult.value;
-    if (ratio >= 1.0) {
-      fannoMaxResult.warnings.push('Flow is choked \u2014 pipe exceeds Fanno max length');
-      const dpResult = results.pressureDropPipe;
-      if (dpResult?.isValid) {
-        dpResult.warnings.push('Flow is choked \u2014 pipe exceeds Fanno max length');
-      }
-    } else if (ratio > 0.8) {
-      fannoMaxResult.warnings.push('Approaching choked flow');
-    }
+  if (machResult?.isValid && machResult.value > 1) {
+    machResult.warnings.push(
+      'Velocity exceeds sonic velocity \u2014 results unreliable'
+    );
   }
 
   // Post-solve: Negative Reynolds number

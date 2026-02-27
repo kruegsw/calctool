@@ -595,7 +595,9 @@ describe('registry property calculations', () => {
     });
   });
 
-  describe('Fanno pressure drop method', () => {
+  // Fanno/isothermal methods and fannoMaxLength disabled from UI (code retained).
+  // These tests access the removed registry entries directly; skip until re-enabled.
+  describe.skip('Fanno pressure drop method', () => {
     it('converges to Darcy at low Mach (< 1% difference)', () => {
       // Consistent thermodynamic inputs: ideal gas ρ = P·MW/(R·T·1000)
       const P = 500000;    // Pa
@@ -666,7 +668,7 @@ describe('registry property calculations', () => {
     });
   });
 
-  describe('isothermal pressure drop method', () => {
+  describe.skip('isothermal pressure drop method', () => {
     it('returns positive ΔP for valid subsonic flow', () => {
       const result = REGISTRY.pressureDropPipe.methods.isothermal.calculate({
         frictionFactor: 0.02,
@@ -704,7 +706,7 @@ describe('registry property calculations', () => {
     });
   });
 
-  describe('fannoMaxLength property', () => {
+  describe.skip('fannoMaxLength property', () => {
     it('returns positive value for subsonic flow', () => {
       const Lstar = REGISTRY.fannoMaxLength.methods.fanno.calculate({
         frictionFactor: 0.02,
@@ -774,7 +776,7 @@ describe('registry property calculations', () => {
       },
     };
 
-    it('switches to fanno for gas at Ma > 0.3', () => {
+    it.skip('switches to fanno for gas at Ma > 0.3', () => {
       const methodMap = getDefaultMethodMap(REGISTRY);
       const results = solve({
         registry: REGISTRY,

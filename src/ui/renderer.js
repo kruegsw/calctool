@@ -1214,13 +1214,7 @@ function updateMethodSelectors(state) {
     const autoSelected = !state.userMethodOverrides.has(propId);
 
     if (autoSelected) {
-      let autoTitle = 'Automatically selected based on phase';
-      if (propId === 'pressureDropPipe') {
-        const method = state.activeMethodMap[propId];
-        if (method === 'fanno' || method === 'isothermal') {
-          autoTitle = 'Automatically selected \u2014 Mach > 0.3';
-        }
-      }
+      const autoTitle = 'Automatically selected based on phase';
       group.appendChild(el('span', {
         className: 'method-status-badge status-auto',
         title: autoTitle,
@@ -1266,7 +1260,6 @@ function updateWarnings(state) {
     let badgeLabel = 'warning';
     if (/outside valid range/i.test(warningText)) badgeLabel = 'extrapolated';
     else if (/chok/i.test(warningText)) badgeLabel = 'choked';
-    else if (/mach|compressib/i.test(warningText)) badgeLabel = 'compressible';
     else if (/critical point/i.test(warningText)) badgeLabel = 'near critical';
     else if (/cavitation/i.test(warningText)) badgeLabel = 'cavitation risk';
 
@@ -1506,21 +1499,12 @@ function updateResultsHero(state) {
     }
   }
 
-  // Conditional visibility: fannoMaxLength row (gas flows only)
-  const fannoRow = document.querySelector('.field-row[data-prop-id="fannoMaxLength"]');
-  if (fannoRow) {
-    const fannoResult = state.results.fannoMaxLength;
-    fannoRow.style.display = (fannoResult?.isValid) ? '' : 'none';
-  }
-
-  // Conditional visibility: pressureDropPipe row (compressible or fittings present)
+  // Conditional visibility: pressureDropPipe row (show when fittings present)
   const dpPipeRow = document.querySelector('.field-row[data-prop-id="pressureDropPipe"]');
   if (dpPipeRow) {
-    const method = state.activeMethodMap.pressureDropPipe;
     const hasFittings = state.results.pressureDropFittings?.isValid &&
                         state.results.pressureDropFittings.value > 0;
-    const isCompressible = method === 'fanno' || method === 'isothermal';
-    dpPipeRow.style.display = (isCompressible || hasFittings) ? '' : 'none';
+    dpPipeRow.style.display = hasFittings ? '' : 'none';
   }
 }
 
