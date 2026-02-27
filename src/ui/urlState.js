@@ -114,7 +114,13 @@ export function serializeState(state) {
 
   // Fittings list (overrides totalKFactor param when present)
   if (state.fittings && state.fittings.length > 0) {
-    const fitParts = state.fittings.map(f => `${f.id}:${f.qty}`);
+    const fitParts = state.fittings.map(f => {
+      if (f.id === '__custom__') {
+        // Encode custom: __custom__:qty:k:name
+        return `__custom__:${f.qty}:${f.k}:${encodeURIComponent(f.name || 'Custom')}`;
+      }
+      return `${f.id}:${f.qty}`;
+    });
     params.set('fit', fitParts.join('|'));
     // Remove totalKFactor from params since fittings define it
     params.delete('K');
@@ -197,9 +203,18 @@ export function deserializeState(search, state) {
     state.fittings = [];
     let kSum = 0;
     for (const part of fit.split('|')) {
-      const [id, qtyStr] = part.split(':');
-      const qty = parseInt(qtyStr, 10) || 1;
-      if (id) {
+      const segments = part.split(':');
+      const id = segments[0];
+      if (!id) continue;
+      if (id === '__custom__') {
+        // __custom__:qty:k:name
+        const qty = parseInt(segments[1], 10) || 1;
+        const k = parseFloat(segments[2]) || 0;
+        const name = segments[3] ? decodeURIComponent(segments[3]) : 'Custom';
+        state.fittings.push({ id, qty, name, k });
+        kSum += k * qty;
+      } else {
+        const qty = parseInt(segments[1], 10) || 1;
         state.fittings.push({ id, qty });
         const fitting = getFittingById(id);
         if (fitting) kSum += fitting.k * qty;

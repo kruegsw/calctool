@@ -265,11 +265,18 @@ export class AppState {
 
   /**
    * Add a fitting to the fittings list.
-   * @param {string} fittingId - The fitting id from fittings.json
+   * @param {string} fittingId - The fitting id from fittings.json, or '__custom__'
    * @param {number} qty - Quantity (default 1)
+   * @param {string} [name] - Custom fitting name (only for __custom__)
+   * @param {number} [k] - Custom K-factor value (only for __custom__)
    */
-  addFitting(fittingId, qty = 1) {
-    this.fittings.push({ id: fittingId, qty });
+  addFitting(fittingId, qty = 1, name, k) {
+    const entry = { id: fittingId, qty };
+    if (fittingId === '__custom__') {
+      entry.name = name || 'Custom';
+      entry.k = k || 0;
+    }
+    this.fittings.push(entry);
     this._syncTotalKFactor();
   }
 
@@ -297,8 +304,12 @@ export class AppState {
   _syncTotalKFactor() {
     let sum = 0;
     for (const entry of this.fittings) {
-      const fitting = getFittingById(entry.id);
-      if (fitting) sum += fitting.k * entry.qty;
+      if (entry.id === '__custom__') {
+        sum += (entry.k || 0) * entry.qty;
+      } else {
+        const fitting = getFittingById(entry.id);
+        if (fitting) sum += fitting.k * entry.qty;
+      }
     }
     this.setValue('totalKFactor', sum);
   }

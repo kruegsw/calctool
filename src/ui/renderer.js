@@ -306,6 +306,10 @@ function buildResultsHero(state) {
   dpValueRow.appendChild(dpCopyBtn);
   dpItem.appendChild(dpValueRow);
   dpItem.appendChild(buildHeroUnitSelect('pressureDropTotal', state));
+  // Breakdown sub-text for pipe + fittings
+  const dpBreakdown = el('div', { className: 'hero-dp-breakdown', dataset: { dpBreakdown: 'true' } });
+  dpBreakdown.style.display = 'none';
+  dpItem.appendChild(dpBreakdown);
   hero.appendChild(dpItem);
 
   // Reynolds Number with regime badge
@@ -421,6 +425,8 @@ function buildFittingsEditor(state) {
     }
     fittingSelect.appendChild(optgroup);
   }
+  // Custom option at the end
+  fittingSelect.appendChild(el('option', { value: '__custom__' }, 'Custom\u2026'));
   addRow.appendChild(fittingSelect);
 
   // Quantity spinner
@@ -439,16 +445,51 @@ function buildFittingsEditor(state) {
     className: 'fittings-add-btn',
     textContent: 'Add',
   });
-  addBtn.addEventListener('click', () => {
-    const fittingId = fittingSelect.value;
-    const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
-    if (!fittingId) return;
-    state.addFitting(fittingId, qty);
-    qtyInput.value = '1';
-  });
   addRow.appendChild(addBtn);
 
   wrapper.appendChild(addRow);
+
+  // Custom fitting row (hidden by default)
+  const customRow = el('div', { className: 'fittings-custom-row' });
+  const customName = el('input', {
+    type: 'text',
+    className: 'fittings-custom-name',
+    placeholder: 'Name',
+  });
+  const customK = el('input', {
+    type: 'number',
+    className: 'fittings-custom-k',
+    placeholder: 'K',
+    step: 'any',
+    min: '0',
+  });
+  customRow.appendChild(customName);
+  customRow.appendChild(el('span', { className: 'fittings-item-k' }, 'K ='));
+  customRow.appendChild(customK);
+  wrapper.appendChild(customRow);
+
+  // Toggle custom row visibility
+  fittingSelect.addEventListener('change', () => {
+    customRow.classList.toggle('visible', fittingSelect.value === '__custom__');
+  });
+
+  // Add handler
+  addBtn.addEventListener('click', () => {
+    const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+    if (fittingSelect.value === '__custom__') {
+      const name = customName.value.trim() || 'Custom';
+      const k = parseFloat(customK.value);
+      if (!isFinite(k) || k < 0) return;
+      state.addFitting('__custom__', qty, name, k);
+      customName.value = '';
+      customK.value = '';
+    } else {
+      const fittingId = fittingSelect.value;
+      if (!fittingId) return;
+      state.addFitting(fittingId, qty);
+    }
+    qtyInput.value = '1';
+  });
 
   // List of added fittings
   const list = el('div', { className: 'fittings-list', dataset: { fittingsList: 'true' } });
@@ -469,13 +510,20 @@ function updateFittingsList(state) {
 
   for (let i = 0; i < state.fittings.length; i++) {
     const entry = state.fittings[i];
-    const fitting = getFittingById(entry.id);
-    if (!fitting) continue;
+    let name, k;
+    if (entry.id === '__custom__') {
+      name = entry.name || 'Custom';
+      k = entry.k || 0;
+    } else {
+      const fitting = getFittingById(entry.id);
+      if (!fitting) continue;
+      name = fitting.name;
+      k = fitting.k;
+    }
 
     const row = el('div', { className: 'fittings-list-item' });
 
-    const nameSpan = el('span', { className: 'fittings-item-name' },
-      `${fitting.name}`);
+    const nameSpan = el('span', { className: 'fittings-item-name' }, name);
 
     const qtyInput = el('input', {
       type: 'number',
@@ -491,7 +539,7 @@ function updateFittingsList(state) {
     });
 
     const kSpan = el('span', { className: 'fittings-item-k' },
-      `K = ${formatNumber(fitting.k * entry.qty)}`);
+      `K = ${formatNumber(k * entry.qty)}`);
 
     const removeBtn = el('button', {
       type: 'button',
@@ -1254,6 +1302,24 @@ function updateResultsHero(state) {
       const def = REGISTRY[propId];
       const currentUnit = state.userValues[propId]?.unit || def?.defaultUnit;
       if (currentUnit) heroSelect.value = currentUnit;
+    }
+  }
+
+  // Pressure drop breakdown (pipe + fittings)
+  const dpBreakdown = document.querySelector('[data-dp-breakdown]');
+  if (dpBreakdown) {
+    const pipeResult = state.results.pressureDropPipe;
+    const fitResult = state.results.pressureDropFittings;
+    const totalResult = state.results.pressureDropTotal;
+    if (totalResult?.isValid && pipeResult?.isValid && fitResult?.isValid && fitResult.value > 0) {
+      const def = REGISTRY.pressureDropTotal;
+      const displayUnit = state.userValues.pressureDropTotal?.unit || def?.defaultUnit;
+      const pipeDisplay = fromSI('pressureDifference', displayUnit, pipeResult.value);
+      const fitDisplay = fromSI('pressureDifference', displayUnit, fitResult.value);
+      dpBreakdown.textContent = `Pipe: ${formatNumber(pipeDisplay)} + Fittings: ${formatNumber(fitDisplay)}`;
+      dpBreakdown.style.display = '';
+    } else {
+      dpBreakdown.style.display = 'none';
     }
   }
 
