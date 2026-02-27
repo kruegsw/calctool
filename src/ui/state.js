@@ -2,6 +2,7 @@
 
 import { REGISTRY, getDefaultMethodMap } from '../engine/registry.js';
 import { solve } from '../engine/solver.js';
+import { convertUnits } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
 
@@ -54,11 +55,20 @@ export class AppState {
   }
 
   /**
-   * Set just the display unit (no recalculation needed, just re-display).
+   * Set the display unit, converting the stored value so the physical quantity stays constant.
    */
   setUnit(propertyId, unit) {
-    if (this.userValues[propertyId]) {
-      this.userValues[propertyId].unit = unit;
+    const entry = this.userValues[propertyId];
+    const oldUnit = entry?.unit;
+    const def = this.registry[propertyId];
+    const quantity = def?.quantity;
+
+    if (entry) {
+      // Convert value when we have a numeric value, a known old unit, and a quantity
+      if (entry.value != null && oldUnit && oldUnit !== unit && quantity) {
+        entry.value = convertUnits(quantity, entry.value, oldUnit, unit);
+      }
+      entry.unit = unit;
     } else {
       this.userValues[propertyId] = { value: null, unit };
     }

@@ -747,6 +747,9 @@ function updateAll(state) {
 
   // Update dependent dropdowns
   updateDependentDropdowns(state);
+
+  // Sync input values with state (e.g. after unit conversion)
+  updateInputValues(state);
 }
 
 /**
@@ -1015,5 +1018,22 @@ function updateDependentDropdowns(state) {
     if ([...schedSelect.options].some(o => o.value === oldVal)) {
       schedSelect.value = oldVal;
     }
+  }
+}
+
+/**
+ * Sync number input elements with state values (e.g. after unit conversion in setUnit).
+ * Skips focused inputs to avoid disrupting user typing.
+ */
+function updateInputValues(state) {
+  for (const [propId, entry] of Object.entries(state.userValues)) {
+    if (entry.value == null) continue;
+    const input = document.getElementById(`input-${propId}`);
+    if (!input || input.type !== 'number') continue;
+    // Don't overwrite while the user is typing
+    if (document.activeElement === input) continue;
+    const stateStr = String(entry.value);
+    if (input.value === stateStr) continue;
+    input.value = stateStr;
   }
 }
