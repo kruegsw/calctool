@@ -337,7 +337,12 @@ body {
 }
 
 .chemical-search {
-  max-width: 300px;
+  width: 300px;
+  max-width: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238b8fa3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
 }
 
 .chemical-search-wrapper {
@@ -345,18 +350,14 @@ body {
 }
 
 .chem-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  position: fixed;
   max-height: 240px;
   overflow-y: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: var(--shadow-md);
-  z-index: 20;
-  margin-top: -1px;
+  z-index: 100;
 }
 
 .chem-dropdown-item {
@@ -366,6 +367,7 @@ body {
   padding: 0.375rem 0.5rem;
   cursor: pointer;
   transition: background 0.1s;
+  white-space: nowrap;
 }
 
 .chem-dropdown-item:hover,

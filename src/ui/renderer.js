@@ -461,7 +461,14 @@ function buildChemicalSearch(state) {
       }
     }
 
-    wrapper.appendChild(dropdown);
+    // Append to body so it escapes overflow:hidden ancestors
+    document.body.appendChild(dropdown);
+
+    // Position below the input using fixed coordinates
+    const rect = input.getBoundingClientRect();
+    dropdown.style.top = `${rect.bottom}px`;
+    dropdown.style.left = `${rect.left}px`;
+    dropdown.style.width = `${rect.width}px`;
 
     // Auto-highlight the first result so Enter selects it immediately
     if (results.length > 0) {
@@ -514,7 +521,7 @@ function buildChemicalSearch(state) {
 
   // Close on outside click
   document.addEventListener('click', (e) => {
-    if (!wrapper.contains(e.target)) clearDropdown();
+    if (!wrapper.contains(e.target) && !(dropdown && dropdown.contains(e.target))) clearDropdown();
   });
 
   // Pre-populate with currently selected chemical name
