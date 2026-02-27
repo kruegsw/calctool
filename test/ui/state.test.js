@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { AppState } from '../../src/ui/state.js';
-import { toSI } from '../../src/engine/units.js';
+import { toSI, UNIT_PRESETS } from '../../src/engine/units.js';
+import { REGISTRY } from '../../src/engine/registry.js';
 
 describe('AppState.setUnit() value conversion', () => {
   /** Helper: create state with a user value already set. */
@@ -94,5 +95,78 @@ describe('AppState sigFigs tracking', () => {
         expect(entry.sigFigs).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe('AppState.setUnitSystem()', () => {
+  it('converts all quantities to SI units', () => {
+    const state = new AppState();
+    state.setUnitSystem('SI');
+    expect(state.unitSystem).toBe('SI');
+
+    for (const [propId, def] of Object.entries(REGISTRY)) {
+      if (!def.quantity) continue;
+      const target = UNIT_PRESETS.SI[def.quantity];
+      if (!target) continue;
+      const entry = state.userValues[propId];
+      if (entry) {
+        expect(entry.unit).toBe(target);
+      }
+    }
+  });
+
+  it('converts all quantities to Imperial units', () => {
+    const state = new AppState();
+    state.setUnitSystem('Imperial');
+    expect(state.unitSystem).toBe('Imperial');
+
+    for (const [propId, def] of Object.entries(REGISTRY)) {
+      if (!def.quantity) continue;
+      const target = UNIT_PRESETS.Imperial[def.quantity];
+      if (!target) continue;
+      const entry = state.userValues[propId];
+      if (entry) {
+        expect(entry.unit).toBe(target);
+      }
+    }
+  });
+
+  it('preserves sig figs during conversion', () => {
+    const state = new AppState();
+    state.userValues.massFlowRate = { value: 100, unit: 'lb/hr', sigFigs: 3 };
+    state.setUnitSystem('SI');
+    // 100 lb/hr → 45.4 kg/hr (3 sig figs)
+    expect(state.userValues.massFlowRate.value).toBeCloseTo(45.4, 5);
+    expect(state.userValues.massFlowRate.unit).toBe('kg/hr');
+    expect(state.userValues.massFlowRate.sigFigs).toBe(3);
+  });
+
+  it('manual setUnit() after setUnitSystem() clears unitSystem to null', () => {
+    const state = new AppState();
+    state.setUnitSystem('SI');
+    expect(state.unitSystem).toBe('SI');
+    state.setUnit('temperature', 'F');
+    expect(state.unitSystem).toBeNull();
+  });
+
+  it('skips properties without quantity', () => {
+    const state = new AppState();
+    const before = { ...state.userValues.chemicalSearch };
+    state.setUnitSystem('SI');
+    // chemicalSearch has no quantity — should be unchanged
+    expect(state.userValues.chemicalSearch).toEqual(before);
+  });
+
+  it('preserves physical quantity after round-trip SI→Imperial→SI', () => {
+    const state = new AppState();
+    // Set a known value
+    state.userValues.temperature = { value: 25, unit: 'C', sigFigs: 4 };
+    const siBefore = toSI('temperature', 'C', 25);
+
+    state.setUnitSystem('Imperial');
+    state.setUnitSystem('SI');
+
+    const siAfter = toSI('temperature', 'C', state.userValues.temperature.value);
+    expect(siAfter).toBeCloseTo(siBefore, 1);
   });
 });

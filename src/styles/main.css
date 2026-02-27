@@ -72,6 +72,37 @@ body {
   flex: 1;
 }
 
+/* ─── Unit system toggle ─── */
+.unit-system-toggle {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.unit-system-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.unit-system-btn:hover {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+}
+
+.unit-system-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
 /* ─── Sections container ─── */
 .sections {
   max-width: 900px;

@@ -2,7 +2,7 @@
 
 import { REGISTRY, getDefaultMethodMap } from '../engine/registry.js';
 import { solve } from '../engine/solver.js';
-import { convertUnits } from '../engine/units.js';
+import { convertUnits, UNIT_PRESETS } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
 import { countSigFigs, roundToSigFigs } from './formatting.js';
@@ -14,6 +14,7 @@ export class AppState {
     this.userValues = {};
     this.results = {};
     this.listeners = [];
+    this.unitSystem = null;
     this.expandedSections = new Set();
     this.dirtyFields = new Set();
 
@@ -69,6 +70,7 @@ export class AppState {
    * Set the display unit, converting the stored value so the physical quantity stays constant.
    */
   setUnit(propertyId, unit) {
+    this.unitSystem = null;
     const entry = this.userValues[propertyId];
     const oldUnit = entry?.unit;
     const def = this.registry[propertyId];
@@ -87,6 +89,46 @@ export class AppState {
     } else {
       this.userValues[propertyId] = { value: null, unit };
     }
+    this.recalculate();
+  }
+
+  /**
+   * Switch all property units to a preset system (SI or Imperial).
+   * Converts existing values to preserve physical quantities.
+   */
+  setUnitSystem(system) {
+    const preset = UNIT_PRESETS[system];
+    if (!preset) return;
+
+    for (const [propId, def] of Object.entries(this.registry)) {
+      const quantity = def.quantity;
+      if (!quantity) continue;
+      const targetUnit = preset[quantity];
+      if (!targetUnit) continue;
+
+      const entry = this.userValues[propId];
+      const oldUnit = entry?.unit || def.defaultUnit;
+      if (oldUnit === targetUnit) {
+        // Still update the unit in case entry exists with a different stored unit
+        if (entry) entry.unit = targetUnit;
+        continue;
+      }
+
+      if (entry && entry.value != null) {
+        let converted = convertUnits(quantity, entry.value, oldUnit, targetUnit);
+        if (entry.sigFigs && isFinite(converted)) {
+          converted = roundToSigFigs(converted, entry.sigFigs);
+        }
+        entry.value = converted;
+        entry.unit = targetUnit;
+      } else if (entry) {
+        entry.unit = targetUnit;
+      } else {
+        this.userValues[propId] = { value: null, unit: targetUnit };
+      }
+    }
+
+    this.unitSystem = system;
     this.recalculate();
   }
 

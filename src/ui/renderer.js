@@ -1,7 +1,7 @@
 // DOM construction with createElement (no innerHTML). Update loop.
 
 import { REGISTRY } from '../engine/registry.js';
-import { UNITS, unitOptionsFor, filteredUnitOptionsFor, CONDITIONAL_UNITS, fromSI, toSI } from '../engine/units.js';
+import { UNITS, unitOptionsFor, filteredUnitOptionsFor, CONDITIONAL_UNITS, UNIT_PRESETS, fromSI, toSI } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel, countSigFigs } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
@@ -55,10 +55,26 @@ export function buildApp(root, state) {
   // Accent strip
   root.appendChild(el('div', { className: 'accent-strip' }));
 
+  const unitToggle = el('div', { className: 'unit-system-toggle' },
+    el('button', {
+      className: 'unit-system-btn',
+      dataset: { unitSystem: 'SI' },
+      textContent: 'SI',
+      onClick: () => state.setUnitSystem('SI'),
+    }),
+    el('button', {
+      className: 'unit-system-btn',
+      dataset: { unitSystem: 'Imperial' },
+      textContent: 'Imperial',
+      onClick: () => state.setUnitSystem('Imperial'),
+    }),
+  );
+
   const header = el('header', { className: 'app-header' },
     el('h1', {}, 'Pressure Drop Calculator'),
     el('span', { className: 'version-badge' }, 'v2'),
     el('p', { className: 'subtitle' }, 'Single-phase pipe flow \u2014 Darcy-Weisbach method'),
+    unitToggle,
   );
   root.appendChild(header);
 
@@ -762,6 +778,9 @@ function updateAll(state) {
   // Update conditional unit dropdowns (SCFH/SCFM for air)
   updateConditionalUnits(state);
 
+  // Sync unit system toggle and all unit selectors
+  updateUnitSystemToggle(state);
+
   // Sync input values with state (e.g. after unit conversion)
   updateInputValues(state);
 }
@@ -1087,6 +1106,44 @@ function updateDependentDropdowns(state) {
     populateDropdown(schedSelect, 'pipeSchedule', state);
     if ([...schedSelect.options].some(o => o.value === oldVal)) {
       schedSelect.value = oldVal;
+    }
+  }
+}
+
+/**
+ * Sync unit system toggle active state and all unit selector dropdowns
+ * with current state (needed after setUnitSystem bulk-changes units).
+ */
+function updateUnitSystemToggle(state) {
+  // Sync toggle button active class
+  const btns = document.querySelectorAll('.unit-system-btn');
+  for (const btn of btns) {
+    btn.classList.toggle('active', btn.dataset.unitSystem === state.unitSystem);
+  }
+
+  // Sync all .unit-selector dropdowns to match state
+  const selectors = document.querySelectorAll('.unit-selector');
+  for (const select of selectors) {
+    const propId = select.dataset.propId;
+    const def = REGISTRY[propId];
+    if (!def) continue;
+    const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
+    if (currentUnit && select.value !== currentUnit) {
+      select.value = currentUnit;
+      autoSizeSelect(select);
+    }
+  }
+
+  // Sync hero unit selects
+  const heroSelects = document.querySelectorAll('[data-hero-unit]');
+  for (const select of heroSelects) {
+    const propId = select.dataset.heroUnit;
+    const def = REGISTRY[propId];
+    if (!def) continue;
+    const currentUnit = state.userValues[propId]?.unit || def.defaultUnit;
+    if (currentUnit && select.value !== currentUnit) {
+      select.value = currentUnit;
+      autoSizeSelect(select);
     }
   }
 }

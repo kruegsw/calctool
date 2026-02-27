@@ -202,6 +202,31 @@ export function unitOptionsFor(quantity) {
  * Map of unit keys that should only appear when a specific chemical (CAS) is selected.
  * Structure: { quantityKey: { unitKey: requiredCAS } }
  */
+export const UNIT_PRESETS = {
+  SI: {
+    temperature: 'C',      pressure: 'kPa',
+    pressureDifference: 'kPa', length: 'm',
+    area: 'm2',            volume: 'm3',
+    velocity: 'm/s',       massRate: 'kg/hr',
+    volumeRate: 'm3/h',    concentrationMass: 'kg/m3',
+    viscosityDynamic: 'Pa*s',
+    specificHeatCapacity: 'J/kg/K',
+    thermalConductivity: 'W/m/K',
+    specificEnergy: 'J/kg', molarVolume: 'm3/kmol',
+  },
+  Imperial: {
+    temperature: 'F',      pressure: 'psia',
+    pressureDifference: 'psi', length: 'ft',
+    area: 'ft2',           volume: 'ft3',
+    velocity: 'ft/s',      massRate: 'lb/hr',
+    volumeRate: 'gpm',     concentrationMass: 'lb/ft3',
+    viscosityDynamic: 'centipoise',
+    specificHeatCapacity: 'BTU/lb/F',
+    thermalConductivity: 'W/m/K',   // no imperial option exists
+    specificEnergy: 'BTU/lb', molarVolume: 'm3/kmol', // no imperial option
+  },
+};
+
 export const CONDITIONAL_UNITS = {
   massRate: { 'SCFH': '132259-10-0', 'SCFM': '132259-10-0' },
 };
