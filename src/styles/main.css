@@ -255,10 +255,33 @@ body {
   font-family: inherit;
 }
 
+.theme-toggle-btn svg {
+  display: block;
+}
+
+.theme-toggle-btn.theme-sun {
+  color: #e8a020;
+  filter: drop-shadow(0 0 4px rgba(245, 180, 50, 0.5));
+}
+
+.theme-toggle-btn.theme-moon {
+  color: #b0c4de;
+  filter: drop-shadow(0 0 4px rgba(176, 210, 255, 0.45));
+}
+
 .theme-toggle-btn:hover {
   background: var(--color-bg);
-  color: var(--color-text-secondary);
   border-color: var(--color-text-muted);
+}
+
+.theme-toggle-btn.theme-sun:hover {
+  color: #d4911a;
+  filter: drop-shadow(0 0 6px rgba(245, 180, 50, 0.7));
+}
+
+.theme-toggle-btn.theme-moon:hover {
+  color: #cde0f5;
+  filter: drop-shadow(0 0 6px rgba(176, 210, 255, 0.65));
 }
 
 /* ─── Share button ─── */
