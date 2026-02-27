@@ -142,7 +142,7 @@ export const REGISTRY = {
     quantity: null,
     category: 'chemical-property',
     defaultUnit: null,
-    defaultValue: '',
+    defaultValue: '132259-10-0',
     isUserInput: true,
     isSelection: true,
     methods: {},

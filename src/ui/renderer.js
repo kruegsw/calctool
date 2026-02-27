@@ -438,6 +438,11 @@ function buildChemicalSearch(state) {
     }
 
     wrapper.appendChild(dropdown);
+
+    // Auto-highlight the first result so Enter selects it immediately
+    if (results.length > 0) {
+      setActive(0);
+    }
   }
 
   input.addEventListener('input', () => {
@@ -466,6 +471,10 @@ function buildChemicalSearch(state) {
     }
   });
 
+  input.addEventListener('focus', () => {
+    input.select();
+  });
+
   input.addEventListener('blur', () => {
     // Small delay so mousedown on item fires before removal
     setTimeout(clearDropdown, 150);
@@ -475,6 +484,13 @@ function buildChemicalSearch(state) {
   document.addEventListener('click', (e) => {
     if (!wrapper.contains(e.target)) clearDropdown();
   });
+
+  // Pre-populate with currently selected chemical name
+  const selectedCas = state.userValues.chemicalSearch?.value;
+  if (selectedCas) {
+    const chem = getChemicalByCAS(selectedCas);
+    if (chem) input.value = chem.name;
+  }
 
   wrapper.appendChild(input);
   return wrapper;
