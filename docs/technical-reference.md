@@ -19,7 +19,8 @@ This document describes the data sources, calculation methods, assumptions, defa
 11. [Solver Behavior](#solver-behavior)
 12. [Unit System](#unit-system)
 13. [Potential Issues and Limitations](#potential-issues-and-limitations)
-14. [References](#references)
+14. [Future Improvements (Compressible Flow)](#future-improvements-compressible-flow)
+15. [References](#references)
 
 ---
 
@@ -612,6 +613,24 @@ The chemical database contains pure component properties only. Mixtures are not 
 ### Pipe Roughness as a Constant
 
 Pipe roughness values represent new, clean pipe. Fouling, scaling, corrosion, and biological growth can significantly increase the effective roughness over time. For aged or fouled pipes, users should override the roughness value with an appropriate estimate.
+
+---
+
+## Future Improvements (Compressible Flow)
+
+The following enhancements to compressible flow handling are planned but not yet implemented.
+
+### Expose Outlet Conditions
+
+The Fanno and isothermal solvers already compute outlet Mach number (Ma2) and pressure ratio (P2/P1) internally, but discard these values after computing the pressure drop. Exposing Ma2, P2, rho2, and v2 as calculated properties would give users visibility into how conditions change along the pipe — particularly useful for verifying that downstream equipment ratings are met and for sizing downstream piping.
+
+### Local Mach Number at Fittings
+
+As noted in [Undetected Choking at Fittings and Valves](#undetected-choking-at-fittings-and-valves), the calculator does not check for sonic conditions at flow restrictions. Adding effective area ratios to the fittings database (e.g., reduced-port ball valves at ~60% of pipe area, control valve trim passages at 30-70%) would allow the calculator to estimate the local Mach number at each restriction and warn when choking is likely. This would extend the current choking analysis beyond straight pipe to the components most prone to choking in practice.
+
+### Maximum Mass Flow Rate at Choking
+
+When choking is detected (pipe length exceeds Fanno L*, or local Ma reaches 1.0 at a restriction), the calculator could back-calculate and display the maximum mass flow rate that the system can sustain. This is the flow rate at which the outlet (or restriction) just reaches sonic conditions. Displaying this value alongside the choking warning would give users an immediate sense of how far over the limit they are and what flow rate the system can actually deliver.
 
 ---
 
