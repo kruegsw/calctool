@@ -361,6 +361,7 @@ export const REGISTRY = {
     quantity: 'pressure',
     category: 'chemical-condition',
     defaultUnit: 'Pa',
+    allowUserOverride: true,
     methods: {
       perryCorrelation: {
         name: 'Perry correlation',
@@ -407,6 +408,7 @@ export const REGISTRY = {
     quantity: 'concentrationMass',
     category: 'chemical-condition',
     defaultUnit: 'kg/m3',
+    allowUserOverride: true,
     methods: {
       idealGas: {
         name: 'Ideal Gas Law',
@@ -463,6 +465,7 @@ export const REGISTRY = {
     quantity: 'viscosityDynamic',
     category: 'chemical-condition',
     defaultUnit: 'centipoise',
+    allowUserOverride: true,
     methods: {
       sutherland: {
         name: "Sutherland's Law",
@@ -514,6 +517,7 @@ export const REGISTRY = {
     quantity: 'specificHeatCapacity',
     category: 'chemical-condition',
     defaultUnit: 'J/kg/K',
+    allowUserOverride: true,
     methods: {
       perryLiquidCorrelation: {
         name: 'Perry liquid Cp correlation',
@@ -568,6 +572,7 @@ export const REGISTRY = {
     quantity: 'specificHeatCapacity',
     category: 'chemical-condition',
     defaultUnit: 'J/kg/K',
+    allowUserOverride: true,
     methods: {
       idealGas: {
         name: 'Ideal gas (Cv = Cp - R/MW)',
@@ -589,6 +594,7 @@ export const REGISTRY = {
     quantity: null,
     category: 'chemical-condition',
     defaultUnit: null,
+    allowUserOverride: true,
     methods: {
       ratio: {
         name: 'Cp / Cv',
@@ -604,6 +610,7 @@ export const REGISTRY = {
     quantity: 'specificEnergy',
     category: 'chemical-condition',
     defaultUnit: 'J/kg',
+    allowUserOverride: true,
     methods: {
       perryCorrelation: {
         name: 'Perry correlation',
@@ -635,6 +642,7 @@ export const REGISTRY = {
     quantity: 'thermalConductivity',
     category: 'chemical-condition',
     defaultUnit: 'W/m/K',
+    allowUserOverride: true,
     methods: {
       perryVaporCorrelation: {
         name: 'Perry vapor correlation',
@@ -668,6 +676,7 @@ export const REGISTRY = {
     quantity: 'velocity',
     category: 'chemical-condition',
     defaultUnit: 'm/s',
+    allowUserOverride: true,
     methods: {
       compressibleGas: {
         name: 'Compressible gas',
@@ -786,6 +795,7 @@ export const REGISTRY = {
     quantity: 'area',
     category: 'system-property',
     defaultUnit: 'in2',
+    allowUserOverride: true,
     methods: {
       fromDiameter: {
         name: 'From inner diameter',
@@ -804,6 +814,7 @@ export const REGISTRY = {
     quantity: 'length',
     category: 'system-property',
     defaultUnit: 'in',
+    allowUserOverride: true,
     methods: {
       fromDiameter: {
         name: 'D/4 (circular pipe)',
@@ -866,6 +877,7 @@ export const REGISTRY = {
     quantity: 'volumeRate',
     category: 'system-condition',
     defaultUnit: 'm3/h',
+    allowUserOverride: true,
     methods: {
       fromMassRateAndDensity: {
         name: 'Mass flow / density',
@@ -886,6 +898,7 @@ export const REGISTRY = {
     quantity: 'velocity',
     category: 'system-condition',
     defaultUnit: 'm/s',
+    allowUserOverride: true,
     methods: {
       fromVolumeRateAndArea: {
         name: 'Volume flow / area',
@@ -905,6 +918,7 @@ export const REGISTRY = {
     quantity: null,
     category: 'system-condition',
     defaultUnit: null,
+    allowUserOverride: true,
     methods: {
       standard: {
         name: 'Re = rho*v*D/mu',
@@ -926,6 +940,7 @@ export const REGISTRY = {
     quantity: null,
     category: 'system-condition',
     defaultUnit: null,
+    allowUserOverride: true,
     methods: {
       laminar: {
         name: 'Laminar (64/Re)',
@@ -1025,6 +1040,7 @@ export const REGISTRY = {
     quantity: 'pressureDifference',
     category: 'system-condition',
     defaultUnit: 'psi',
+    allowUserOverride: true,
     methods: {
       darcy: {
         name: 'Darcy-Weisbach',
@@ -1049,6 +1065,7 @@ export const REGISTRY = {
     quantity: 'pressureDifference',
     category: 'system-condition',
     defaultUnit: 'psi',
+    allowUserOverride: true,
     methods: {
       pipeOnly: {
         name: 'Pipe only (no fittings)',
