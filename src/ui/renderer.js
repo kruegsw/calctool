@@ -84,9 +84,14 @@ export function buildApp(root, state) {
     dataset: { themeBtn: 'true' },
   });
   themeBtn.addEventListener('click', () => {
-    const next = state.theme === 'system' ? 'light'
-               : state.theme === 'light' ? 'dark'
-               : 'system';
+    let next;
+    if (state.theme === 'system') {
+      // Skip to the opposite of what system resolves to (avoids no-op click)
+      next = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+    } else {
+      // From explicit light/dark, go back to system
+      next = 'system';
+    }
     state.setTheme(next);
   });
 
@@ -1186,6 +1191,12 @@ function updateChemicalCard(state) {
   }
 
   card.style.display = '';
+
+  // Sync search input text if it's empty (e.g. after lazy-load of chemicals data)
+  const searchInput = document.getElementById('input-chemicalSearch');
+  if (searchInput && !searchInput.value && chem.name) {
+    searchInput.value = chem.name;
+  }
 
   const nameEl = card.querySelector('[data-chem-card-name]');
   if (nameEl) nameEl.textContent = chem.name || '\u2014';

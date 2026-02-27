@@ -40,9 +40,8 @@ async function init() {
   showLoadingSkeleton(root);
 
   try {
-    // Load data in parallel
+    // Load small data files eagerly (pipe + sources = ~75KB)
     await Promise.all([
-      loadChemicals(),
       loadPipeData(),
       loadSources(),
     ]);
@@ -51,9 +50,14 @@ async function init() {
     const state = new AppState();
     deserializeState(window.location.search, state);
 
-    // Build UI, then subscribe URL sync
+    // Build UI immediately — chemical search gracefully returns empty until loaded
     buildApp(root, state);
     state.subscribe(() => syncURL(state));
+
+    // Lazy-load chemicals.json (3.8MB) in background, then refresh
+    loadChemicals().then(() => {
+      state.recalculate();
+    });
   } catch (err) {
     root.textContent = `Error loading application: ${err.message}`;
     console.error(err);
