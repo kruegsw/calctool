@@ -170,6 +170,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => chemData?.cas || null,
       },
     },
@@ -186,6 +187,7 @@ export const REGISTRY = {
       lookup: {
         name: 'Database lookup',
         inputs: [],
+        source: 'perry',
         calculate: (inputs, chemData) => chemData?.name || null,
       },
     },
@@ -1071,6 +1073,9 @@ export const REGISTRY = {
       colebrook: {
         name: 'Colebrook (iterative)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
+        source: 'colebrook',
+        description: 'Implicit Colebrook-White equation solved iteratively',
+        assumption: 'Turbulent flow in hydraulically rough or smooth pipes',
         calculate: (inputs) => {
           const Re = inputs.reynoldsNumber;
           const e = inputs.pipeAbsoluteRoughness;
