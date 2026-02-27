@@ -533,16 +533,24 @@ body {
   cursor: help;
 }
 
-/* ─── Auto-method badge ─── */
-.auto-badge {
+/* ─── Method status badge (auto / pinned) ─── */
+.method-status-badge {
   margin-left: 0.25rem;
   padding: 0.0625rem 0.3rem;
   font-size: 0.5625rem;
   font-weight: 500;
-  color: #0e7490;
-  background: #e0f2fe;
   border-radius: 9999px;
   cursor: help;
+}
+
+.method-status-badge.status-auto {
+  color: #0e7490;
+  background: #e0f2fe;
+}
+
+.method-status-badge.status-pinned {
+  color: #92400e;
+  background: #fef3c7;
 }
 
 .field-row.has-warning {

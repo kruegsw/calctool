@@ -807,8 +807,8 @@ function updateAll(state) {
  * updated by auto-selection in the solver).
  */
 function updateMethodSelectors(state) {
-  // Remove previous auto-badges
-  const prevBadges = document.querySelectorAll('.auto-badge');
+  // Remove previous method-status badges
+  const prevBadges = document.querySelectorAll('.method-status-badge');
   for (const b of prevBadges) b.remove();
 
   const selectors = document.querySelectorAll('.method-selector');
@@ -820,12 +820,22 @@ function updateMethodSelectors(state) {
       autoSizeSelect(select);
     }
 
-    // Add "auto" badge if this property has multiple methods and user hasn't overridden
     const def = REGISTRY[propId];
     const methodKeys = Object.keys(def?.methods || {});
-    if (methodKeys.length > 1 && !state.userMethodOverrides.has(propId)) {
+    if (methodKeys.length <= 1) continue;
+
+    const overridden = def.allowUserOverride && state.isOverridden(propId);
+    const autoSelected = !state.userMethodOverrides.has(propId);
+
+    if (overridden) {
       const badge = el('span', {
-        className: 'auto-badge',
+        className: 'method-status-badge status-pinned',
+        title: 'Value pinned by user — calculation bypassed',
+      }, 'pinned');
+      select.parentNode.insertBefore(badge, select.nextSibling);
+    } else if (autoSelected) {
+      const badge = el('span', {
+        className: 'method-status-badge status-auto',
         title: 'Automatically selected based on phase',
       }, 'auto');
       select.parentNode.insertBefore(badge, select.nextSibling);
