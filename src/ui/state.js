@@ -116,6 +116,16 @@ export class AppState {
   }
 
   /**
+   * Check if a calculated property is currently user-overridden.
+   */
+  isOverridden(propertyId) {
+    const def = this.registry[propertyId];
+    if (!def?.allowUserOverride) return false;
+    const uv = this.userValues[propertyId];
+    return uv != null && uv.value !== '' && uv.value != null;
+  }
+
+  /**
    * Run the solver with current state.
    */
   recalculate() {

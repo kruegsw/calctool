@@ -744,6 +744,7 @@ export const REGISTRY = {
     quantity: 'length',
     category: 'system-property',
     defaultUnit: 'in',
+    allowUserOverride: true,
     methods: {
       fromPipeInfo: {
         name: 'From pipe tables',
@@ -818,6 +819,7 @@ export const REGISTRY = {
     quantity: 'length',
     category: 'system-property',
     defaultUnit: 'm',
+    allowUserOverride: true,
     methods: {
       fromMaterial: {
         name: 'From pipe material',

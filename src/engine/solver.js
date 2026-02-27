@@ -73,6 +73,17 @@ function evaluateProperty(id, registry, activeMethodMap, userValues, results, ch
     return createPropertyResult(id, siValue, displayValue, userVal.unit || def.defaultUnit, null, []);
   }
 
+  // Case 1.5: User override of a calculated property
+  if (def.allowUserOverride && userVal != null && userVal.value !== '' && userVal.value != null) {
+    let siValue;
+    if (def.quantity && userVal.unit) {
+      siValue = toSI(def.quantity, userVal.unit, userVal.value);
+    } else {
+      siValue = userVal.value;
+    }
+    return createPropertyResult(id, siValue, userVal.value, userVal.unit || def.defaultUnit, null, []);
+  }
+
   // Case 2: Lookup from chemical data
   if (def.isLookup && methodKey === 'lookup') {
     const method = def.methods.lookup;

@@ -1,7 +1,7 @@
 // DOM construction with createElement (no innerHTML). Update loop.
 
 import { REGISTRY } from '../engine/registry.js';
-import { UNITS, unitOptionsFor } from '../engine/units.js';
+import { UNITS, unitOptionsFor, fromSI } from '../engine/units.js';
 import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
@@ -290,7 +290,8 @@ function buildPropertyField(propId, state) {
 
   // Determine row type class
   let rowType = 'row-output';
-  if (def.isUserInput && !def.isSelection) rowType = 'row-input';
+  if (def.allowUserOverride) rowType = 'row-override';
+  else if (def.isUserInput && !def.isSelection) rowType = 'row-input';
   else if (def.isSelection) rowType = 'row-input';
   else if (def.isLookup) rowType = 'row-lookup';
 
@@ -301,6 +302,20 @@ function buildPropertyField(propId, state) {
 
   // Label
   const label = el('label', { className: 'field-label', for: `input-${propId}` }, def.name);
+
+  // "Pinned ×" badge (hidden by default) for override fields — click to un-pin
+  if (def.allowUserOverride) {
+    const badge = el('span', { className: 'pinned-badge', dataset: { pinnedBadge: propId } }, 'Pinned \u00d7');
+    badge.style.display = 'none';
+    badge.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.querySelector(`.override-input[data-prop-id="${propId}"]`);
+      if (input) input.value = '';
+      state.setValue(propId, null, state.userValues[propId]?.unit);
+    });
+    label.appendChild(badge);
+  }
+
   row.appendChild(label);
 
   // Input area
@@ -312,6 +327,12 @@ function buildPropertyField(propId, state) {
     inputArea.appendChild(buildPhaseDisplay(propId, state));
   } else if (def.isSelection && !def.quantity) {
     inputArea.appendChild(buildSelectionDropdown(propId, state));
+  } else if (def.allowUserOverride) {
+    // Override field: input + unit selector (like user-input), with placeholder for calculated value
+    const group = el('div', { className: 'input-group' });
+    group.appendChild(buildOverrideInput(propId, state));
+    group.appendChild(buildUnitSelector(propId, state));
+    inputArea.appendChild(group);
   } else if (def.isUserInput) {
     // Number input: fuse input + unit in a single bordered group
     if (def.quantity) {
@@ -546,6 +567,30 @@ function buildNumberInput(propId, state) {
 }
 
 /**
+ * Build a number input for overridable calculated properties.
+ * Empty input falls through to normal calculation; a value pins/overrides.
+ */
+function buildOverrideInput(propId, state) {
+  const input = el('input', {
+    type: 'number',
+    id: `input-${propId}`,
+    className: 'field-input-control number-input override-input',
+    step: 'any',
+    dataset: { propId },
+  });
+
+  const current = state.userValues[propId];
+  if (current?.value != null && current.value !== '') input.value = current.value;
+
+  input.addEventListener('input', () => {
+    const val = input.value === '' ? null : +input.value;
+    state.setValue(propId, val, state.userValues[propId]?.unit);
+  });
+
+  return input;
+}
+
+/**
  * Build a read-only output display for calculated properties.
  */
 function buildOutputDisplay(propId, state) {
@@ -659,6 +704,9 @@ function updateAll(state) {
     }
   }
 
+  // Update override (pinned) field states
+  updateOverrideFields(state);
+
   // Update results hero
   updateResultsHero(state);
 
@@ -670,6 +718,76 @@ function updateAll(state) {
 
   // Update dependent dropdowns
   updateDependentDropdowns(state);
+}
+
+/**
+ * Update override (pinned) field states: badge visibility, row class,
+ * placeholder with calculated value, and upstream bypassed indicators.
+ */
+function updateOverrideFields(state) {
+  // Remove all previous bypassed badges
+  const prevBadges = document.querySelectorAll('.bypassed-badge');
+  for (const b of prevBadges) b.remove();
+
+  // Collect which upstream fields are bypassed and by which pinned properties
+  const bypassedBy = {}; // depId -> [pinned property names]
+
+  for (const [propId, def] of Object.entries(REGISTRY)) {
+    if (!def.allowUserOverride) continue;
+
+    const overridden = state.isOverridden(propId);
+    const row = document.querySelector(`.field-row[data-prop-id="${propId}"]`);
+    if (!row) continue;
+
+    // Toggle pinned state on row
+    row.classList.toggle('is-pinned', overridden);
+
+    // Show/hide pinned badge
+    const badge = document.querySelector(`[data-pinned-badge="${propId}"]`);
+    if (badge) badge.style.display = overridden ? '' : 'none';
+
+    // Set placeholder to calculated value when NOT overridden
+    const input = row.querySelector('.override-input');
+    if (input) {
+      const result = state.results[propId];
+      if (!overridden && result?.isValid) {
+        const displayUnit = state.userValues[propId]?.unit || def.defaultUnit;
+        const displayVal = def.quantity && displayUnit
+          ? fromSI(def.quantity, displayUnit, result.value)
+          : result.value;
+        input.placeholder = typeof displayVal === 'number'
+          ? displayVal.toPrecision(6).replace(/\.?0+$/, '')
+          : String(displayVal);
+      } else if (!overridden) {
+        input.placeholder = '';
+      }
+    }
+
+    // Track upstream fields bypassed by this override
+    if (overridden) {
+      const methodKey = state.activeMethodMap[propId];
+      const method = def.methods?.[methodKey];
+      if (method?.inputs) {
+        for (const depId of method.inputs) {
+          if (!bypassedBy[depId]) bypassedBy[depId] = [];
+          bypassedBy[depId].push(def.name);
+        }
+      }
+    }
+  }
+
+  // Add bypassed badges with tooltip to upstream field labels
+  for (const [depId, pinnedNames] of Object.entries(bypassedBy)) {
+    const depRow = document.querySelector(`.field-row[data-prop-id="${depId}"]`);
+    if (!depRow) continue;
+    const label = depRow.querySelector('.field-label');
+    if (!label) continue;
+    const bypassBadge = el('span', {
+      className: 'bypassed-badge',
+      title: `${pinnedNames.join(', ')} pinned — this field is bypassed`,
+    }, 'bypassed');
+    label.appendChild(bypassBadge);
+  }
 }
 
 /**

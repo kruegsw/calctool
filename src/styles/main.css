@@ -371,6 +371,51 @@ body {
   background: #fff;
 }
 
+/* ─── Visual distinction: overridable (pinned) rows ─── */
+.field-row.row-override {
+  border-left: 3px solid transparent;
+}
+
+.field-row.row-override.is-pinned {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.pinned-badge {
+  margin-left: 0.375rem;
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #92400e;
+  background: #fef3c7;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pinned-badge:hover {
+  background: #fde68a;
+  color: #78350f;
+}
+
+.override-input::placeholder {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.bypassed-badge {
+  margin-left: 0.375rem;
+  padding: 0.0625rem 0.3rem;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: #f3f4f6;
+  border-radius: 3px;
+  text-transform: uppercase;
+  cursor: default;
+}
+
 /* ─── Visual distinction: output rows ─── */
 .field-row.row-output .field-output {
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
