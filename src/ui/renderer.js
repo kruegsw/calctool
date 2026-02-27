@@ -144,13 +144,18 @@ function buildSection(section, state) {
     if (section.id === 'results') continue;
     primaryEl.appendChild(buildPropertyField(propId, state));
   }
-  if (primaryEl.children.length > 0) {
-    bodyEl.appendChild(primaryEl);
-  }
 
-  // Chemical summary card (shown after search input in fluid section)
+  // Fluid section: inline chemical card on same row as search
   if (section.id === 'fluid') {
-    bodyEl.appendChild(buildChemicalCard(state));
+    const fluidRow = el('div', { className: 'fluid-primary-row' });
+    // Move the chemicalSearch field-row into the flex row
+    while (primaryEl.firstChild) {
+      fluidRow.appendChild(primaryEl.firstChild);
+    }
+    fluidRow.appendChild(buildChemicalCard(state));
+    bodyEl.appendChild(fluidRow);
+  } else if (primaryEl.children.length > 0) {
+    bodyEl.appendChild(primaryEl);
   }
 
   // Detail fields (shown when expanded)
