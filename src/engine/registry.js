@@ -978,6 +978,7 @@ export const REGISTRY = {
     quantity: null,
     category: 'system-condition',
     defaultUnit: null,
+    allowUserOverride: true,
     methods: {
       standard: {
         name: 'Ma = v / c',
