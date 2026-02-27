@@ -86,6 +86,7 @@
 
 /* ─── Dark theme ─── */
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-bg: #0f1117;
   --color-surface: #1a1d27;
   --color-border: #2e3244;
