@@ -6,6 +6,7 @@ import { SECTIONS } from './sections.js';
 import { formatNumber, flowRegimeLabel, countSigFigs, roundToSigFigs } from './formatting.js';
 import { getAllChemicals, searchChemicals, getChemicalByCAS } from '../data/chemicals.js';
 import { getMaterialNames, getPipeStandards, getNominalDiameters, getSchedules, getPipeUnits } from '../data/pipe.js';
+import { getAllFittings, getFittingsByType, getFittingById } from '../data/fittings.js';
 import { setupHoverHighlighting } from './hover.js';
 import { getSources } from '../data/sources.js';
 import { initSourcePopover, bindSourceBadge, hideSourcePopover } from './sourcePopover.js';
@@ -259,6 +260,10 @@ function buildSection(section, state) {
     const detailEl = el('div', { className: 'fields detail-fields' });
     for (const propId of section.detail) {
       detailEl.appendChild(buildPropertyField(propId, state));
+      // Inject fittings editor after the totalKFactor row
+      if (propId === 'totalKFactor') {
+        detailEl.appendChild(buildFittingsEditor(state));
+      }
     }
     bodyEl.appendChild(detailEl);
   }
@@ -395,6 +400,115 @@ function buildChemicalCard(state) {
   );
 
   return card;
+}
+
+/**
+ * Build the inline fittings editor: dropdown + qty + add button + list of added fittings.
+ */
+function buildFittingsEditor(state) {
+  const wrapper = el('div', { className: 'fittings-editor', dataset: { fittingsEditor: 'true' } });
+
+  // Add-fitting controls row
+  const addRow = el('div', { className: 'fittings-add-row' });
+
+  // Fitting dropdown grouped by type
+  const fittingSelect = el('select', { className: 'fittings-select' });
+  const groups = getFittingsByType();
+  for (const [type, fittings] of Object.entries(groups)) {
+    const optgroup = el('optgroup', { label: type });
+    for (const f of fittings) {
+      optgroup.appendChild(el('option', { value: f.id }, `${f.name} (K=${f.k})`));
+    }
+    fittingSelect.appendChild(optgroup);
+  }
+  addRow.appendChild(fittingSelect);
+
+  // Quantity spinner
+  const qtyInput = el('input', {
+    type: 'number',
+    className: 'fittings-qty',
+    value: '1',
+    min: '1',
+    step: '1',
+  });
+  addRow.appendChild(qtyInput);
+
+  // Add button
+  const addBtn = el('button', {
+    type: 'button',
+    className: 'fittings-add-btn',
+    textContent: 'Add',
+  });
+  addBtn.addEventListener('click', () => {
+    const fittingId = fittingSelect.value;
+    const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+    if (!fittingId) return;
+    state.addFitting(fittingId, qty);
+    qtyInput.value = '1';
+  });
+  addRow.appendChild(addBtn);
+
+  wrapper.appendChild(addRow);
+
+  // List of added fittings
+  const list = el('div', { className: 'fittings-list', dataset: { fittingsList: 'true' } });
+  wrapper.appendChild(list);
+
+  return wrapper;
+}
+
+/**
+ * Rebuild the fittings list display from current state.
+ */
+function updateFittingsList(state) {
+  const list = document.querySelector('[data-fittings-list]');
+  if (!list) return;
+
+  list.textContent = '';
+  if (state.fittings.length === 0) return;
+
+  for (let i = 0; i < state.fittings.length; i++) {
+    const entry = state.fittings[i];
+    const fitting = getFittingById(entry.id);
+    if (!fitting) continue;
+
+    const row = el('div', { className: 'fittings-list-item' });
+
+    const nameSpan = el('span', { className: 'fittings-item-name' },
+      `${fitting.name}`);
+
+    const qtyInput = el('input', {
+      type: 'number',
+      className: 'fittings-item-qty',
+      value: String(entry.qty),
+      min: '1',
+      step: '1',
+    });
+    const idx = i;
+    qtyInput.addEventListener('change', () => {
+      const newQty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+      state.updateFittingQuantity(idx, newQty);
+    });
+
+    const kSpan = el('span', { className: 'fittings-item-k' },
+      `K = ${formatNumber(fitting.k * entry.qty)}`);
+
+    const removeBtn = el('button', {
+      type: 'button',
+      className: 'fittings-remove-btn',
+      title: 'Remove fitting',
+      textContent: '\u00d7',
+    });
+    removeBtn.addEventListener('click', () => {
+      state.removeFitting(idx);
+    });
+
+    row.appendChild(nameSpan);
+    row.appendChild(qtyInput);
+    row.appendChild(kSpan);
+    row.appendChild(removeBtn);
+    list.appendChild(row);
+  }
 }
 
 /**
@@ -895,6 +1009,9 @@ function updateAll(state) {
 
   // Validate user inputs (red border on invalid)
   updateInputValidation(state);
+
+  // Update fittings list
+  updateFittingsList(state);
 
   // Update dependent dropdowns
   updateDependentDropdowns(state);

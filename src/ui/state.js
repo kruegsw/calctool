@@ -5,6 +5,7 @@ import { solve } from '../engine/solver.js';
 import { convertUnits, UNIT_PRESETS } from '../engine/units.js';
 import { getChemicalByCAS, searchChemicals } from '../data/chemicals.js';
 import { getPipeData, getSchedules, getNominalDiameters } from '../data/pipe.js';
+import { getFittingById } from '../data/fittings.js';
 import { countSigFigs } from './formatting.js';
 
 const UNIT_SYSTEM_STORAGE_KEY = 'calctool:unitSystem';
@@ -22,6 +23,7 @@ export class AppState {
     this.expandedSections = new Set();
     this.dirtyFields = new Set();
     this.userMethodOverrides = new Set();
+    this.fittings = []; // [{ id, qty }, ...]
 
     // Set defaults from registry
     for (const [id, def] of Object.entries(REGISTRY)) {
@@ -259,6 +261,46 @@ export class AppState {
     if (!def?.allowUserOverride) return false;
     const uv = this.userValues[propertyId];
     return uv != null && uv.value !== '' && uv.value != null;
+  }
+
+  /**
+   * Add a fitting to the fittings list.
+   * @param {string} fittingId - The fitting id from fittings.json
+   * @param {number} qty - Quantity (default 1)
+   */
+  addFitting(fittingId, qty = 1) {
+    this.fittings.push({ id: fittingId, qty });
+    this._syncTotalKFactor();
+  }
+
+  /**
+   * Remove a fitting by index.
+   */
+  removeFitting(index) {
+    this.fittings.splice(index, 1);
+    this._syncTotalKFactor();
+  }
+
+  /**
+   * Update the quantity of a fitting by index.
+   */
+  updateFittingQuantity(index, qty) {
+    if (this.fittings[index]) {
+      this.fittings[index].qty = qty;
+      this._syncTotalKFactor();
+    }
+  }
+
+  /**
+   * Recompute totalKFactor from fittings list and trigger recalculate.
+   */
+  _syncTotalKFactor() {
+    let sum = 0;
+    for (const entry of this.fittings) {
+      const fitting = getFittingById(entry.id);
+      if (fitting) sum += fitting.k * entry.qty;
+    }
+    this.setValue('totalKFactor', sum);
   }
 
   /**

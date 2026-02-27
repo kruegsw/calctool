@@ -905,6 +905,17 @@ export const REGISTRY = {
     methods: {},
   },
 
+  totalKFactor: {
+    id: 'totalKFactor',
+    name: 'Total K-Factor (Fittings)',
+    quantity: null,
+    category: 'system-property',
+    defaultUnit: null,
+    defaultValue: 0,
+    isUserInput: true,
+    methods: {},
+  },
+
   // =========================================================================
   // SYSTEM CONDITIONS (flow calculations)
   // =========================================================================
@@ -1185,6 +1196,29 @@ export const REGISTRY = {
     },
   },
 
+  pressureDropFittings: {
+    id: 'pressureDropFittings',
+    name: 'Pressure Drop (Fittings)',
+    quantity: 'pressureDifference',
+    category: 'system-condition',
+    defaultUnit: 'psi',
+    methods: {
+      kFactor: {
+        name: 'K-factor method',
+        inputs: ['totalKFactor', 'density', 'velocity'],
+        source: 'crane',
+        description: 'Fitting losses from resistance coefficients: dP = K \u00d7 \u03c1 \u00d7 v\u00b2 / 2',
+        assumption: 'Incompressible flow; K values independent of Reynolds number',
+        calculate: (inputs) => {
+          const K = inputs.totalKFactor;
+          const rho = inputs.density;    // kg/m3
+          const v = inputs.velocity;     // m/s
+          return K * rho * v * v / 2;    // Pa
+        },
+      },
+    },
+  },
+
   pressureDropTotal: {
     id: 'pressureDropTotal',
     name: 'Pressure Drop (Total)',
@@ -1193,6 +1227,11 @@ export const REGISTRY = {
     defaultUnit: 'psi',
     allowUserOverride: true,
     methods: {
+      pipeAndFittings: {
+        name: 'Pipe + fittings',
+        inputs: ['pressureDropPipe', 'pressureDropFittings'],
+        calculate: (inputs) => inputs.pressureDropPipe + inputs.pressureDropFittings,
+      },
       pipeOnly: {
         name: 'Pipe only (no fittings)',
         inputs: ['pressureDropPipe'],
@@ -1216,6 +1255,8 @@ export function getDefaultMethodMap(registry) {
     } else if (id === 'frictionFactor') {
       // Churchill 1977 handles all flow regimes (laminar, transition, turbulent)
       map[id] = 'churchill1977';
+    } else if (id === 'pressureDropTotal') {
+      map[id] = 'pipeAndFittings';
     } else {
       const keys = Object.keys(def.methods);
       map[id] = keys.length > 0 ? keys[0] : null;

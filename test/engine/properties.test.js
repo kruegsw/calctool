@@ -450,6 +450,7 @@ describe('registry property calculations', () => {
           pipeMaterial: { value: 'Commercial Steel or Wrought Iron' },
           massFlowRate: { value: 100 / 2.205, unit: 'kg/hr' },
           pipeLength: { value: 100 / 3.281, unit: 'm' },
+          totalKFactor: { value: 0 },
         },
         chemData: waterData,
         pipeData: testPipeData,
@@ -471,12 +472,91 @@ describe('registry property calculations', () => {
     });
   });
 
+  describe('pressureDropFittings (K-factor method)', () => {
+    it('computes dP = K * rho * v^2 / 2', () => {
+      const dP = REGISTRY.pressureDropFittings.methods.kFactor.calculate({
+        totalKFactor: 2.0,
+        density: 997,    // water kg/m3
+        velocity: 1.0,   // m/s
+      });
+      // dP = 2.0 * 997 * 1.0^2 / 2 = 997 Pa
+      expect(dP).toBeCloseTo(997, 0);
+    });
+
+    it('returns 0 when totalKFactor is 0', () => {
+      const dP = REGISTRY.pressureDropFittings.methods.kFactor.calculate({
+        totalKFactor: 0,
+        density: 997,
+        velocity: 1.0,
+      });
+      expect(dP).toBe(0);
+    });
+  });
+
+  describe('pressureDropTotal (pipeAndFittings)', () => {
+    it('sums pipe and fittings pressure drops', () => {
+      const dP = REGISTRY.pressureDropTotal.methods.pipeAndFittings.calculate({
+        pressureDropPipe: 500,
+        pressureDropFittings: 300,
+      });
+      expect(dP).toBe(800);
+    });
+
+    it('pipeOnly still works', () => {
+      const dP = REGISTRY.pressureDropTotal.methods.pipeOnly.calculate({
+        pressureDropPipe: 500,
+      });
+      expect(dP).toBe(500);
+    });
+  });
+
+  describe('end-to-end with fittings: water through 2" Sch 40', () => {
+    it('produces valid fittings + total pressure drop', () => {
+      const methodMap = getDefaultMethodMap(REGISTRY);
+      methodMap.density = 'perryLiquidCorrelation';
+      methodMap.viscosity = 'perryLiquidCorrelation';
+      methodMap.frictionFactor = 'churchill1977';
+      methodMap.pressureDropTotal = 'pipeAndFittings';
+
+      const results = solve({
+        registry: REGISTRY,
+        activeMethodMap: methodMap,
+        userValues: {
+          chemicalSearch: { value: 'water' },
+          temperature: { value: 298.15, unit: 'K' },
+          pressure: { value: 101325, unit: 'Pa' },
+          pipeStandard: { value: 'NPS' },
+          pipeNominalDiameter: { value: '2' },
+          pipeSchedule: { value: 'Sch. 40' },
+          pipeMaterial: { value: 'Commercial Steel or Wrought Iron' },
+          massFlowRate: { value: 100 / 2.205, unit: 'kg/hr' },
+          pipeLength: { value: 100 / 3.281, unit: 'm' },
+          totalKFactor: { value: 2.0 },
+        },
+        chemData: waterData,
+        pipeData: testPipeData,
+      });
+
+      expect(results.pressureDropFittings.isValid).toBe(true);
+      expect(results.pressureDropFittings.value).toBeGreaterThan(0);
+      expect(results.pressureDropPipe.isValid).toBe(true);
+      expect(results.pressureDropTotal.isValid).toBe(true);
+      // Total = pipe + fittings, so total > pipe alone
+      expect(results.pressureDropTotal.value).toBeGreaterThan(results.pressureDropPipe.value);
+    });
+  });
+
   describe('getDefaultMethodMap', () => {
     it('assigns first method to calculated properties', () => {
       const map = getDefaultMethodMap(REGISTRY);
       expect(map.density).toBe('idealGas'); // first method
       expect(map.temperature).toBeNull();   // user input
       expect(map.molecularWeight).toBe('lookup');
+    });
+
+    it('defaults pressureDropTotal to pipeAndFittings', () => {
+      const map = getDefaultMethodMap(REGISTRY);
+      expect(map.pressureDropTotal).toBe('pipeAndFittings');
     });
   });
 });

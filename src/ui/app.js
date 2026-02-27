@@ -2,6 +2,7 @@
 
 import { loadChemicals } from '../data/chemicals.js';
 import { loadPipeData } from '../data/pipe.js';
+import { loadFittingsData } from '../data/fittings.js';
 import { loadSources } from '../data/sources.js';
 import { AppState } from './state.js';
 import { buildApp } from './renderer.js';
@@ -40,9 +41,10 @@ async function init() {
   showLoadingSkeleton(root);
 
   try {
-    // Load small data files eagerly (pipe + sources = ~75KB)
+    // Load small data files eagerly (pipe + fittings + sources = ~80KB)
     await Promise.all([
       loadPipeData(),
+      loadFittingsData(),
       loadSources(),
     ]);
 

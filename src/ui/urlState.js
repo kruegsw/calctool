@@ -1,5 +1,7 @@
 // URL state serialization/deserialization for shareable links
 
+import { getFittingById } from '../data/fittings.js';
+
 // Short param keys for user-input properties
 const INPUT_KEYS = {
   chemicalSearch: 'chem',
@@ -11,6 +13,7 @@ const INPUT_KEYS = {
   pipeNominalDiameter: 'nom',
   pipeSchedule: 'sch',
   pipeMaterial: 'mat',
+  totalKFactor: 'K',
 };
 
 // Unit suffix for numeric inputs
@@ -109,6 +112,14 @@ export function serializeState(state) {
     }
   }
 
+  // Fittings list (overrides totalKFactor param when present)
+  if (state.fittings && state.fittings.length > 0) {
+    const fitParts = state.fittings.map(f => `${f.id}:${f.qty}`);
+    params.set('fit', fitParts.join('|'));
+    // Remove totalKFactor from params since fittings define it
+    params.delete('K');
+  }
+
   return params;
 }
 
@@ -177,6 +188,25 @@ export function deserializeState(search, state) {
         state.userMethodOverrides.add(propId);
       }
     }
+  }
+
+  // Fittings list
+  const fit = params.get('fit');
+  if (fit) {
+    found = true;
+    state.fittings = [];
+    let kSum = 0;
+    for (const part of fit.split('|')) {
+      const [id, qtyStr] = part.split(':');
+      const qty = parseInt(qtyStr, 10) || 1;
+      if (id) {
+        state.fittings.push({ id, qty });
+        const fitting = getFittingById(id);
+        if (fitting) kSum += fitting.k * qty;
+      }
+    }
+    state.userValues.totalKFactor = { value: kSum, unit: null };
+    state.dirtyFields.add('totalKFactor');
   }
 
   return found;
