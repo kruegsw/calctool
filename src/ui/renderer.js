@@ -208,14 +208,6 @@ function buildResultsHero(state) {
   }
   hero.appendChild(ffItem);
 
-  // Pressure Drop (Pipe) — secondary
-  const dpPipeItem = el('div', { className: 'hero-item', dataset: { heroId: 'pressureDropPipe' } });
-  dpPipeItem.appendChild(el('div', { className: 'hero-label' }, 'Pressure Drop (Pipe)'));
-  const dpPipeValue = el('div', { className: 'hero-value empty', dataset: { propId: 'pressureDropPipe' } }, '\u2014');
-  dpPipeItem.appendChild(dpPipeValue);
-  dpPipeItem.appendChild(buildHeroUnitSelect('pressureDropPipe', state));
-  hero.appendChild(dpPipeItem);
-
   return hero;
 }
 
@@ -868,7 +860,7 @@ function updatePhaseDisplay(el, result) {
  * Update results hero values.
  */
 function updateResultsHero(state) {
-  const heroProps = ['pressureDropTotal', 'pressureDropPipe', 'reynoldsNumber', 'frictionFactor'];
+  const heroProps = ['pressureDropTotal', 'reynoldsNumber', 'frictionFactor'];
 
   for (const propId of heroProps) {
     const heroValue = document.querySelector(`.hero-value[data-prop-id="${propId}"]`);
@@ -885,7 +877,7 @@ function updateResultsHero(state) {
   }
 
   // Sync hero unit selects with current state
-  for (const propId of ['pressureDropTotal', 'pressureDropPipe']) {
+  for (const propId of ['pressureDropTotal']) {
     const heroSelect = document.querySelector(`[data-hero-unit="${propId}"]`);
     if (heroSelect) {
       const def = REGISTRY[propId];

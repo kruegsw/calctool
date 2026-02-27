@@ -29,7 +29,7 @@ export const SECTIONS = [
     accentColor: '#475569',  // slate
     primary: ['pipeStandard', 'pipeNominalDiameter', 'pipeSchedule', 'pipeLength'],
     detail: ['pipeMaterial', 'pipeInnerDiameter', 'pipeCrossSectionalArea',
-             'pipeHydraulicRadius', 'pipeAbsoluteRoughness'],
+             'pipeAbsoluteRoughness'],
   },
   {
     id: 'flow',
@@ -44,7 +44,7 @@ export const SECTIONS = [
     title: 'Results',
     stepNumber: 5,
     accentColor: '#4f46e5',  // indigo
-    primary: ['reynoldsNumber', 'frictionFactor', 'pressureDropPipe', 'pressureDropTotal'],
+    primary: ['reynoldsNumber', 'frictionFactor', 'pressureDropTotal'],
     detail: [],
   },
 ];
