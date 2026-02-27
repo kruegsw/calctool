@@ -1118,6 +1118,22 @@ export const REGISTRY = {
           return 1 / (x * x);
         },
       },
+      moody: {
+        name: 'Moody (1947)',
+        inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],
+        source: 'moody',
+        description: 'Early empirical approximation for turbulent friction factor',
+        assumption: 'Turbulent flow only; lower accuracy than modern Colebrook approximations',
+        legacy: true,
+        calculate: (inputs) => {
+          const Re = inputs.reynoldsNumber;
+          const e = inputs.pipeAbsoluteRoughness;
+          const D = inputs.pipeInnerDiameter;
+          const eD = e / D;
+
+          return 0.0055 * (1 + Math.pow(20000 * eD + 1e6 / Re, 1 / 3));
+        },
+      },
       cheng: {
         name: 'Cheng (all regimes)',
         inputs: ['reynoldsNumber', 'pipeAbsoluteRoughness', 'pipeInnerDiameter'],

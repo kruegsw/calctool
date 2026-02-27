@@ -15,7 +15,7 @@
     "reference": "F.M. White, Viscous Fluid Flow, 3rd ed., McGraw-Hill, 2006."
   },
   "moody": {
-    "reference": "Friction Factors for Pipe Flow (L. F. Moody, 1944)"
+    "reference": "Moody, L.F. (1947). \"An Approximate Formula for Pipe Friction Factors.\" Transactions of the ASME, 69, 1005-1006."
   },
   "poling": {
     "reference": "The Properties of Gases and Liquids, 5th ed. McGraw-Hill, 2001"

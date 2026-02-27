@@ -813,7 +813,10 @@ function buildMethodSelector(propId, state) {
   });
 
   for (const key of keys) {
-    select.appendChild(el('option', { value: key }, '\u2699 ' + methods[key].name));
+    const label = methods[key].legacy
+      ? '\u2699 ' + methods[key].name + ' (legacy)'
+      : '\u2699 ' + methods[key].name;
+    select.appendChild(el('option', { value: key }, label));
   }
 
   const current = state.activeMethodMap[propId];

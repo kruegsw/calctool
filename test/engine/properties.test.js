@@ -400,6 +400,7 @@ describe('registry property calculations', () => {
       const niazkar = REGISTRY.frictionFactor.methods.niazkar.calculate(input);
       const swameeJain = REGISTRY.frictionFactor.methods.swameeJain.calculate(input);
       const haaland = REGISTRY.frictionFactor.methods.haaland.calculate(input);
+      const moody = REGISTRY.frictionFactor.methods.moody.calculate(input);
 
       // All should be within 5% of each other for turbulent flow
       expect(churchill73).toBeCloseTo(colebrook, 3);
@@ -408,6 +409,8 @@ describe('registry property calculations', () => {
       expect(haaland).toBeCloseTo(colebrook, 3);
       // Churchill 1977 covers all regimes, may differ slightly in transitional
       expect(churchill77).toBeCloseTo(colebrook, 2);
+      // Moody is a legacy approximation — looser tolerance
+      expect(moody).toBeCloseTo(colebrook, 2);
     });
   });
 
