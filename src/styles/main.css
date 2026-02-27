@@ -557,19 +557,13 @@ body {
 .method-status-badge.status-pinned {
   color: #92400e;
   background: #fef3c7;
-  cursor: default;
-}
-
-.method-status-dismiss {
   cursor: pointer;
-  margin-left: 0.125rem;
-  font-weight: 700;
-  opacity: 0.6;
-  transition: opacity 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
-.method-status-dismiss:hover {
-  opacity: 1;
+.method-status-badge.status-pinned:hover {
+  background: #fde68a;
+  color: #78350f;
 }
 
 .field-row.has-warning {

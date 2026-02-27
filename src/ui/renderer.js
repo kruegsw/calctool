@@ -836,17 +836,13 @@ function updateMethodSelectors(state) {
     } else {
       const badge = el('span', {
         className: 'method-status-badge status-pinned',
-        title: 'Method selected by user — click × to return to auto',
-      }, 'pinned ');
-      const dismiss = el('span', {
-        className: 'method-status-dismiss',
-        textContent: '\u00d7',
-      });
-      dismiss.addEventListener('click', (e) => {
+        title: 'Click to return to auto-selection',
+      }, 'pinned \u00d7');
+      badge.addEventListener('mousedown', (e) => {
+        e.preventDefault();
         e.stopPropagation();
         state.clearMethodOverride(propId);
       });
-      badge.appendChild(dismiss);
       group.appendChild(badge);
     }
   }
